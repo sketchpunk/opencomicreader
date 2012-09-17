@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
+ 	<!-- Bottom Line -->
+    <item><shape android:shape="rectangle"><solid android:color="#2f2f2f"/></shape></item>
+
+    <!-- Color of your action bar -->
+    <item android:bottom="2dip"><shape android:shape="rectangle">
+        <gradient android:startColor="#565656" android:endColor="#818181" android:angle="90"/>
+	</shape></item>
+</layer-list>

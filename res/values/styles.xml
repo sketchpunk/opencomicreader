@@ -1,0 +1,10 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+    <style name="AppTheme" parent="android:Theme.Holo"/>
+    <style name="actionBar" parent="android:style/Widget.Holo.ActionBar">
+        <item name="android:background">@drawable/actionbarbg</item>
+    </style>
+    
+    <style name="CustomTheme" parent="android:style/Theme.Holo">
+        <item name="android:actionBarStyle">@style/actionBar</item>
+    </style>
+</resources>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+	<PreferenceCategory android:key="mainSettings" android:title="Settings" android:summary="Username and password information">
+		<sage.pref.FolderPref android:key="syncfolder1" android:title="Sync Folder 1" android:defaultValue=""/>
+		<sage.pref.FolderPref android:key="syncfolder2" android:title="Sync Folder 2" android:defaultValue=""/>
+	    
+	    <!-- 
+		<sage.pref.SeekbarPref android:key="customPref" android:defaultValue="32" android:title="Custom Preference"/>
+		<sage.pref.DialogPref
+			android:title="Reset Quests"
+            android:summary="Reset all quest-progress."
+            android:dialogMessage="Are you sure you wish to reset your quest progress? This action cannot be undone!"
+            android:positiveButtonText="Clear Quests"
+            android:negativeButtonText="Cancel"/>
+		-->
+	</PreferenceCategory>
+</PreferenceScreen>

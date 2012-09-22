@@ -7,6 +7,7 @@ import java.lang.ref.WeakReference;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.view.View;
 import android.widget.ImageView;
 
 public class LoadImageView{
@@ -17,24 +18,24 @@ public class LoadImageView{
 	}//interface
 	
 	public static interface OnImageLoadedListener{
-		public void onImageLoaded(boolean isSuccess,Bitmap bmp,ImageView iv);
+		public void onImageLoaded(boolean isSuccess,Bitmap bmp,View view);
 	}//interface
 	
 	
     /*========================================================
 	*/	
 	//Starting Point, Load the image through a thread
-	public static void loadImage(String imgPath,ImageView iv,Object context){
-		if(cancelRunningTask(imgPath,iv)){
-			final LoadingTask task = new LoadingTask(iv,context);
-			iv.setTag(taskTagID,task);
+	public static void loadImage(String imgPath,View view,Object context){
+		if(cancelRunningTask(imgPath,view)){
+			final LoadingTask task = new LoadingTask(view,context);
+			view.setTag(taskTagID,task);
 			task.execute(imgPath);
 		}//if
 	}//func
 	
 	//if a task is already running, cancel it.
-	public static boolean cancelRunningTask(String imgPath,ImageView imgView){
-		final LoadingTask task = getLoadingTask(imgView);
+	public static boolean cancelRunningTask(String imgPath,View view){
+		final LoadingTask task = getLoadingTask(view);
 		
 		if(task != null){
 			final String taskImgPath = task.imagePath;
@@ -47,9 +48,9 @@ public class LoadImageView{
 	}//func
 		
 	//Get the loading task from the imageview
-	public static LoadingTask getLoadingTask(ImageView iv){
-		if(iv != null){
-			final Object task = iv.getTag(taskTagID);
+	public static LoadingTask getLoadingTask(View view){
+		if(view != null){
+			final Object task = view.getTag(taskTagID);
 			if(task != null && task instanceof LoadingTask){
 				return (LoadingTask)task;
 			}//if
@@ -69,8 +70,8 @@ public class LoadImageView{
 		
 		public String imagePath; //used to compare if the same task
 		
-		public LoadingTask(ImageView iv,Object context){
-			mImgView = new WeakReference(iv);
+		public LoadingTask(View view,Object context){
+			mImgView = new WeakReference(view);
 
 			if(context != null){
 				if(context instanceof OnImageLoadingListener) mOnImageLoading = new WeakReference((OnImageLoadingListener)context);
@@ -109,11 +110,9 @@ public class LoadImageView{
 			//--------------------------
 			//if no callback, but we have an image and a view.
 			}else if(mImgView != null && bmp != null){
-				final ImageView iv = (ImageView) mImgView.get();
-				final LoadingTask task = LoadImageView.getLoadingTask(iv);
-				
-				if(iv != null && bmp != null){
-					iv.setImageBitmap((Bitmap)bmp);
+				final View view = (View) mImgView.get();
+				if(view != null && view instanceof ImageView && bmp != null){
+					((ImageView)view).setImageBitmap((Bitmap)bmp);
 					isSuccess = true;
 				}//if
 			
@@ -125,7 +124,7 @@ public class LoadImageView{
 			//When done loading the image, alert parent
 			if(mOnImageLoaded != null){
 				final OnImageLoadedListener callback = (OnImageLoadedListener) mOnImageLoaded.get();
-				if(callback != null) callback.onImageLoaded(isSuccess,(Bitmap)bmp,(ImageView) mImgView.get());
+				if(callback != null) callback.onImageLoaded(isSuccess,(Bitmap)bmp,(View) mImgView.get());
 			}//if
 		}//func
 	}//cls

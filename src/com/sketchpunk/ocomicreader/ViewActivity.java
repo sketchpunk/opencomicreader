@@ -1,6 +1,7 @@
 package com.sketchpunk.ocomicreader;
 
 import com.sketchpunk.ocomicreader.lib.ComicLoader;
+import com.sketchpunk.ocomicreader.lib.ComicPageView;
 import sage.listener.GestureListener;
 
 import android.os.Bundle;
@@ -15,32 +16,33 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-public class ViewActivity extends Activity implements View.OnTouchListener
-	,GestureListener.OnGestureListener
-	,ComicLoader.CallBack{
+public class ViewActivity extends Activity implements 
+	//View.OnTouchListener
+	//,GestureListener.OnGestureListener
+	ComicLoader.CallBack{
 
-	private ImageView mImageView; //Main display of image
+	private ComicPageView mImageView; //Main display of image
 	private ComicLoader mComicLoad; //Object that will manage streaming and scaling images out of the archive file
 	
-    private int mPageWidth,mPageHeight,mViewWidth,mViewHeight;
-    private float mBoundLeft = 0,mBoundBottom = 0,mLastDistance = 0;
+    //private int mPageWidth,mPageHeight,mViewWidth,mViewHeight;
+    //private float mBoundLeft = 0,mBoundBottom = 0,mLastDistance = 0;
     
     //tell the difference between touch input
-    static final int NOMODE=0,DRAGMODE=1,ZOOMMODE=2;
-    private int mMode = NOMODE;
+    //static final int NOMODE=0,DRAGMODE=1,ZOOMMODE=2;
+    //private int mMode = NOMODE;
     
-    private Matrix mMatrix = new Matrix();
-    private PointF mLastPos = new PointF();
+    //private Matrix mMatrix = new Matrix();
+    //private PointF mLastPos = new PointF();
    
-    private GestureListener mGestureListener;
-    private GestureDetector mGestureDetector;
+    //private GestureListener mGestureListener;
+    //private GestureDetector mGestureDetector;
 
 
 	/*========================================================
 	View Events*/
 	@Override
 	public void onDestroy(){
-		if(mComicLoad != null) mComicLoad.close();
+		//if(mComicLoad != null) mComicLoad.close();
 		super.onDestroy();
 	}//func
 	
@@ -56,21 +58,25 @@ public class ViewActivity extends Activity implements View.OnTouchListener
         this.getActionBar().hide();
         
         //.........................................
+        Bundle b = this.getIntent().getExtras(); 
+        String filePath = b.getString("path");
+        
+        System.out.println(filePath);
+        
+        /*
+        //.........................................
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
         mViewWidth = size.x;
         mViewHeight = size.y;
+		*/
         
-        //.........................................
-        Bundle b = this.getIntent().getExtras(); 
-        String filePath = b.getString("path");
-
         //.........................................        
-        mImageView = (ImageView)this.findViewById(R.id.ivMain);
+        mImageView = (ComicPageView)this.findViewById(R.id.pageView);
         //mImageView.setOnClickListener(this);
-        mImageView.setOnTouchListener(this);
-        mImageView.setImageMatrix(mMatrix);
+        //mImageView.setOnTouchListener(this);
+        //mImageView.setImageMatrix(mMatrix);
         
         //.........................................
         mComicLoad = new ComicLoader(this,mImageView);
@@ -78,12 +84,12 @@ public class ViewActivity extends Activity implements View.OnTouchListener
         mComicLoad.gotoPage(0);
 
         //.........................................
-        mGestureListener = new GestureListener(this);
-        mGestureDetector = new GestureDetector(mImageView.getContext(),mGestureListener);
+        //mGestureListener = new GestureListener(this);
+        //mGestureDetector = new GestureDetector(mImageView.getContext(),mGestureListener);
         
         //.........................................
-        View root = mImageView.getRootView();
-        root.setBackgroundColor(0xFF000000);
+        //View root = mImageView.getRootView();
+        //root.setBackgroundColor(0xFF000000);
     }//func
 
 
@@ -92,8 +98,8 @@ public class ViewActivity extends Activity implements View.OnTouchListener
 
 	@Override
 	public void onPageLoaded(boolean isSuccess,int pWidth,int pHeight){
-		if(!isSuccess) return;
-		
+		//if(!isSuccess) return;
+		/*
 		mMatrix.reset(); //new image loaded, lets reset the matrix.
 		mPageWidth = pWidth;
 		mPageHeight = pHeight;
@@ -105,11 +111,13 @@ public class ViewActivity extends Activity implements View.OnTouchListener
 		//mMatrix.postTranslate(left,0);
 		
 		mImageView.setImageMatrix(mMatrix);
+		*/
 	}//func
     
     
 	/*========================================================
 	Zoom and Drag Events*/
+	/*
     private void onDragStart(MotionEvent event){
     	//..................................
     	float[] m = new float[9];
@@ -213,6 +221,7 @@ public class ViewActivity extends Activity implements View.OnTouchListener
     	mLastDistance = distance;
     }//func
     
+    
 	@Override
 	public boolean onTouch(View v, MotionEvent event){
 		if(mMode != ZOOMMODE){
@@ -240,10 +249,11 @@ public class ViewActivity extends Activity implements View.OnTouchListener
 		}//if
 		return true;
 	}//func
-
+*/
 	
 	/*========================================================
 	Gesture Events*/
+	/*
 	@Override
 	public boolean onDoubleTap(MotionEvent e) {
 		System.out.println("DoubleTap");
@@ -281,4 +291,5 @@ public class ViewActivity extends Activity implements View.OnTouchListener
 				break;
 		}//switch
 	}//func
+	*/
 }//cls

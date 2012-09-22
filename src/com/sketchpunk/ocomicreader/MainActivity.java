@@ -243,8 +243,9 @@ public class MainActivity extends FragmentActivity
     /*========================================================
 	Image Loading*/
 	@Override
-	public void onImageLoaded(boolean isSuccess,Bitmap bmp,ImageView iv){
-		if(iv == null) return;
+	public void onImageLoaded(boolean isSuccess,Bitmap bmp,View view){
+		if(view == null) return;
+		ImageView iv = (ImageView)view;
 		
 		if(!isSuccess) iv.setImageBitmap(null); //release reference, if cover didn't load show that it didn't.
 		

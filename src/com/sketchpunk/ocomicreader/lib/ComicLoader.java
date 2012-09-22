@@ -18,6 +18,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.view.Display;
+import android.view.View;
 import android.widget.ImageView;
 
 import sage.loader.LoadImageView;
@@ -33,12 +34,12 @@ public class ComicLoader implements LoadImageView.OnImageLoadingListener,LoadIma
 	private float mScreenWidth, mScreenHeight, mMaxSize;
 	private CallBack mCallBack;
 	
-	private ImageView mImageView;
+	private ComicPageView mImageView;
 	private ZipFile mZipFile;
 	private List<String> mPageList;
 	private Bitmap mBitmap = null;
 
-	public ComicLoader(Context context,ImageView o){
+	public ComicLoader(Context context,ComicPageView o){
 		mImageView = o;
 		mPageList = new ArrayList<String>();
 
@@ -197,7 +198,7 @@ public class ComicLoader implements LoadImageView.OnImageLoadingListener,LoadIma
 
 	//after is task is complete, get our image.
 	@Override
-	public void onImageLoaded(boolean isSuccess,Bitmap bmp,ImageView iv){
+	public void onImageLoaded(boolean isSuccess,Bitmap bmp,View view){
 		//if we have a new image and an old image.
 		if(bmp != null && mBitmap != null){
 			mImageView.setImageBitmap(null);

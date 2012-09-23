@@ -5,22 +5,54 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
+import android.view.ScaleGestureDetector.OnScaleGestureListener;
 import android.view.View;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.OvershootInterpolator;
 
 
-public class ComicPageView extends View implements GestureDetector.OnGestureListener,GestureDetector.OnDoubleTapListener{
+public class ComicPageView extends View implements GestureDetector.OnGestureListener,GestureDetector.OnDoubleTapListener, OnScaleGestureListener{
+	protected class Sizes{
+		public float oWidth;
+		public float oHeight;
+		public float scale;
+		public float sWidth;
+		public float sHeight;
+	}//cls
+	
+	public static interface CallBack{
+		public void onComicPageGesture(int gestureID);
+	}//interface
+	
+	
+	public static final int ScaleNone = 0;
+	public static final int ScaleToHeight = 1;
+	public static final int ScaleToWidth = 2;
+	
+	public static final int FlingLeft = 0;
+	public static final int FlingRight = 1;
+	public static final int TapLeft = 2;
+	public static final int TapRight = 3;
+
 	private Bitmap mBitmap; //WeakReference Change to this
 	private Matrix mMatrix;
+	private Paint mPaint;
 	private GestureDetector mGesture;
-	private float mScale;
+	private ScaleGestureDetector mScaleGesture;
+	private ComicPageView.CallBack mCallBack;
+
+	private int mScaleMode=1;
 	private RectF mBound;
+	private Sizes mViewSize;
+	private Sizes mImgSize;
 	private boolean mIsScrollH = false;
 	private boolean mIsScrollV = false;
 	
@@ -31,26 +63,59 @@ public class ComicPageView extends View implements GestureDetector.OnGestureList
 	private void init(Context context){
 		mMatrix = new Matrix();
 		mGesture = new GestureDetector(context,this);
-		mScale = 1;
+		mScaleGesture = new ScaleGestureDetector(context,this);
+		
+		if(context instanceof CallBack) mCallBack = (CallBack)context;
+		
+		mPaint = new Paint(Paint.FILTER_BITMAP_FLAG); //make scaled image less pixelated
+		
 		mBound = new RectF();
 		mBound.left = 0;
 		mBound.top = 0;
+		
+		mViewSize = new Sizes();
+		mImgSize = new Sizes();
+		mImgSize.scale = 1.0f;
 	}//func
 
 	private void doImageCalc(){
 		if(mBitmap == null) return;
-		mBound.right = ((mBitmap.getWidth()*mScale) - this.getWidth()) * -1;
-		mBound.bottom = ((mBitmap.getHeight()*mScale) - this.getHeight()) * -1;
+		mImgSize.sWidth = mImgSize.scale * mImgSize.oWidth;
+		mImgSize.sHeight = mImgSize.scale * mImgSize.oHeight;
 		
-		mIsScrollH = (mBitmap.getWidth()*mScale > this.getWidth());
-		mIsScrollV = (mBitmap.getHeight()*mScale > this.getHeight());
+		mBound.right = (mImgSize.sWidth - mViewSize.oWidth) * -1;
+		mBound.bottom = (mImgSize.sHeight - mViewSize.oHeight) * -1;
 		
-		System.out.println(String.format("%d : %d : %f : %f",mBitmap.getWidth(),this.getWidth(),mBound.right,mScale));
-		System.out.println(String.format("%d : %d : %f : %f",mBitmap.getHeight(),this.getHeight(),mBound.bottom,mScale));
+		mIsScrollH = (mImgSize.sWidth > mViewSize.oWidth);
+		mIsScrollV = (mImgSize.sHeight > mViewSize.oHeight);
+	
+		//System.out.println(String.format("%d : %d : %f : %f",mBitmap.getWidth(),this.getWidth(),mBound.right,mScale));
+		//System.out.println(String.format("%d : %d : %f : %f",mBitmap.getHeight(),this.getHeight(),mBound.bottom,mScale));
 	}//func
 	
 	public void setImageBitmap(Bitmap bmp){
+		if(bmp == null){
+			mBitmap = null;
+			return;
+		}//func
+		
+		mMatrix.reset();
 		mBitmap = bmp;
+		
+		mViewSize.oWidth = (float)this.getWidth();
+		mViewSize.oHeight = (float)this.getHeight();
+		mImgSize.oWidth = (float)mBitmap.getWidth();
+		mImgSize.oHeight = (float)mBitmap.getHeight();
+		
+		if(mScaleMode != ComicPageView.ScaleNone){
+			switch(mScaleMode){
+				case ComicPageView.ScaleToHeight: mImgSize.scale = (float)this.getHeight() / bmp.getHeight(); break;
+				case ComicPageView.ScaleToWidth: mImgSize.scale = (float)this.getWidth() / bmp.getWidth(); break;
+			}//swtich
+			mMatrix.setScale(mImgSize.scale,mImgSize.scale);
+		}//if
+		
+		
 		doImageCalc();
 		this.invalidate();
 	}//func
@@ -59,14 +124,17 @@ public class ComicPageView extends View implements GestureDetector.OnGestureList
 	*/
 	@Override
 	public boolean onTouchEvent(MotionEvent e){
-		return mGesture.onTouchEvent(e);
+		mScaleGesture.onTouchEvent(e);
+		mGesture.onTouchEvent(e);
+
+		return true;
 	}//func
 	
 	@Override
 	protected void onDraw(Canvas canvas){
 		System.out.println("ONDRAW");
 		if(mBitmap != null){
-			canvas.drawBitmap(mBitmap,mMatrix,null);
+			canvas.drawBitmap(mBitmap,mMatrix,mPaint);
 			System.out.println("draw bmp");
 		}//func
 	}//func	
@@ -75,29 +143,33 @@ public class ComicPageView extends View implements GestureDetector.OnGestureList
 	/*========================================================
 	*/
 	@Override
-	public boolean onDown(MotionEvent e){//needed to return tree to get most of the gestures to work.
+	public boolean onDown(MotionEvent e){//needed to return true to get most of the gestures to work.
 		System.out.println("onDown");
 		return true;
 	}//func
 	
 	
 	/*========================================================
-	*/
+	Basic Gestures*/
 	@Override
 	public void onLongPress(MotionEvent e) {
-		System.out.println("onLongPress");
-		// TODO Auto-generated method stub
+		//System.out.println("onLongPress");
 	}//func
 	
 	@Override
 	public boolean onSingleTapConfirmed(MotionEvent e){
-		System.out.println("onSingleTap");
+		if(mCallBack != null){
+			float x = e.getX();
+			float area = mViewSize.oWidth/4;
+			
+			if(x <= area) mCallBack.onComicPageGesture(ComicPageView.TapLeft);
+			else if(x >= mViewSize.oWidth-area) mCallBack.onComicPageGesture(ComicPageView.TapRight);
+		}//func
 		return true;
 	}//func
 	
 	@Override
 	public boolean onDoubleTap(MotionEvent e){
-		System.out.println("onDoubleTap");
 		mMatrix.reset();
 		invalidate();
 		return true;
@@ -107,18 +179,31 @@ public class ComicPageView extends View implements GestureDetector.OnGestureList
 
 
 	/*========================================================
-	*/	
+	Complex Gestures*/	
 	@Override
 	public boolean onFling(MotionEvent e1,MotionEvent e2,final float xVelocity,final float yVelocity) {
-		//System.out.println("onFling");
+		//System.out.println(String.format("%f : %f",xVelocity,(e1.getRawY() - e2.getRawY())));
 		
-		Thread thread = new Thread(new Runnable(){
-			@Override
-			public void run(){onFlingAnimate(xVelocity,yVelocity);}
-		});
+		//...................................
+		//if going fast horizontally but very little change vertically, then its a Left/Right Fling
+		if(mCallBack != null){
+			if(Math.abs(xVelocity) > 1000 && Math.abs(e1.getRawY() - e2.getRawY()) < 200){
+				if(xVelocity > 0)
+					mCallBack.onComicPageGesture(ComicPageView.FlingRight);
+				else
+					mCallBack.onComicPageGesture(ComicPageView.FlingLeft);
+				
+				return true;
+			}//if
+		}//if
+		
+		//...................................
+		//Thread thread = new Thread(new Runnable(){
+		//	@Override
+		//	public void run(){onFlingAnimate(xVelocity,yVelocity);}
+		//});
 		
 		//thread.start();
-	
 		return true;
 	}//func
 	
@@ -172,7 +257,45 @@ public class ComicPageView extends View implements GestureDetector.OnGestureList
 		System.out.println("animateend");
 	}//func
 	
-
+	@Override
+	public boolean onScale(ScaleGestureDetector dScale) {
+    	//..................................
+		float[] m = new float[9];
+		mMatrix.getValues(m);
+		float ratio = dScale.getScaleFactor();
+		float prevScale = m[Matrix.MSCALE_X];
+        float newScale = prevScale * ratio; //Calc new matrix scale to test what the height will become.
+		
+     	//..................................
+    	//Limit how small image can scale
+    	float newHeight = mImgSize.oHeight * newScale;
+    	
+    	if(newHeight < mViewSize.oHeight){
+    		ratio = mViewSize.oHeight / (mImgSize.oHeight * prevScale);		
+    		newScale = prevScale * ratio;
+    	}//if
+    	
+    	mMatrix.postScale(ratio,ratio,dScale.getCurrentSpanX(),dScale.getCurrentSpanY());
+    	
+    	//..................................
+    	//when scaled small, need to realign x,y : keep at top and left
+    	mMatrix.getValues(m);
+        float ymatrix = m[Matrix.MTRANS_Y];
+        float xmatrix = m[Matrix.MTRANS_X];
+        
+        ymatrix = (ymatrix > 0 || (mImgSize.oHeight * newScale) <= mViewSize.oHeight)? ymatrix*-1 : 0;        
+        //xmatrix = (mPageWidth * newScale <= mViewWidth)? ((mViewWidth - (mPageWidth * newScale))/2) - xmatrix : 0; //this centers but acts up in portrait mode.
+        xmatrix = (xmatrix > 0 || (mImgSize.oWidth * newScale) <= mViewSize.oWidth)? xmatrix*-1 : 0;
+        
+        if(ymatrix != 0 || xmatrix != 0) mMatrix.postTranslate(xmatrix,ymatrix);
+	    	            
+    	//..................................
+    	mImgSize.scale = newScale;
+    	doImageCalc(); //Redo calcs since we scaled the image
+		this.invalidate();
+		return true;
+	}//func
+	
 	@Override
 	public boolean onScroll(MotionEvent e1,MotionEvent e2,float xDistance,float yDistance){
 		if(!mIsScrollH && !mIsScrollV) return true;
@@ -214,7 +337,7 @@ public class ComicPageView extends View implements GestureDetector.OnGestureList
 
 	
 	/*========================================================
-	*/
+	Unneeded Gestures*/
 	@Override
 	public boolean onDoubleTapEvent(MotionEvent e){ return false; }
 	
@@ -223,4 +346,10 @@ public class ComicPageView extends View implements GestureDetector.OnGestureList
 
 	@Override
 	public boolean onSingleTapUp(MotionEvent arg0){ return false; }
+
+	@Override
+	public boolean onScaleBegin(ScaleGestureDetector arg0){return true;}
+	
+	@Override
+	public void onScaleEnd(ScaleGestureDetector arg0){}
 }//cls

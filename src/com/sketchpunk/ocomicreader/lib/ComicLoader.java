@@ -179,6 +179,7 @@ public class ComicLoader implements LoadImageView.OnImageLoadingListener,LoadIma
 				
 				bmpOption.inSampleSize = scale;
 				bmpOption.inJustDecodeBounds = false;
+				bmpOption.inScaled = false;
 
 				//....................................
 				//Load bitmap

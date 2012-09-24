@@ -27,7 +27,6 @@ public class Sqlite{
 		if(mDb != null) mDb.close();
 		if(dbHelper != null) dbHelper.close();
 	}//func
-
 	
 	/*========================================================
 	Transactions*/
@@ -76,22 +75,12 @@ public class Sqlite{
 	}//func
 
 	public static Map<String,String> scalarRow(Context c,String sql,String[] args){
-		Map<String,String> rtn = new HashMap<String,String>();
 		Sqlite db = new Sqlite(c);
 		
 		db.openRead();
-		Cursor cur = db.raw(sql,args);
-		
-		if(cur != null){
-			if(cur.moveToFirst()){
-				for(int i = 0; i < cur.getColumnCount(); i++){
-					rtn.put(cur.getColumnName(i),cur.getString(i));
-				}//for
-			}//if
-			cur.close();
-		}//if
-		
+		Map<String,String> rtn = db.scalarRow(sql,args);
 		db.close();
+
 		return rtn;
 	}//func
 	
@@ -184,9 +173,27 @@ public class Sqlite{
 		return rtn;
 	}//func
 	
+	public Map<String,String> scalarRow(String sql,String[] args){
+		Map<String,String> rtn = new HashMap<String,String>();
+		try{
+			Cursor cur = mDb.rawQuery(sql,args);
+			if(cur != null){
+				if(cur.moveToFirst()){
+					for(int i = 0; i < cur.getColumnCount(); i++){
+						rtn.put(cur.getColumnName(i),cur.getString(i));
+					}//for
+				}//if
+				cur.close();
+			}//if
+		}catch(Exception e){
+			System.out.println(e.getMessage());
+		}//func
+		
+		return rtn;
+	}//func
+	
 
 	/*========================================================
-	
 	public void insertSomething(String a, String b, String c){
 		ContentValues con = new ContentValues();
 		con.put("_id",a);

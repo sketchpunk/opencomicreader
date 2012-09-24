@@ -119,9 +119,11 @@ public class FolderPref extends DialogPreference implements DialogInterface.OnCl
 		//..............................
 		File fObj = new File(path);
 		File[] fList = fObj.listFiles();
-
-		for(File file:fList){
-			if(file.isDirectory()) mFolderList.put(file.getPath(),file.getName());
-		}//for
+		
+		if(fList != null){
+			for(File file:fList){
+				if(file.isDirectory()) mFolderList.put(file.getPath(),file.getName());
+			}//for
+		}//if
 	}//func
 }//cls

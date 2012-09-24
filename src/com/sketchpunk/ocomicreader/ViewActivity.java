@@ -1,9 +1,18 @@
 package com.sketchpunk.ocomicreader;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.nio.channels.FileChannel;
+import java.util.Map;
+
+import sage.data.Sqlite;
+
 import com.sketchpunk.ocomicreader.lib.ComicLoader;
 import com.sketchpunk.ocomicreader.lib.ComicPageView;
 
 import android.os.Bundle;
+import android.os.Environment;
 import android.app.Activity;
 import android.view.View;
 import android.widget.Toast;
@@ -11,19 +20,31 @@ import android.widget.Toast;
 public class ViewActivity extends Activity implements ComicPageView.CallBack,ComicLoader.CallBack{
 	private ComicPageView mImageView; //Main display of image
 	private ComicLoader mComicLoad; //Object that will manage streaming and scaling images out of the archive file
-
+	private String mComicID = "";
+	private Sqlite mDb = null;
+	
 	/*========================================================
 	View Events*/
 	@Override
-	public void onDestroy(){
-		super.onDestroy();
+	public void onPause(){
+		super.onPause();
 	}//func
-	
+
 	@Override
 	public void onResume(){
 		super.onResume();
+		
+        if(mDb == null) mDb = new Sqlite(this);
+        if(!mDb.isOpen()) mDb.openRead();
 	}//func
-	
+
+	@Override
+	public void onDestroy(){
+		if(mDb != null){ mDb.close(); mDb = null; }
+
+		super.onDestroy();
+	}//func
+		
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,15 +53,25 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
         
         //.........................................
         Bundle b = this.getIntent().getExtras(); 
-        String filePath = b.getString("path");
+        mComicID = b.getString("comicid");
+        System.out.println(mComicID);
+
+        //.........................................
+        //Get comic information
+        mDb = new Sqlite(this);
+        mDb.openRead();
+        Map<String,String> dbData = mDb.scalarRow("SELECT path,pgCurrent FROM ComicLibrary WHERE comicID = ?",new String[]{mComicID});
         
         //.........................................        
         mImageView = (ComicPageView)this.findViewById(R.id.pageView);
         
         //.........................................
         mComicLoad = new ComicLoader(this,mImageView);
-        mComicLoad.loadArchive(filePath);
-        mComicLoad.gotoPage(0);
+        if(mComicLoad.loadArchive(dbData.get("path"))){
+        	mComicLoad.gotoPage(Integer.parseInt(dbData.get("pgCurrent"))); //Continue where user left off
+        }else{
+        	Toast.makeText(this,"Unable to load comic.",Toast.LENGTH_LONG).show();
+        }//if
         
         //.........................................
         View root = mImageView.getRootView();
@@ -51,11 +82,16 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
 	/*========================================================
 	*/
 	@Override
-	public void onPageLoaded(boolean isSuccess,int pWidth,int pHeight){
+	public void onPageLoaded(boolean isSuccess,int currentPage){
+		if(isSuccess){ //Save reading progress.
+			String cp = Integer.toString(currentPage);
+			String sql = "UPDATE ComicLibrary SET pgCurrent="+cp+", pgRead=CASE WHEN pgRead < "+cp+" THEN "+cp+" ELSE pgRead END WHERE comicID = '" + mComicID + "'"; 
+			mDb.execSql(sql,null);
+		}//if
 	}//func
 
 	@Override
-	public void onComicPageGesture(int gestureID) {
+	public void onComicPageGesture(int gestureID){
 		switch(gestureID){
 			case ComicPageView.FlingRight:
 			case ComicPageView.TapLeft:
@@ -67,5 +103,5 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
 				if(!mComicLoad.nextPage()) Toast.makeText(this,"Last Page",Toast.LENGTH_SHORT).show();
 				break;
 		}//switch
-	}//func
+	}//func	
 }//cls

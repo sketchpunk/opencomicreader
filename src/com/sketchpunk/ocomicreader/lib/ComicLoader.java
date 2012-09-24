@@ -25,7 +25,7 @@ import sage.loader.LoadImageView;
 
 public class ComicLoader implements LoadImageView.OnImageLoadingListener,LoadImageView.OnImageLoadedListener{
 	public static interface CallBack{
-		public void onPageLoaded(boolean isSuccess,int pWidth,int pHeight);
+		public void onPageLoaded(boolean isSuccess,int currentPage);
 	}//interface
 
 	/*--------------------------------------------------------
@@ -61,7 +61,7 @@ public class ComicLoader implements LoadImageView.OnImageLoadingListener,LoadIma
 	//Since the event has been created, these getters plus the variables won't be needed anymore.
 	public int getPageWidth(){ return mPageWidth; }
 	public int getPageHeight(){ return mPageHeight; }
-	
+	public int getCurrentPage(){ return mCurrentPage; }
 
 	/*--------------------------------------------------------
 	Methods*/
@@ -83,7 +83,7 @@ public class ComicLoader implements LoadImageView.OnImageLoadingListener,LoadIma
 
 		return false;
 	}//func
-
+	
 	//Load a list of images in the archive file, need path to stream out the file.
 	public boolean loadArchive(String path){
 		try {
@@ -217,7 +217,7 @@ public class ComicLoader implements LoadImageView.OnImageLoadingListener,LoadIma
 
 		//............................................
 		if(mCallBack != null){
-			mCallBack.onPageLoaded((bmp != null),mPageWidth, mPageHeight);
+			mCallBack.onPageLoaded((bmp != null),mCurrentPage);
 		}//if
 		
 		bmp = null;

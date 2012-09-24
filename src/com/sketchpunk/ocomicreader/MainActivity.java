@@ -50,6 +50,8 @@ public class MainActivity extends FragmentActivity
 	Main*/
 	@Override
 	public void onDestroy(){
+		if(mDb != null){ mDb.close(); mDb = null; }
+
 		super.onDestroy();
 	}//func
 	
@@ -172,7 +174,7 @@ public class MainActivity extends FragmentActivity
 		AdapterItemRef itmRef = (AdapterItemRef)view.getTag();
 
     	Intent intent = new Intent(this,ViewActivity.class);
-		intent.putExtra("path",itmRef.path);
+		intent.putExtra("comicid",itmRef.id);
 	    this.startActivityForResult(intent,0);
 	}//func
     

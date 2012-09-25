@@ -6,6 +6,7 @@ import sage.data.Sqlite;
 import sage.data.SqlCursorLoader;
 import sage.adapter.SqlCursorAdapter;
 import sage.loader.LoadImageView;
+import sage.ui.ProgressCircle;
 
 import android.os.Bundle;
 import android.os.Environment;
@@ -45,6 +46,7 @@ public class MainActivity extends FragmentActivity
 	
 	private String mThumbPath;
 	private ProgressDialog mProgress;
+	private boolean mIsFirstRun = true;
 	
 	/*========================================================
 	Main*/
@@ -97,6 +99,9 @@ public class MainActivity extends FragmentActivity
         
         if(mDb == null) mDb = new Sqlite(this);
         if(!mDb.isOpen()) mDb.openRead();
+        
+        if(!mIsFirstRun) this.refreshData();
+        else mIsFirstRun = false;
     }//func
     
     
@@ -186,7 +191,7 @@ public class MainActivity extends FragmentActivity
     @Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle arg){
     	SqlCursorLoader cursorLoader = new SqlCursorLoader(this,mDb);
-    	cursorLoader.setRaw("SELECT comicID [_id],title,path FROM ComicLibrary ORDER BY title");
+    	cursorLoader.setRaw("SELECT comicID [_id],title,pgCount,pgRead,isCoverExists FROM ComicLibrary ORDER BY title");
     	return cursorLoader;
 	}//func
     
@@ -205,9 +210,9 @@ public class MainActivity extends FragmentActivity
 	Adapter Events*/
 	protected class AdapterItemRef{
     	String id;
-    	String path;
     	TextView lblTitle;
     	ImageView imgCover;
+    	ProgressCircle pcProgress;
     	Bitmap bitmap = null;
     }//cls
 	
@@ -216,6 +221,7 @@ public class MainActivity extends FragmentActivity
     	try{
     		AdapterItemRef itmRef = new AdapterItemRef();
     		itmRef.lblTitle = (TextView)v.findViewById(R.id.lblTitle);
+    		itmRef.pcProgress = (ProgressCircle)v.findViewById(R.id.pcProgress);
     		itmRef.imgCover = (ImageView)v.findViewById(R.id.imgCover);
     		itmRef.imgCover.setTag(itmRef);
 
@@ -232,10 +238,24 @@ public class MainActivity extends FragmentActivity
 			AdapterItemRef itmRef = (AdapterItemRef)v.getTag();
 			//..............................................
 			itmRef.id = c.getString(mAdapter.getColIndex("_id"));
-			itmRef.path = c.getString(mAdapter.getColIndex("path"));
 			itmRef.lblTitle.setText(c.getString(mAdapter.getColIndex("title")));
 
-			LoadImageView.loadImage(mThumbPath + itmRef.id + ".jpg",itmRef.imgCover,this);
+			//..............................................
+			//load Cover Image
+			if(c.getString(mAdapter.getColIndex("isCoverExists")).equals("1")){
+				LoadImageView.loadImage(mThumbPath + itmRef.id + ".jpg",itmRef.imgCover,this);
+			}//if
+			
+			//..............................................
+			//display reading progress
+			float progress = 0f;
+			int pTotal = c.getInt(mAdapter.getColIndex("pgCount"));
+			if(pTotal > 0){
+				float pRead = c.getFloat(mAdapter.getColIndex("pgRead"));
+				progress = (pRead / (float)pTotal);
+			}//if
+			
+			itmRef.pcProgress.setProgress(progress);
     	}catch(Exception e){
     		System.out.println("onBindListItem " + e.getMessage());
     	}//try

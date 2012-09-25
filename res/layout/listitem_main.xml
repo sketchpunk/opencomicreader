@@ -24,6 +24,13 @@
             android:minHeight="200dp"
             android:scaleType="fitXY"
             android:adjustViewBounds="false"/>
+        
+        <sage.ui.ProgressCircle android:id="@+id/pcProgress"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+           	android:layout_marginTop="168dp"
+           	android:layout_marginLeft="108dp"/>
+            
     </RelativeLayout>
 
     <TextView android:id="@+id/lblTitle"

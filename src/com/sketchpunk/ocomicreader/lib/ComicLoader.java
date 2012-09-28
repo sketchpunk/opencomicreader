@@ -1,16 +1,9 @@
 package com.sketchpunk.ocomicreader.lib;
 
-//https://github.com/edmund-wagner/junrar  Might be suitable for rar/cbr files, has getInputStream
-//https://github.com/junrar
-
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+
+import com.sketchpunk.ocomicreader.ui.ComicPageView;
 
 import android.app.Activity;
 import android.content.Context;
@@ -19,7 +12,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.view.Display;
 import android.view.View;
-import android.widget.ImageView;
 
 import sage.loader.LoadImageView;
 
@@ -27,6 +19,23 @@ public class ComicLoader implements LoadImageView.OnImageLoadingListener,LoadIma
 	public static interface CallBack{
 		public void onPageLoaded(boolean isSuccess,int currentPage);
 	}//interface
+	
+	public static iComicArchive getArchiveInstance(String path){
+		String ext = sage.io.Path.getExt(path).toLowerCase();
+		iComicArchive o = null;
+
+		if(ext.equals("zip") || ext.equals("cbz")){
+			o = new ComicZip();
+			if(o.loadFile(path)) return o;
+			o.close();
+		}else if(ext.equals("rar") || ext.equals("cbr")){
+			o = new ComicRar();
+			if(o.loadFile(path)) return o;
+			o.close();
+		}//if
+		
+		return null;
+	}//func
 
 	/*--------------------------------------------------------
 	*/
@@ -35,13 +44,12 @@ public class ComicLoader implements LoadImageView.OnImageLoadingListener,LoadIma
 	private CallBack mCallBack;
 	
 	private ComicPageView mImageView;
-	private ZipFile mZipFile;
+	private iComicArchive mArchive;
 	private List<String> mPageList;
 	private Bitmap mBitmap = null;
 
 	public ComicLoader(Context context,ComicPageView o){
 		mImageView = o;
-		mPageList = new ArrayList<String>();
 
 		//Save Callback
 		if(context instanceof CallBack) mCallBack = (CallBack)context;
@@ -67,7 +75,7 @@ public class ComicLoader implements LoadImageView.OnImageLoadingListener,LoadIma
 	Methods*/
 	public boolean close(){		
 		try{
-			if(mZipFile != null){ mZipFile.close(); mZipFile = null; }//if
+			if(mArchive != null){ mArchive.close(); mArchive = null; }//if
 
 			if(mBitmap != null){
 				mImageView.setImageBitmap(null);
@@ -86,33 +94,19 @@ public class ComicLoader implements LoadImageView.OnImageLoadingListener,LoadIma
 	
 	//Load a list of images in the archive file, need path to stream out the file.
 	public boolean loadArchive(String path){
-		try {
-			String itmName;
-			ZipEntry itm;
-			mZipFile = new ZipFile(path);
-			Enumeration entries = mZipFile.entries();
-
-			//..................................
-			while(entries.hasMoreElements()) {
-				itm = (ZipEntry)entries.nextElement();
-				if(itm.isDirectory()) continue;
-				
-				itmName = itm.getName().toLowerCase();
-				if(itmName.endsWith(".jpg") || itmName.endsWith(".gif") || itmName.endsWith(".png")){
-					mPageList.add(itm.getName());
-				}//if
-			}//while
-
-			//..................................
-			mPageLen = mPageList.size();
-			if(mPageLen > 0){
-				Collections.sort(mPageList); //Sort the page names
-				mCurrentPage = -1;
+		try{
+			mArchive = ComicLoader.getArchiveInstance(path);
+			if(mArchive == null) return false;
+			
+			//Get page list
+			mPageList = mArchive.getPageList();
+			if(mPageList != null){
+				mPageLen = mPageList.size();
 				return true;
-			}else{ 
-				mZipFile.close(); mZipFile = null;
-				return false;
 			}//if
+			
+			//if non found, then just close the archive.
+			mArchive.close(); mArchive = null;
 		}catch(Exception e){
 			System.err.println("LoadArchive " + e.getMessage());
 		}//try
@@ -157,14 +151,11 @@ public class ComicLoader implements LoadImageView.OnImageLoadingListener,LoadIma
 	//call back use do a custom image loading in the task
 	@Override
 	public Bitmap onImageLoading(String path){
-		ZipEntry itm = mZipFile.getEntry(path);
+		InputStream iStream = mArchive.getItemInputStream(path);
 		Bitmap bmp = null;
 		
-		if(itm != null){
-			InputStream iStream = null;
+		if(iStream != null){
 			try{
-				iStream = mZipFile.getInputStream(itm);				
-
 				//....................................
 				//Get file dimension and downscale if needed
 				BitmapFactory.Options bmpOption = new BitmapFactory.Options();
@@ -184,7 +175,7 @@ public class ComicLoader implements LoadImageView.OnImageLoadingListener,LoadIma
 				//....................................
 				//Load bitmap
 				iStream.close(); iStream = null;
-				iStream = mZipFile.getInputStream(itm);	
+				iStream = mArchive.getItemInputStream(path);
 				bmp = BitmapFactory.decodeStream(iStream,null,bmpOption); 
 			}catch(Exception e){
 				System.err.println("Error loading comic page " + e.getMessage());

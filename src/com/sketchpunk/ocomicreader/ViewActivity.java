@@ -1,18 +1,12 @@
 package com.sketchpunk.ocomicreader;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.nio.channels.FileChannel;
 import java.util.Map;
 
 import sage.data.Sqlite;
-
 import com.sketchpunk.ocomicreader.lib.ComicLoader;
-import com.sketchpunk.ocomicreader.lib.ComicPageView;
+import com.sketchpunk.ocomicreader.ui.ComicPageView;
 
 import android.os.Bundle;
-import android.os.Environment;
 import android.app.Activity;
 import android.view.View;
 import android.widget.Toast;
@@ -23,6 +17,7 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
 	private String mComicID = "";
 	private Sqlite mDb = null;
 	
+
 	/*========================================================
 	View Events*/
 	@Override
@@ -83,7 +78,7 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
 	*/
 	@Override
 	public void onPageLoaded(boolean isSuccess,int currentPage){
-		if(isSuccess){ //Save reading progress.
+		if(isSuccess && mDb != null && mDb.isOpen()){ //Save reading progress.
 			String cp = Integer.toString(currentPage);
 			String sql = "UPDATE ComicLibrary SET pgCurrent="+cp+", pgRead=CASE WHEN pgRead < "+cp+" THEN "+cp+" ELSE pgRead END WHERE comicID = '" + mComicID + "'"; 
 			mDb.execSql(sql,null);

@@ -3,11 +3,9 @@ package com.sketchpunk.ocomicreader.lib;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.util.Enumeration;
+import java.lang.StringBuilder;
 import java.util.Stack;
 import java.util.UUID;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -78,9 +76,9 @@ public class ComicLibrary{
 
 		File fObj = new File(cachePath);
 		File[] fList = fObj.listFiles(new ThumbFindFilter());
-		if(fList == null) return false;
-
-		for(File file:fList) file.delete();
+		if(fList != null){
+			for(File file:fList) file.delete();
+		}//if
 
 		//................................................
 		Sqlite.delete(context,"ComicLibrary","",null);
@@ -117,9 +115,10 @@ public class ComicLibrary{
 		public void run(){
 			int status = ComicLibrary.STATUS_COMPLETE;
 			mDb = new Sqlite(mContext); mDb.openWrite();
+
 			//.....................................
 			try{
-				if((status = crawlComics()) == 0) createCovers();
+				if((status = crawlComics()) == 0) processLibrary();
 			}catch(Exception e){
 				System.out.println("Sync " + e.getMessage());
 			}//try
@@ -131,8 +130,9 @@ public class ComicLibrary{
 			mContext = null;
 		}//func
 		
+
 		/*========================================================
-		Send Thread safe message*/
+		Send thread safe messages*/
 		private void sendProgress(String txt){
 			Bundle rtn = new Bundle();
 			rtn.putString("msg",txt);
@@ -159,7 +159,7 @@ public class ComicLibrary{
 
 		
 		/*========================================================
-		Syncing Process */
+		Process : Crawl for comics */
 		
 		//Crawls the Two paths in settings for comic archive files.
 		private int crawlComics(){
@@ -218,7 +218,7 @@ public class ComicLibrary{
 	    				//Not found, add it to library.
 	    				dbInsert.prepareForInsert();
 						dbInsert.bind(iComicID,UUID.randomUUID().toString());
-	    				dbInsert.bind(iTitle,sage.io.Path.RemoveExt(file.getName()));
+	    				dbInsert.bind(iTitle,sage.io.Path.removeExt(file.getName()));
 	    				dbInsert.bind(iPath,path);
 	    				dbInsert.bind(iPgCount,0);
 	    				dbInsert.bind(iPgRead,0);
@@ -237,74 +237,93 @@ public class ComicLibrary{
 	    	return ComicLibrary.STATUS_COMPLETE;
 		}//func
 
-		//look at what library items don't have covers yet and process it.
-		private void createCovers(){
+		
+		/*========================================================
+		Process : Create Thumbs, GetPage Count, Remove not found file*/
+		
+		//look at what library items don't have covers yet and process it. If file not found, remove from library
+		private void processLibrary(){
+			StringBuilder delList = new StringBuilder(); //Can't delete records with an open cursor, save IDs and delete later.
 			int[] outVar = {0,0}; //PageCount,IsCoverCreated
-			Cursor cur = mDb.raw("SELECT comicID,path FROM ComicLibrary WHERE isCoverExists = 0",null);
+			File file;
+			Cursor cur = mDb.raw("SELECT comicID,path,isCoverExists FROM ComicLibrary",null);
 			
 			for(boolean isOk = cur.moveToFirst(); isOk; isOk = cur.moveToNext()){
-				sendProgress("Cover for " + cur.getString(1));
-				processArchive(cur.getString(0),cur.getString(1),outVar);
+				file = new File(cur.getString(1));
+				
+				//.........................................
+				//if file does not exist, remove from library.
+				if(!file.exists()){
+					sendProgress("Removing reference to " + cur.getString(1));
+					
+					if(delList.length() != 0) delList.append(",");
+					delList.append("'"+cur.getString(0)+"'");
+					
+					//delete thumbnail if available
+					try{
+						file = new File(mCachePath + cur.getString(0) + ".jpg");
+						if(file.exists()) file.delete();
+					}catch(Exception e){}
+					
+					continue;
+				}//if
 
-				if(outVar[0] > 0){//if pagecnt is at least 1, update library.
-					mDb.execSql(String.format("UPDATE ComicLibrary SET pgCount=%d,isCoverExists=%d WHERE comicID = '%s'",outVar[0],outVar[1],cur.getString(0)),null);
+				//.........................................
+				//if cover exists, then it's been processed.
+				if(cur.getString(2).equals("0")){
+					sendProgress("Cover for " + cur.getString(1));
+					processArchive(cur.getString(0),cur.getString(1),outVar);
+					
+					if(outVar[0] > 0){//if pagecnt is at least 1, update library.
+						mDb.execSql(String.format("UPDATE ComicLibrary SET pgCount=%d,isCoverExists=%d WHERE comicID = '%s'",outVar[0],outVar[1],cur.getString(0)),null);
+					}else{ //if no pages found, its not a comic archive. Delete.
+						if(delList.length() != 0) delList.append(",");
+						delList.append("'"+cur.getString(0)+"'");
+					}//if
 				}//if
 			}//for
-			
 			cur.close(); cur = null;
+			
+			//.........................................
+			//if there is a list of items to delete, do it now in one swoop.
+			if(delList.length() > 0){
+				sendProgress("Cleaning up library...");
+				mDb.execSql(String.format("DELETE FROM ComicLibrary WHERE comicID in (%s)",delList.toString()),null);
+			}//if
 		}//func
-		
+
 		//look through archive for page count and the first image to use as a cover.
 		private void processArchive(String fileID,String path,int[] outVar){
-			int cntPage = 0;
-			try{
-				String filePath;
-				String coverEntry = "";
-				
-				ZipEntry zItem;
-				ZipFile oZip = new ZipFile(path);
-				Enumeration zEnum = oZip.entries();
-
-				//..................................
-				//loop through getting page count and first page to make cover out of.
-				while(zEnum.hasMoreElements()) {
-					zItem = (ZipEntry)zEnum.nextElement();
-					if(zItem.isDirectory()) continue;
-					
-					filePath = zItem.getName().toLowerCase();
-					if(filePath.endsWith(".jpg") || filePath.endsWith(".gif") || filePath.endsWith(".png")){
-						if(cntPage == 0) coverEntry = zItem.getName();
-						cntPage++;
-					}//if
-				}//while
-
-				//..................................
-				//if a page is found, make a thumb out of it.
-				if(!coverEntry.equals("")){
-					outVar[1] = (createThumb(oZip,coverEntry,fileID))?1:0;
-				}else outVar[1] = 0;
-
-				//..................................
-				oZip.close(); oZip = null;
-			}catch(Exception e){
-				System.err.println("ProcessComic " + e.getMessage());
-			}//try
+			outVar[0] = 0; //Page Count
+			outVar[1] = 0; //Cover Created
+			iComicArchive archive = ComicLoader.getArchiveInstance(path);
 			
-			outVar[0] = cntPage;
+			//.............................................
+			if(archive != null){
+				String[] data = {"0",""};
+				if(archive.getLibraryData(data)){
+					outVar[0] = Integer.parseInt(data[0]);
+					
+					//if a page is found, make a thumb out of it.
+					if(!data[1].equals("")){
+						System.out.println("Cover " + data[1]);
+						System.out.println("Pg Len " + data[0]);
+						outVar[1] = (createThumb(archive,data[1],fileID))?1:0;
+					}else outVar[1] = 0;
+				}//if
+
+				archive.close();
+			}//if
 		}//func
-	
+
 		//stream page out of archive and resize to use as a thumb
-		private boolean createThumb(ZipFile oZip,String coverPath,String fileID){
+		private boolean createThumb(iComicArchive archive,String coverPath,String fileID){
 			boolean rtn = false;
-			ZipEntry zItem = oZip.getEntry(coverPath);
-					
-			if(zItem != null){
-				InputStream iStream = null;
+			InputStream iStream = archive.getItemInputStream(coverPath);
+
+			if(iStream != null){
 				Bitmap bmp = null;
-				
-				try{
-					iStream = oZip.getInputStream(zItem);				
-					
+				try{				
 					//....................................
 					//Get file dimension
 					BitmapFactory.Options bmpOption = new BitmapFactory.Options();
@@ -319,7 +338,7 @@ public class ComicLibrary{
 					//....................................
 					//Load bitmap and rescale
 					iStream.close(); //the first read should of closed the stream. Just do it just incase it didn't
-					iStream = oZip.getInputStream(zItem);	
+					iStream = archive.getItemInputStream(coverPath);
 					bmp = BitmapFactory.decodeStream(iStream,null,bmpOption);
 					
 					//....................................
@@ -357,7 +376,7 @@ public class ComicLibrary{
 	}//interface
 	
     protected static class ComicFindFilter implements java.io.FileFilter{
-    	private final String[] mExtList = new String[]{".zip",".cbz"};
+    	private final String[] mExtList = new String[]{".zip",".cbz",".rar",".cbr"};
     	public boolean accept(File o){
     		if(o.isDirectory()) return true; //Want to allow folders
     		for(String extension:mExtList){

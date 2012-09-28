@@ -1,4 +1,4 @@
-package com.sketchpunk.ocomicreader.lib;
+package com.sketchpunk.ocomicreader.ui;
 
 
 import android.content.Context;
@@ -18,7 +18,6 @@ import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.OvershootInterpolator;
 
-
 public class ComicPageView extends View implements GestureDetector.OnGestureListener,GestureDetector.OnDoubleTapListener, OnScaleGestureListener{
 	protected class Sizes{
 		public float oWidth;
@@ -31,7 +30,6 @@ public class ComicPageView extends View implements GestureDetector.OnGestureList
 	public static interface CallBack{
 		public void onComicPageGesture(int gestureID);
 	}//interface
-	
 	
 	public static final int ScaleNone = 0;
 	public static final int ScaleToHeight = 1;
@@ -249,8 +247,6 @@ public class ComicPageView extends View implements GestureDetector.OnGestureList
 			try {
 				Thread.sleep(1);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-			//	e.printStackTrace();
 			}
 		}//while
 

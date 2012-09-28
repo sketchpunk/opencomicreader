@@ -10,6 +10,7 @@ import android.view.View;
 
 public class ProgressCircle extends View{
 	private Paint mCircleFill;
+	private Paint mInCircleFill;
 	private Paint mCircleStroke;
 	private Paint mArcFill;
 	private RectF mArcRect;
@@ -25,6 +26,10 @@ public class ProgressCircle extends View{
 		mCircleFill.setColor(Color.WHITE);
 		mCircleFill.setStyle(Paint.Style.FILL);
 		
+		mInCircleFill = new Paint(Paint.ANTI_ALIAS_FLAG);
+		mInCircleFill.setColor(0xFF808080);
+		mInCircleFill.setStyle(Paint.Style.FILL);
+		
 		mCircleStroke = new Paint(Paint.ANTI_ALIAS_FLAG);
 		mCircleStroke.setColor(0xFF505050);
 		mCircleStroke.setStyle(Paint.Style.STROKE);
@@ -36,7 +41,6 @@ public class ProgressCircle extends View{
 		
 		mPercent = 0.0f;
 	}//func
-	
 	
 	public void setProgress(float per){
 		mPercent = per;
@@ -56,6 +60,9 @@ public class ProgressCircle extends View{
 		canvas.drawCircle(x,y,x-1,mCircleFill);
 		canvas.drawCircle(x,y,x-1,mCircleStroke);
 		
-		if(deg > 0.0f) canvas.drawArc(mArcRect,270,deg,true,mArcFill);
+		if(deg > 0.0f){
+			canvas.drawArc(mArcRect,270,deg,true,mArcFill);
+			canvas.drawCircle(x,y,3,mInCircleFill);
+		}//if
 	}//func	
 }//cls

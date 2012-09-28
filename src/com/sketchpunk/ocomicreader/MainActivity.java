@@ -252,7 +252,7 @@ public class MainActivity extends FragmentActivity
 			int pTotal = c.getInt(mAdapter.getColIndex("pgCount"));
 			if(pTotal > 0){
 				float pRead = c.getFloat(mAdapter.getColIndex("pgRead"));
-				progress = (pRead / (float)pTotal);
+				progress = (pRead / ((float)pTotal-1)); //array starts at 0 not 1, so subtract.
 			}//if
 			
 			itmRef.pcProgress.setProgress(progress);

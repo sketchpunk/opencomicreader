@@ -39,6 +39,7 @@ public class ComicPageView extends View implements GestureDetector.OnGestureList
 	public static final int FlingRight = 1;
 	public static final int TapLeft = 2;
 	public static final int TapRight = 3;
+	public static final int LongPress = 4;
 
 	private Bitmap mBitmap; //WeakReference Change to this
 	private Matrix mMatrix;
@@ -96,8 +97,6 @@ public class ComicPageView extends View implements GestureDetector.OnGestureList
 			mBitmap = null;
 			return;
 		}//func
-		
-		mMatrix.reset();
 		mBitmap = bmp;
 		
 		mViewSize.oWidth = (float)this.getWidth();
@@ -105,18 +104,29 @@ public class ComicPageView extends View implements GestureDetector.OnGestureList
 		mImgSize.oWidth = (float)mBitmap.getWidth();
 		mImgSize.oHeight = (float)mBitmap.getHeight();
 		
-		if(mScaleMode != ComicPageView.ScaleNone){
-			switch(mScaleMode){
-				case ComicPageView.ScaleToHeight: mImgSize.scale = (float)this.getHeight() / bmp.getHeight(); break;
-				case ComicPageView.ScaleToWidth: mImgSize.scale = (float)this.getWidth() / bmp.getWidth(); break;
-			}//swtich
-			mMatrix.setScale(mImgSize.scale,mImgSize.scale);
-		}//if
+		resetScale();
+	}//func
+	
+	private void resetScale(){
+		switch(mScaleMode){
+			case ComicPageView.ScaleToHeight: mImgSize.scale = (float)mViewSize.oHeight / mImgSize.oHeight; break;
+			case ComicPageView.ScaleToWidth: mImgSize.scale = (float)mViewSize.oWidth / mImgSize.oWidth; break;
+			case ComicPageView.ScaleNone: mImgSize.scale = 1f;
+		}//swtich
 		
+		mMatrix.reset();
+		mMatrix.setScale(mImgSize.scale,mImgSize.scale);
 		
 		doImageCalc();
 		this.invalidate();
 	}//func
+
+	public int getScaleMode(){ return mScaleMode; }
+	public void setScaleMode(int mode){
+		mScaleMode = mode;
+		resetScale();
+	}//func
+
 	
 	/*========================================================
 	*/
@@ -130,11 +140,7 @@ public class ComicPageView extends View implements GestureDetector.OnGestureList
 	
 	@Override
 	protected void onDraw(Canvas canvas){
-		System.out.println("ONDRAW");
-		if(mBitmap != null){
-			canvas.drawBitmap(mBitmap,mMatrix,mPaint);
-			System.out.println("draw bmp");
-		}//func
+		if(mBitmap != null) canvas.drawBitmap(mBitmap,mMatrix,mPaint);
 	}//func	
 
 	
@@ -142,7 +148,6 @@ public class ComicPageView extends View implements GestureDetector.OnGestureList
 	*/
 	@Override
 	public boolean onDown(MotionEvent e){//needed to return true to get most of the gestures to work.
-		System.out.println("onDown");
 		return true;
 	}//func
 	
@@ -151,14 +156,14 @@ public class ComicPageView extends View implements GestureDetector.OnGestureList
 	Basic Gestures*/
 	@Override
 	public void onLongPress(MotionEvent e) {
-		//System.out.println("onLongPress");
+		if(mCallBack != null) mCallBack.onComicPageGesture(ComicPageView.LongPress);
 	}//func
 	
 	@Override
 	public boolean onSingleTapConfirmed(MotionEvent e){
 		if(mCallBack != null){
 			float x = e.getX();
-			float area = mViewSize.oWidth/4;
+			float area = mViewSize.oWidth/6;
 			
 			if(x <= area) mCallBack.onComicPageGesture(ComicPageView.TapLeft);
 			else if(x >= mViewSize.oWidth-area) mCallBack.onComicPageGesture(ComicPageView.TapRight);
@@ -168,8 +173,7 @@ public class ComicPageView extends View implements GestureDetector.OnGestureList
 	
 	@Override
 	public boolean onDoubleTap(MotionEvent e){
-		mMatrix.reset();
-		invalidate();
+		resetScale();
 		return true;
 	}//func
 
@@ -219,10 +223,10 @@ public class ComicPageView extends View implements GestureDetector.OnGestureList
 		long eTime = (sTime + (long)(1000*timeRatio));
 		float lenTime = (float)(eTime - sTime);
 		
-		System.out.println(sTime);
-		System.out.println(eTime);
-		System.out.println(lenTime);
-		System.out.println((1000*timeRatio));
+		//System.out.println(sTime);
+		//System.out.println(eTime);
+		//System.out.println(lenTime);
+		//System.out.println((1000*timeRatio));
 		
 		float percTime = 0;
 		long cTime = 0;

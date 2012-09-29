@@ -1,6 +1,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/menu_settings"
-        android:title="@string/menu_settings"
+    <item android:id="@+id/mnu_scale"
+        android:title="Scale"
         android:orderInCategory="100"
-        android:showAsAction="never" />
+        android:showAsAction="never">
+        <menu>
+            <group android:checkableBehavior="single">
+            	<item android:id="@+id/mnu_scalen" android:title="Off" android:checkable="true"/>
+            	<item android:id="@+id/mnu_scaleh" android:title="Screen Height" android:checkable="true"/>
+            	<item android:id="@+id/mnu_scalew" android:title="Screen Width" android:checkable="true"/>
+            </group>
+        </menu>
+	</item>
 </menu>

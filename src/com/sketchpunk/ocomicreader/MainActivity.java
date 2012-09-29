@@ -61,7 +61,8 @@ public class MainActivity extends FragmentActivity
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+        
         mThumbPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/OpenComicReader/thumbs/";
         
         //....................................
@@ -151,24 +152,25 @@ public class MainActivity extends FragmentActivity
 				AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
 				AdapterItemRef ref = (AdapterItemRef)info.targetView.getTag();
 				
-				menu.setHeaderTitle(ref.lblTitle.getText().toString());
-				menu.add(0, 1, 0,"Edit");
-				menu.add(0, 2, 1,"Delete");
+				menu.setHeaderTitle(ref.lblTitle.getText().toString());				
+				menu.add(0, 2, 0,"Delete");
+				menu.add(0, 1, 1,"Reset Progress");
 			break;
 		}//switch
 	}//func
 	
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
-		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+		//AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
 		//final ListItemRef ref = (ListItemRef)info.targetView.getTag();
 		
-		switch(item.getItemId()){
-			case 1:
-				Toast.makeText(this,"Feature not implemented",Toast.LENGTH_SHORT).show();
-			break;
-		}//switch
-	  return true;
+		//switch(item.getItemId()){
+		//	case 1:
+				
+		//	break;
+		//}//switch
+		Toast.makeText(this,"Feature not implemented (YET)",Toast.LENGTH_SHORT).show();
+		return true;
 	}//func
 
 	

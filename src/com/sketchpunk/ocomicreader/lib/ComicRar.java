@@ -125,7 +125,7 @@ public class ComicRar implements iComicArchive{
 		List<FileHeader> files = mArchive.getFileHeaders();
 		for(FileHeader fh : files){
 			if(fh.isDirectory()) continue;
-
+ 
 			itmName = fh.getFileNameString().toLowerCase();
 			if(itmName.endsWith(".jpg") || itmName.endsWith(".gif") || itmName.endsWith(".png")){
 				if(pgCnt == 0) coverPath = fh.getFileNameString();
@@ -137,11 +137,10 @@ public class ComicRar implements iComicArchive{
 		if(pgCnt > 0){
 			outVar[0] = Integer.toString(pgCnt);
 			outVar[1] = coverPath;
-			
-			return false;
+			return true;
 		}//if
 		
-		return true;
+		return false;
 	}//func
 
 }//func

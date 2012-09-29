@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.sketchpunk.ocomicreader" android:versionCode="2" android:versionName="0.0.2 alpha">
+    package="com.sketchpunk.ocomicreader" android:versionCode="3" android:versionName="0.0.3 alpha">
 
     <uses-sdk android:minSdkVersion="15" android:targetSdkVersion="15"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -17,7 +17,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ViewActivity" android:label="@string/title_activity_view"></activity>
+        <activity android:name=".ViewActivity" android:label="@string/title_activity_view" android:theme="@style/CustomTheme"></activity>
 		<activity android:name=".PrefActivity" android:theme="@android:style/Theme.Black.NoTitleBar"></activity>
     </application>
 </manifest>

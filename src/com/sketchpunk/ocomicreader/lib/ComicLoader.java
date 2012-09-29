@@ -70,6 +70,7 @@ public class ComicLoader implements LoadImageView.OnImageLoadingListener,LoadIma
 	public int getPageWidth(){ return mPageWidth; }
 	public int getPageHeight(){ return mPageHeight; }
 	public int getCurrentPage(){ return mCurrentPage; }
+	public int getPageCount(){ return mPageLen; }
 
 	/*--------------------------------------------------------
 	Methods*/

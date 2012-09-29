@@ -209,7 +209,7 @@ public class ComicLibrary{
 	    				//------------------------------
 	    				//Check if already in library
 	    				sendProgress(file.getName());
-	    				path = file.getPath();
+	    				path = file.getPath(); System.out.println(path);
 
 	    				tmp = mDb.scalar("SELECT comicID FROM ComicLibrary WHERE path = '"+path.replace("'","''")+"'",null);
 	    				if(!tmp.isEmpty()) continue;

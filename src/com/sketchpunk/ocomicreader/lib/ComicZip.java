@@ -78,7 +78,6 @@ public class ComicZip implements iComicArchive{
 
 	public InputStream getItemInputStream(String path){
 		try{
-			System.out.println(path);
 			if(mLastItemReqPath.equals(path) && mLastItemReq != null){
 				return mArchive.getInputStream(mLastItemReq);
 			}//if

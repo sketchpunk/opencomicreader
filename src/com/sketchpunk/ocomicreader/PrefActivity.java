@@ -1,7 +1,5 @@
 package com.sketchpunk.ocomicreader;
 
-import java.util.List;
-
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
@@ -9,6 +7,10 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ListView;
 
 public class PrefActivity extends PreferenceActivity{
 	/*========================================================
@@ -16,12 +18,14 @@ public class PrefActivity extends PreferenceActivity{
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        this.getFragmentManager().beginTransaction().replace(android.R.id.content,new PrefFragment()).commit();
     }//func
 
-    @Override
-    public void onBuildHeaders(List<Header> target){
-        loadHeadersFromResource(R.xml.prefheader,target);
-    }//func
+    //@Override
+    //public void onBuildHeaders(List<Header> target){
+    //    loadHeadersFromResource(R.xml.prefheader,target);
+    //}//func
 
 
 	//************************************************************
@@ -46,13 +50,24 @@ public class PrefActivity extends PreferenceActivity{
     	}//func
     	
     	@Override
+    	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState){
+    		//Remove all that padding around the settings.
+    	    View view = super.onCreateView(inflater, container, savedInstanceState);
+    	    if(view != null){
+            	ListView lv = (ListView) view.findViewById(android.R.id.list);
+            	if(lv != null) lv.setPadding(0,0,0,0);
+            }//if
+    	    return view;
+    	}//func
+    	
+    	@Override
         public void onCreate(Bundle savedInstanceState){
             super.onCreate(savedInstanceState);
             
             //.............................................
             prefs = PreferenceManager.getDefaultSharedPreferences(this.getActivity());
             prefs.registerOnSharedPreferenceChangeListener(this);
-
+            
             //.............................................
             //Bundle args = this.getArguments();
             //String val = args.getString("test");

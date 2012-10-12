@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
-	<PreferenceCategory android:key="mainSettings" android:title="Settings" android:summary="Username and password information">
+	<PreferenceCategory android:key="setiLibrary" android:title="LIBRARY SETTINGS" android:summary="">
 		<sage.pref.FolderPref android:key="syncfolder1" android:title="Sync Folder 1" android:defaultValue=""/>
 		<sage.pref.FolderPref android:key="syncfolder2" android:title="Sync Folder 2" android:defaultValue=""/>
 	    
@@ -13,5 +13,15 @@
             android:positiveButtonText="Clear Quests"
             android:negativeButtonText="Cancel"/>
 		-->
+	</PreferenceCategory>
+	
+	<PreferenceCategory android:key="setiViewing" android:title="VIEWING SETTINGS" android:summary="">
+	    <ListPreference
+           android:title="Scale Mode"
+           android:summary="Set how the image should scale depending on the screen."
+           android:key="scaleMode"
+           android:defaultValue="1"
+           android:entries="@array/scaleMode"
+           android:entryValues="@array/scaleMode_v"/>    
 	</PreferenceCategory>
 </PreferenceScreen>

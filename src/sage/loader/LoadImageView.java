@@ -40,7 +40,7 @@ public class LoadImageView{
 		if(task != null){
 			final String taskImgPath = task.imagePath;
 			
-			if(!taskImgPath.equals(imgPath)) task.cancel(true);
+			if(taskImgPath == null || !taskImgPath.equals(imgPath)) task.cancel(true);
 			else return false;
 		}//if
 		

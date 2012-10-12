@@ -13,6 +13,7 @@ import android.preference.DialogPreference;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -28,12 +29,12 @@ public class FolderPref extends DialogPreference implements DialogInterface.OnCl
 	*/	
 	public FolderPref(Context context,AttributeSet attrib){
 		super(context,attrib);
-		setDialogLayoutResource(com.sketchpunk.ocomicreader.R.layout.dialogpref_folder);
+		//setDialogLayoutResource(com.sketchpunk.ocomicreader.R.layout.dialogpref_folder);
 	}//func
 
 	public FolderPref(Context context,AttributeSet attrib,int defStyle) {
 		super(context,attrib,defStyle);
-		setDialogLayoutResource(com.sketchpunk.ocomicreader.R.layout.dialogpref_folder);
+		//setDialogLayoutResource(com.sketchpunk.ocomicreader.R.layout.dialogpref_folder);
 	}//func
 
 	
@@ -44,28 +45,40 @@ public class FolderPref extends DialogPreference implements DialogInterface.OnCl
 		super.onPrepareDialogBuilder(builder);  
 		builder.setPositiveButton("Save",this);
 		builder.setNegativeButton("Cancel",this);
+		builder.setNeutralButton("Clear",this);
 	}//func
 
 	@Override
 	protected View onCreateDialogView(){
-		//NOTE :: This interface should be created by code instead of using layout xml, would remove dependency
-		View view = super.onCreateDialogView();
-		mPathView = (TextView) view.findViewById(com.sketchpunk.ocomicreader.R.id.lblTitle);
-		  
+		LinearLayout container = new LinearLayout(getContext());
+	    container.setOrientation(LinearLayout.VERTICAL);
+
+	    //......................................
+	    mPathView = new TextView(this.getContext());
+	    container.addView(mPathView,LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+	    
+	    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mPathView.getLayoutParams();
+	    params.setMargins(8,0,0,0);
+	    mPathView.setLayoutParams(params);
+
+	    //......................................
 		mFolderList = new LinkedHashMap<String,String>();
 		loadPath(Environment.getExternalStorageDirectory().getAbsolutePath());
-		  
+	    
+	    //......................................
 		mAdapter = new MapAdapter<String,String>(this.getContext());
-		mAdapter.setListItemLayout(com.sketchpunk.ocomicreader.R.layout.listitem_dlgfolder);
+		mAdapter.setListItemLayout(com.sketchpunk.ocomicreader.R.layout.listitem_dlgfolder); //this should by dynamic, remove dependency
 		mAdapter.setCallback(this);
 		mAdapter.setSortEnabled(true);
 		mAdapter.setData(mFolderList);
 		
-		mListView = (ListView) view.findViewById(com.sketchpunk.ocomicreader.R.id.lvListView);
+	    mListView = new ListView(this.getContext());
 		mListView.setOnItemClickListener(this);
 		mListView.setAdapter(mAdapter);
+		container.addView(mListView,LinearLayout.LayoutParams.MATCH_PARENT,250);
 
-		return view;
+	    //......................................
+		return container;
 	}//func
 	
 	@Override
@@ -89,8 +102,11 @@ public class FolderPref extends DialogPreference implements DialogInterface.OnCl
 	/*========================================================
 	UI Events*/
 	@Override
-	public void onClick(DialogInterface dialog, int which) {
-		if(which == -1) this.persistString(mCurrentPath);
+	public void onClick(DialogInterface dialog, int which){
+		switch(which){
+			case -1: this.persistString(mCurrentPath); break; //Positive
+			case -3: this.persistString(null); break; //Neutral
+		}//switch
 	}//func
 	
 	@Override

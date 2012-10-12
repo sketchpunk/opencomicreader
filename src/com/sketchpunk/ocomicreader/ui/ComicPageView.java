@@ -1,13 +1,18 @@
 package com.sketchpunk.ocomicreader.ui;
 
 
+import java.io.File;
+import java.util.Stack;
+
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.RectF;
+import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -75,6 +80,11 @@ public class ComicPageView extends View implements GestureDetector.OnGestureList
 		mViewSize = new Sizes();
 		mImgSize = new Sizes();
 		mImgSize.scale = 1.0f;
+		
+		//Get perferences
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+    	String tmp = prefs.getString("scaleMode","1");
+    	this.mScaleMode = Integer.parseInt(tmp);
 	}//func
 
 	private void doImageCalc(){

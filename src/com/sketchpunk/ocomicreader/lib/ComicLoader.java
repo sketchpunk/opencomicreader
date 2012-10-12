@@ -12,6 +12,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.view.Display;
 import android.view.View;
+import android.widget.Toast;
 
 import sage.loader.LoadImageView;
 
@@ -47,10 +48,12 @@ public class ComicLoader implements LoadImageView.OnImageLoadingListener,LoadIma
 	private iComicArchive mArchive;
 	private List<String> mPageList;
 	private Bitmap mBitmap = null;
+	private Context mContext = null;
 
 	public ComicLoader(Context context,ComicPageView o){
 		mImageView = o;
-
+		mContext = context;
+		
 		//Save Callback
 		if(context instanceof CallBack) mCallBack = (CallBack)context;
 		
@@ -179,12 +182,15 @@ public class ComicLoader implements LoadImageView.OnImageLoadingListener,LoadIma
 				iStream = mArchive.getItemInputStream(path);
 				bmp = BitmapFactory.decodeStream(iStream,null,bmpOption); 
 			}catch(Exception e){
-				System.err.println("Error loading comic page " + e.getMessage());
+				//System.err.println("Error loading comic page " + e.getMessage());
+				Toast.makeText(mContext,"Error loading comic page. Email comic file to sketchpunk@ymail.com for troubleshooting.",Toast.LENGTH_LONG).show();
 			}//try
 			
 			if(iStream != null){
 				try{ iStream.close(); iStream = null; }catch(Exception e){}
 			}//if
+		}else{
+			Toast.makeText(mContext,"Unable to load image input stream. Email comic file to sketchpunk@ymail.com for troubleshooting.",Toast.LENGTH_LONG).show();
 		}//if
 		return bmp;
 	}//func

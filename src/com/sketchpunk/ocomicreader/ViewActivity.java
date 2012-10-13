@@ -7,16 +7,18 @@ import com.sketchpunk.ocomicreader.lib.ComicLoader;
 import com.sketchpunk.ocomicreader.ui.ComicPageView;
 
 import android.os.Bundle;
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Toast;
 
-public class ViewActivity extends Activity implements ComicPageView.CallBack,ComicLoader.CallBack{
+public class ViewActivity extends Activity implements ComicPageView.CallBack,ComicLoader.CallBack,
+	DialogInterface.OnClickListener{
 	private ComicPageView mImageView; //Main display of image
 	private ComicLoader mComicLoad; //Object that will manage streaming and scaling images out of the archive file
 	private String mComicID = "";
@@ -44,7 +46,8 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
 		super.onDestroy();
 	}//func
 		
-    @Override
+    @SuppressLint("ShowToast")
+	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view);
@@ -104,8 +107,15 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
 			case R.id.mnu_scaleh: mImageView.setScaleMode(ComicPageView.ScaleToHeight); break;
 			case R.id.mnu_scalew: mImageView.setScaleMode(ComicPageView.ScaleToWidth); break;
 			case R.id.mnu_scalen: mImageView.setScaleMode(ComicPageView.ScaleNone); break;
+			case R.id.mnu_goto: sage.ui.Dialogs.NumPicker(this,"Goto Page",1,mComicLoad.getPageCount(),mComicLoad.getCurrentPage()+1,this); break;
 		}//switch
 		return true;
+	}//func
+	
+	//this is for the goto menu option and user clicks ok.
+	@Override
+	public void onClick(DialogInterface dialog, int which){
+		mComicLoad.gotoPage(which-1);
 	}//func
     
     
@@ -144,5 +154,5 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
 				if(!mComicLoad.nextPage()) Toast.makeText(this,"Last Page",Toast.LENGTH_SHORT).show();
 				break;
 		}//switch
-	}//func	
+	}//func
 }//cls

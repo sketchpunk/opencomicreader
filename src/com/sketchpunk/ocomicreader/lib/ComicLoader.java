@@ -122,7 +122,7 @@ public class ComicLoader implements LoadImageView.OnImageLoadingListener,LoadIma
 	/*--------------------------------------------------------
 	Paging Methods*/
 	public boolean gotoPage(int pos){
-		if(pos < 0 || pos >= mPageLen) return false;
+		if(pos < 0 || pos >= mPageLen || pos == mCurrentPage) return false;
 		
 		mCurrentPage = pos;
 		LoadImageView.loadImage(mPageList.get(mCurrentPage),mImageView,this);

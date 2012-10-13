@@ -1,4 +1,5 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/mnu_goto" android:title="Goto Page" android:orderInCategory="100" android:showAsAction="never"/>
     <item android:id="@+id/mnu_scale"
         android:title="Scale"
         android:orderInCategory="100"

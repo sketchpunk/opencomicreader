@@ -1,24 +1,13 @@
 package com.sketchpunk.ocomicreader.lib;
 //http://mvnrepository.com/artifact/com.github.junrar/junrar
 
-
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.zip.ZipEntry;
-
-import android.os.Environment;
 
 import com.github.junrar.Archive;
-import com.github.junrar.exception.RarException;
-import com.github.junrar.exception.RarException.RarExceptionType;
-import com.github.junrar.io.ReadOnlyAccessFile;
 import com.github.junrar.rarfile.FileHeader;
 
 public class ComicRar implements iComicArchive{

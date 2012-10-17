@@ -24,7 +24,6 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
 	private String mComicID = "";
 	private Sqlite mDb = null;
 	private Toast mToast;
-	
 
 	/*========================================================
 	View Events*/

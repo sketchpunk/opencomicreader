@@ -4,24 +4,22 @@
 		<sage.pref.FolderPref android:key="syncfolder1" android:title="Sync Folder 1" android:defaultValue=""/>
 		<sage.pref.FolderPref android:key="syncfolder2" android:title="Sync Folder 2" android:defaultValue=""/>
 	    
-	    <!-- 
-		<sage.pref.SeekbarPref android:key="customPref" android:defaultValue="32" android:title="Custom Preference"/>
+	    <!--
 		<sage.pref.DialogPref
 			android:title="Reset Quests"
             android:summary="Reset all quest-progress."
-            android:dialogMessage="Are you sure you wish to reset your quest progress? This action cannot be undone!"
+            android:dialogMessage="Testing one two three"
             android:positiveButtonText="Clear Quests"
             android:negativeButtonText="Cancel"/>
 		-->
 	</PreferenceCategory>
 	
 	<PreferenceCategory android:key="setiViewing" android:title="VIEWING SETTINGS" android:summary="">
-	    <ListPreference
-           android:title="Scale Mode"
+	    <ListPreference android:key="scaleMode"  android:title="Scale Mode" android:defaultValue="1"
            android:summary="Set how the image should scale depending on the screen."
-           android:key="scaleMode"
-           android:defaultValue="1"
-           android:entries="@array/scaleMode"
-           android:entryValues="@array/scaleMode_v"/>    
+           android:entries="@array/scaleMode" android:entryValues="@array/scaleMode_v"/>
+	    
+	    <CheckBoxPreference android:key="preLoading" android:title="Preload Next Page" android:defaultValue="true"
+	        android:summary="This feature speeds up page loading, but if there is out of memory issues then disable this feature."/>
 	</PreferenceCategory>
 </PreferenceScreen>

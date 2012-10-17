@@ -1,20 +1,17 @@
 package com.sketchpunk.ocomicreader.lib;
 
-import java.io.InputStream;
 import java.util.List;
 
 import com.sketchpunk.ocomicreader.ui.ComicPageView;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.preference.PreferenceManager;
 import android.view.Display;
-import android.view.View;
 import android.widget.Toast;
-
-import sage.loader.LoadImageView;
 
 public class ComicLoader implements PageLoader.CallBack{//LoadImageView.OnImageLoadingListener,LoadImageView.OnImageLoadedListener{
 	public static interface CallBack{
@@ -40,9 +37,10 @@ public class ComicLoader implements PageLoader.CallBack{//LoadImageView.OnImageL
 
 	/*--------------------------------------------------------
 	*/
-	private int mPageLen, mCurrentPage, mPageWidth, mPageHeight;
-	private float mScreenWidth, mScreenHeight, mMaxSize;
+	private int mPageLen, mCurrentPage;
+	private float mMaxSize;
 	private CallBack mCallBack;
+	private boolean mIsPreloading;
 	
 	private ComicPageView mImageView;
 	private PageLoader mPageLoader;
@@ -63,18 +61,18 @@ public class ComicLoader implements PageLoader.CallBack{//LoadImageView.OnImageL
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		Point size = new Point();
 		display.getSize(size);
-		mScreenWidth = (float)size.x;
-		mScreenHeight = (float)size.y;
-		mMaxSize = (float)Math.max(mScreenWidth,mScreenHeight);
+		mMaxSize = (float)Math.max((float)size.x,(float)size.y);
 		
 		mPageLoader = new PageLoader();
+		
+		//Get perferences
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		mIsPreloading = prefs.getBoolean("preLoading",true);
 	}//func
 
 	/*--------------------------------------------------------
 	Getters*/
 	//Since the event has been created, these getters plus the variables won't be needed anymore.
-	public int getPageWidth(){ return mPageWidth; }
-	public int getPageHeight(){ return mPageHeight; }
 	public int getCurrentPage(){ return mCurrentPage; }
 	public int getPageCount(){ return mPageLen; }
 
@@ -82,6 +80,8 @@ public class ComicLoader implements PageLoader.CallBack{//LoadImageView.OnImageL
 	Methods*/
 	public boolean close(){		
 		try{
+			mPageLoader.close(); //cancel any tasks that may be running.
+			
 			if(mArchive != null){ mArchive.close(); mArchive = null; }//if
 
 			if(mBitmap != null){
@@ -170,8 +170,6 @@ public class ComicLoader implements PageLoader.CallBack{//LoadImageView.OnImageL
 		if(bmp != null){
 			mBitmap = bmp;
 			mImageView.setImageBitmap(mBitmap);
-			mPageWidth = mBitmap.getWidth();
-			mPageHeight = mBitmap.getHeight();
 		}//if
 
 		//............................................

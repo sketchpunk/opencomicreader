@@ -30,6 +30,12 @@ public class PageLoader{
 	}//func
 	
 	
+	public void close(){
+		if(mTask != null){
+			if(mTask.getStatus() != AsyncTask.Status.FINISHED) mTask.cancel(true);
+		}//if
+	}//func
+	
 	//************************************************************
 	// Load Image through thread
 	//************************************************************

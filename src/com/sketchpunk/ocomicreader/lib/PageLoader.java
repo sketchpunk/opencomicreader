@@ -9,7 +9,7 @@ import android.os.AsyncTask;
 
 public class PageLoader{
 	public static interface CallBack{
-		public void onImageLoaded(String errMsg,Bitmap bmp);
+		public void onImageLoaded(String errMsg,Bitmap bmp,int imgType);
 	}//interface
 	
     /*========================================================
@@ -17,7 +17,7 @@ public class PageLoader{
 	private LoadingTask mTask;
 	public PageLoader(){}
 	
-	public void loadImage(CallBack callback,String imgPath,float maxSize,iComicArchive archive){
+	public void loadImage(CallBack callback,String imgPath,float maxSize,iComicArchive archive,int imgType){
 		if(mTask != null){
 			if(mTask.getStatus() != AsyncTask.Status.FINISHED){
 				if(!mTask.imagePath.equals(imgPath)) mTask.cancel(true);
@@ -25,15 +25,27 @@ public class PageLoader{
 			}//if
 		}//if
 
-		mTask = new LoadingTask(callback,archive);
+		mTask = new LoadingTask(callback,archive,imgType);
 		mTask.execute(new Float(maxSize),imgPath);
 	}//func
 	
-	
 	public void close(){
+		cancelTask();
+	}//func
+	
+	public void cancelTask(){
 		if(mTask != null){
 			if(mTask.getStatus() != AsyncTask.Status.FINISHED) mTask.cancel(true);
 		}//if
+	}//func
+	
+	public boolean isLoading(){
+		if(mTask != null){
+			if(mTask.getStatus() == AsyncTask.Status.FINISHED) return false;
+			else return true;
+		}//if
+		
+		return false;
 	}//func
 	
 	//************************************************************
@@ -44,10 +56,12 @@ public class PageLoader{
 		private WeakReference<CallBack> mCallBack = null;
 		private String errMsg = null;
 		public String imagePath = null;
+		private int mImgType;
 		
-		public LoadingTask(CallBack callback,iComicArchive archive){
+		public LoadingTask(CallBack callback,iComicArchive archive,int imgType){
 			mArchive = new WeakReference<iComicArchive>(archive);
 			mCallBack = new WeakReference<CallBack>(callback);
+			mImgType = imgType;
 		}//func
 		
 		@Override
@@ -119,7 +133,7 @@ public class PageLoader{
 			//When done loading the image, alert parent
 			if(mCallBack != null){
 				final CallBack cb = mCallBack.get();
-				if(cb != null) cb.onImageLoaded(errMsg,(Bitmap)bmp);
+				if(cb != null) cb.onImageLoaded(errMsg,(Bitmap)bmp,mImgType);
 			}//if
 		}//func
 	}//cls

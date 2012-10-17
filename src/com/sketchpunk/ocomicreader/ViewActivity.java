@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.res.Configuration;
 import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.MenuItem;
@@ -38,6 +39,12 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
         if(mDb == null) mDb = new Sqlite(this);
         if(!mDb.isOpen()) mDb.openRead();
 	}//func
+	
+	@Override
+	public void onConfigurationChanged(Configuration config){
+		super.onConfigurationChanged(config);
+		mComicLoad.refreshOrientation();
+	}//func
 
 	@Override
 	public void onDestroy(){
@@ -47,7 +54,7 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
 		
     @SuppressLint("ShowToast")
 	@Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view);
         this.getActionBar().hide();
@@ -57,6 +64,10 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
         Bundle b = this.getIntent().getExtras(); 
         mComicID = b.getString("comicid");
 
+        //.........................................
+        mToast = Toast.makeText(this,"",Toast.LENGTH_SHORT);
+		mToast.setGravity(Gravity.TOP | Gravity.RIGHT, 0, 0);
+        
         //.........................................
         //Get comic information
         mDb = new Sqlite(this);
@@ -70,6 +81,7 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
         //.........................................
         mComicLoad = new ComicLoader(this,mImageView);
         if(mComicLoad.loadArchive(dbData.get("path"))){
+        	showToast("Loading Page...",1);
         	mComicLoad.gotoPage(Integer.parseInt(dbData.get("pgCurrent"))); //Continue where user left off
         }else{
         	Toast.makeText(this,"Unable to load comic.",Toast.LENGTH_LONG).show();
@@ -78,13 +90,9 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
         //.........................................
         View root = mImageView.getRootView();
         root.setBackgroundColor(0xFF000000);
-
-        //.........................................
-        mToast = Toast.makeText(this,"",Toast.LENGTH_SHORT);
-		mToast.setGravity(Gravity.TOP | Gravity.RIGHT, 0, 0);
     }//func
 
-    
+
 	/*========================================================
 	Menu Events*/
     @Override
@@ -129,8 +137,7 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
 			
 			//....................................
 			//Display page number
-			mToast.setText(String.format("%d / %d",currentPage+1,mComicLoad.getPageCount()));
-			mToast.show();
+			showToast(String.format("%d / %d",currentPage+1,mComicLoad.getPageCount()),0);
 		}//if
 	}//func
 
@@ -140,18 +147,35 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
 			//.........................................
 			case ComicPageView.LongPress:
 				this.openContextMenu(mImageView);
-				System.out.println("LONG PRESS");
 			break;
 			//.........................................		
 			case ComicPageView.FlingRight:
 			case ComicPageView.TapLeft:
-				if(!mComicLoad.prevPage()) Toast.makeText(this,"First Page",Toast.LENGTH_SHORT).show();
+				showToast("Loading Page...",1);
+				switch(mComicLoad.prevPage()){
+					case 0: showToast("FIRST PAGE",1); break;
+					case -1: showToast("Still Preloading, Try again in one second",1); break;
+				}//switch
 				break;
 			//.........................................
 			case ComicPageView.FlingLeft:
 			case ComicPageView.TapRight:
-				if(!mComicLoad.nextPage()) Toast.makeText(this,"Last Page",Toast.LENGTH_SHORT).show();
+				showToast("Loading Page...",1);
+				switch(mComicLoad.nextPage()){
+					case 0: showToast("LAST PAGE",1); break;
+					case -1: showToast("Still Preloading, Try again in one second",1); break;
+				}//switch
 				break;
 		}//switch
 	}//func
+	
+    
+	/*========================================================
+	functions*/
+	private void showToast(String msg,int duration){
+		mToast.setText(msg);
+		mToast.setDuration(duration);
+		mToast.show();
+	}//func
+	
 }//cls

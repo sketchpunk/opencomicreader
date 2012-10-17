@@ -87,6 +87,8 @@ public class ComicPageView extends View implements GestureDetector.OnGestureList
     	this.mScaleMode = Integer.parseInt(tmp);
 	}//func
 
+	/*=======================================================
+	*/
 	private void doImageCalc(){
 		if(mBitmap == null) return;
 		mImgSize.sWidth = mImgSize.scale * mImgSize.oWidth;
@@ -100,21 +102,6 @@ public class ComicPageView extends View implements GestureDetector.OnGestureList
 	
 		//System.out.println(String.format("%d : %d : %f : %f",mBitmap.getWidth(),this.getWidth(),mBound.right,mScale));
 		//System.out.println(String.format("%d : %d : %f : %f",mBitmap.getHeight(),this.getHeight(),mBound.bottom,mScale));
-	}//func
-	
-	public void setImageBitmap(Bitmap bmp){
-		if(bmp == null){
-			mBitmap = null;
-			return;
-		}//func
-		mBitmap = bmp;
-		
-		mViewSize.oWidth = (float)this.getWidth();
-		mViewSize.oHeight = (float)this.getHeight();
-		mImgSize.oWidth = (float)mBitmap.getWidth();
-		mImgSize.oHeight = (float)mBitmap.getHeight();
-		
-		resetScale();
 	}//func
 	
 	private void resetScale(){
@@ -131,13 +118,42 @@ public class ComicPageView extends View implements GestureDetector.OnGestureList
 		this.invalidate();
 	}//func
 
+
+	/*=======================================================
+	Setters/Getters*/
 	public int getScaleMode(){ return mScaleMode; }
 	public void setScaleMode(int mode){
 		mScaleMode = mode;
 		resetScale();
 	}//func
-
 	
+	public void setImageBitmap(Bitmap bmp){
+		if(bmp == null){
+			mBitmap = null;
+			return;
+		}//func
+		mBitmap = bmp;
+		
+		mViewSize.oWidth = (float)this.getWidth();
+		mViewSize.oHeight = (float)this.getHeight();
+		mImgSize.oWidth = (float)mBitmap.getWidth();
+		mImgSize.oHeight = (float)mBitmap.getHeight();
+		
+		resetScale();
+	}//func
+
+
+	/*========================================================
+	Events*/
+	@Override
+	public void onSizeChanged(int w,int h,int oldw,int oldh){
+		super.onSizeChanged(w, h, oldw, oldh);
+		mViewSize.oWidth = (float)w;
+		mViewSize.oHeight = (float)h;
+		resetScale();
+	}//func
+	
+
 	/*========================================================
 	*/
 	@Override

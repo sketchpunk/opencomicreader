@@ -182,6 +182,7 @@ public class ComicLibrary{
 			
 	    	//............................................
 	    	//setup db stuff.
+	        SeriesParser sParser = new SeriesParser();
 	    	InsertHelper dbInsert = mDb.getInsertHelper("ComicLibrary");
 	    	
 			int iComicID = dbInsert.getColumnIndex("comicID");
@@ -191,6 +192,7 @@ public class ComicLibrary{
 			int iPgRead = dbInsert.getColumnIndex("pgRead");
 			int iPgCurrent = dbInsert.getColumnIndex("pgCurrent");
 			int iIsCoverExists = dbInsert.getColumnIndex("isCoverExists");
+			int iSeries = dbInsert.getColumnIndex("series");
 			
 			mDb.beginTransaction();
 
@@ -209,21 +211,23 @@ public class ComicLibrary{
 	    				//------------------------------
 	    				//Check if already in library
 	    				sendProgress(file.getName());
-	    				path = file.getPath(); System.out.println(path);
+	    				path = file.getPath(); //System.out.println(path);
 
 	    				tmp = mDb.scalar("SELECT comicID FROM ComicLibrary WHERE path = '"+path.replace("'","''")+"'",null);
 	    				if(!tmp.isEmpty()) continue;
 
 	    				//------------------------------
 	    				//Not found, add it to library.
+	    				tmp = sage.io.Path.removeExt(file.getName());
 	    				dbInsert.prepareForInsert();
 						dbInsert.bind(iComicID,UUID.randomUUID().toString());
-	    				dbInsert.bind(iTitle,sage.io.Path.removeExt(file.getName()));
+	    				dbInsert.bind(iTitle,tmp);
 	    				dbInsert.bind(iPath,path);
 	    				dbInsert.bind(iPgCount,0);
 	    				dbInsert.bind(iPgRead,0);
 	    				dbInsert.bind(iPgCurrent,0);
 	    				dbInsert.bind(iIsCoverExists,0);
+	    				dbInsert.bind(iSeries,sParser.get(tmp));
 	    				
 						if(dbInsert.execute() == -1){System.out.println("ERROR");}//if
 	    			}//if
@@ -246,7 +250,9 @@ public class ComicLibrary{
 			StringBuilder delList = new StringBuilder(); //Can't delete records with an open cursor, save IDs and delete later.
 			int[] outVar = {0,0}; //PageCount,IsCoverCreated
 			File file;
-			Cursor cur = mDb.raw("SELECT comicID,path,isCoverExists FROM ComicLibrary",null);
+			String tmp;
+			Cursor cur = mDb.raw("SELECT comicID,path,isCoverExists,series,title FROM ComicLibrary",null);
+			SeriesParser sParser = null;
 			
 			for(boolean isOk = cur.moveToFirst(); isOk; isOk = cur.moveToNext()){
 				file = new File(cur.getString(1));
@@ -279,6 +285,20 @@ public class ComicLibrary{
 					}else{ //if no pages found, its not a comic archive. Delete.
 						if(delList.length() != 0) delList.append(",");
 						delList.append("'"+cur.getString(0)+"'");
+					}//if
+				}//if
+				
+				//.........................................
+				//if series does not exist, process the title for one
+				tmp = cur.getString(3);
+				if(tmp == null || tmp.isEmpty()){
+					if(sParser == null) sParser = new SeriesParser(); //JIT
+					tmp = cur.getString(4);
+					if(tmp == null || tmp.isEmpty()) continue;
+					
+					tmp = sParser.get(tmp);
+					if(!tmp.isEmpty()){
+						mDb.execSql(String.format("UPDATE ComicLibrary SET series='%s' WHERE comicID = '%s'",tmp.replace("'","''"),cur.getString(0)),null);
 					}//if
 				}//if
 			}//for

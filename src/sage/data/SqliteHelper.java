@@ -8,7 +8,7 @@ public class SqliteHelper extends SQLiteOpenHelper{
 	/*========================================================
 	*/
 	public static final String DATABASE_NAME = "main.db";
-	public static final int DATABASE_VERSION = 1;
+	public static final int DATABASE_VERSION = 2;
 
 	private static SqliteHelper mInstance = null;
 	public static SqliteHelper getInstance(Context ctx){
@@ -30,11 +30,17 @@ public class SqliteHelper extends SQLiteOpenHelper{
 		db.execSQL("CREATE TABLE IF NOT EXISTS [ComicLibrary]("
 			+"comicID VARCHAR(40) PRIMARY KEY NOT NULL"
 			+",title VARCHAR(255) NOT NULL,path VARCHAR(255) NOT NULL,isCoverExists INT NOT NULL"
-			+",pgCount INT NOT NULL,pgRead INT NOT NULL,pgCurrent INT NOT NULL);");
+			+",pgCount INT NOT NULL,pgRead INT NOT NULL,pgCurrent INT NOT NULL,series VARCHAR(300) NULL);");
 	}//func
 	
 	@Override
 	public void onUpgrade(SQLiteDatabase db,int oldVersion,int newVersion){
-		onCreate(db);
+		for(int i=oldVersion+1; i <= newVersion; i++){
+			switch(i){
+				case 2:
+					db.execSQL("ALTER TABLE ComicLibrary ADD COLUMN series VARCHAR(300) NULL;");
+					break;
+			}//if
+		}//for
 	}//func
 }//cls

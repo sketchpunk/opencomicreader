@@ -1,6 +1,7 @@
 package com.sketchpunk.ocomicreader;
 
 import com.sketchpunk.ocomicreader.lib.ComicLibrary;
+import com.sketchpunk.ocomicreader.lib.SeriesParser;
 
 import sage.data.Sqlite;
 import sage.data.SqlCursorLoader;
@@ -10,6 +11,8 @@ import sage.ui.ProgressCircle;
 
 import android.os.Bundle;
 import android.os.Environment;
+import android.app.ActionBar;
+import android.app.ActionBar.OnNavigationListener;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -24,8 +27,10 @@ import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,11 +43,19 @@ public class MainActivity extends FragmentActivity
 	,LoaderManager.LoaderCallbacks<Cursor>
 	,LoadImageView.OnImageLoadedListener
 	,ComicLibrary.SyncCallback
-	,OnItemClickListener{
+	,OnItemClickListener, OnNavigationListener{
 
+	private int mSelectedMode = 0;
+	private String[] mFilterModes = new String[]{"View All","View By Series","View Unread","View in Progress","View Read"};
+	private String mSeriesFilter = "";
+	private SpinnerAdapter mSpinAdapter;
+	
 	private GridView mGridView;
 	private SqlCursorAdapter mAdapter;
 	private Sqlite mDb;
+	private ActionBar mActionBar;
+	private TextView mCountLbl;
+	private TextView mSeriesLbl;
 	
 	private String mThumbPath;
 	private ProgressDialog mProgress;
@@ -58,12 +71,25 @@ public class MainActivity extends FragmentActivity
 	}//func
 	
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         overridePendingTransition(R.anim.fadein, R.anim.fadeout);
-        
+
         mThumbPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/OpenComicReader/thumbs/";
+        mSpinAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_dropdown_item,mFilterModes);
+        
+        //....................................
+        //Setup Actionbar
+        ActionBar mActionBar = this.getActionBar();
+        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+        mActionBar.setDisplayShowTitleEnabled(false);
+        mActionBar.setListNavigationCallbacks(mSpinAdapter,this);
+        mActionBar.setSelectedNavigationItem(mSelectedMode);
+        mActionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM|ActionBar.DISPLAY_USE_LOGO|ActionBar.DISPLAY_SHOW_HOME);
+        mActionBar.setCustomView(R.layout.activity_main_actionbar);
+        mCountLbl = (TextView)mActionBar.getCustomView().findViewById(R.id.lblCount);
+        mSeriesLbl = (TextView)mActionBar.getCustomView().findViewById(R.id.lblSeries);
         
         //....................................
         //Setup Main View Area
@@ -90,9 +116,9 @@ public class MainActivity extends FragmentActivity
     @Override
     public void onPause() {
         super.onPause();
-        System.out.println("ON PAUSE");
+        //System.out.println("ON PAUSE");
     }//func
-
+    
     @Override
     public void onResume() {
         super.onResume();
@@ -142,7 +168,16 @@ public class MainActivity extends FragmentActivity
         return true;
     }//cls
     
-
+	@Override
+	public boolean onNavigationItemSelected(int index, long id){
+		if(mSelectedMode != index){//initially, refreshdata gets called twice,its a waste.
+			mSelectedMode = index;
+			this.refreshData();
+		}//if
+		return false;
+	}//func
+    
+    
     /*========================================================
 	Context menu*/
     @Override
@@ -179,27 +214,65 @@ public class MainActivity extends FragmentActivity
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id){
 		AdapterItemRef itmRef = (AdapterItemRef)view.getTag();
-
-    	Intent intent = new Intent(this,ViewActivity.class);
-		intent.putExtra("comicid",itmRef.id);
-	    this.startActivityForResult(intent,0);
+		
+		if(mSelectedMode == 1 && mSeriesFilter.isEmpty()){
+			mSeriesFilter = itmRef.series;
+			refreshData();
+		}else{
+			Intent intent = new Intent(this,ViewActivity.class);
+			intent.putExtra("comicid",itmRef.id);
+			this.startActivityForResult(intent,0);
+		}//if
 	}//func
-    
+	
+	@Override
+	public void onBackPressed(){
+		if(mSelectedMode == 1 && !mSeriesFilter.isEmpty()){
+			mSeriesFilter = "";
+			refreshData();
+		}else{
+			super.onBackPressed();
+		}//if
+	}//func
+
 
     /*========================================================
 	Cursor Loader*/
-	private void refreshData(){ getSupportLoaderManager().restartLoader(0,null,this); }//func
+	private void refreshData(){ if(!mIsFirstRun) getSupportLoaderManager().restartLoader(0,null,this); }//func
 	
     @Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle arg){
+    	String sql = "";
+    	if(mSeriesLbl.getVisibility() != View.GONE) mSeriesLbl.setVisibility(View.GONE);
+    	
+    	if(mSelectedMode == 1){//Filter by series
+    		if(mSeriesFilter.isEmpty()){
+    			sql = "SELECT min(comicID) [_id],series [title],sum(pgCount) [pgCount],sum(pgRead) [pgRead],min(isCoverExists) [isCoverExists],count(comicID) [cntIssue] FROM ComicLibrary GROUP BY series ORDER BY series";
+    		}else{
+    			mSeriesLbl.setText("Series > " + mSeriesFilter);
+    			mSeriesLbl.setVisibility(View.VISIBLE);
+    			sql = "SELECT comicID [_id],title,pgCount,pgRead,isCoverExists FROM ComicLibrary WHERE series = '"+mSeriesFilter.replace("'", "''")+"' ORDER BY title";
+    		}//if
+    	}else{ //Filter by reading progress.
+    		String condWhere = "";
+    		switch(mSelectedMode){
+    			case 2: condWhere = "WHERE pgRead=0"; break; //Unread;
+    			case 3: condWhere = "WHERE pgRead > 0 AND pgRead < pgCount-1"; break;//Progress
+    			case 4: condWhere = "WHERE pgRead >= pgCount-1"; break;//Read
+    		}//switch
+    		sql = "SELECT comicID [_id],title,pgCount,pgRead,isCoverExists FROM ComicLibrary "+condWhere+" ORDER BY title";
+    	}//if
+   
+    	//............................................
     	SqlCursorLoader cursorLoader = new SqlCursorLoader(this,mDb);
-    	cursorLoader.setRaw("SELECT comicID [_id],title,pgCount,pgRead,isCoverExists FROM ComicLibrary ORDER BY title");
+    	cursorLoader.setRaw(sql);
     	return cursorLoader;
 	}//func
     
 	@Override
-	public void onLoadFinished(android.support.v4.content.Loader<Cursor> loader, Cursor cursor) {
-		mAdapter.changeCursor(cursor);
+	public void onLoadFinished(android.support.v4.content.Loader<Cursor> loader, Cursor cursor){
+		mCountLbl.setText(Integer.toString(cursor.getCount()));
+		mAdapter.changeCursor(cursor,true);
 	}//func
 
 	@Override
@@ -216,6 +289,7 @@ public class MainActivity extends FragmentActivity
     	ImageView imgCover;
     	ProgressCircle pcProgress;
     	Bitmap bitmap = null;
+    	String series = "";
     }//cls
 	
 	@Override
@@ -238,9 +312,16 @@ public class MainActivity extends FragmentActivity
 	public void onBindListItem(View v,Cursor c){
 		try{
 			AdapterItemRef itmRef = (AdapterItemRef)v.getTag();
+			
 			//..............................................
+			String tmp = c.getString(mAdapter.getColIndex("title"));
+			if(mSelectedMode == 1 && mSeriesFilter.isEmpty()){
+				itmRef.series = tmp;
+				tmp += " ("+c.getString(mAdapter.getColIndex("cntIssue"))+")";
+			}else itmRef.series = "";
+			itmRef.lblTitle.setText(tmp);
+			
 			itmRef.id = c.getString(mAdapter.getColIndex("_id"));
-			itmRef.lblTitle.setText(c.getString(mAdapter.getColIndex("title")));
 
 			//..............................................
 			//load Cover Image
@@ -300,7 +381,6 @@ public class MainActivity extends FragmentActivity
 		}//if
 	}//func
 
-	
 	@Override
 	public void OnSyncProgress(String txt){
 		if(mProgress != null){
@@ -310,7 +390,6 @@ public class MainActivity extends FragmentActivity
 		System.out.println("PROGRESS");
 	}//func
 	
-
 	@Override
 	public void onSyncComplete(int status){
 		//............................................

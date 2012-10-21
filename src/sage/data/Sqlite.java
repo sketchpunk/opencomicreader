@@ -93,6 +93,16 @@ public class Sqlite{
 		
 		return rtn;
 	}//func
+
+	public static int update(Context c,String sTable,ContentValues cv,String whereClause,String[] whereArgs){
+		Sqlite db = new Sqlite(c);
+		
+		db.openWrite();
+		int rtn = db.update(sTable,cv,whereClause,whereArgs);
+		db.close();
+		
+		return rtn;
+	}//func
 	
 	
 	/*========================================================
@@ -124,6 +134,10 @@ public class Sqlite{
 	
 	public long insert(String sTable,ContentValues cv){
 		return mDb.insert(sTable,null,cv);
+	}//func
+	
+	public int update(String sTable,ContentValues cv,String where,String[] whereArgs){
+		return mDb.update(sTable,cv,where,whereArgs);
 	}//func
 	
 	

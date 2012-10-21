@@ -7,6 +7,7 @@ import java.lang.StringBuilder;
 import java.util.Stack;
 import java.util.UUID;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -53,8 +54,40 @@ public class ComicLibrary{
     		break;
     	}//switch
     }//func
-	    
-   
+
+    
+    /*========================================================
+	methods*/
+    public static void removeComic(Context context,String id,boolean delComic){
+    	File file;
+    	sage.data.Sqlite db = new sage.data.Sqlite(context);
+    	db.openWrite();
+    	
+    	if(delComic){ //Delete comic from device
+    		String comicPath = db.scalar("SELECT path FROM ComicLibrary WHERE comicID = '"+id.replace("'","''")+"';",null);
+    		if(comicPath != null && !comicPath.isEmpty()){
+    			file = new File(comicPath);
+    			if(file.exists()) file.delete();
+    		}//if
+    	}//if
+    	
+    	//Delete comic from library
+    	if(db.delete("ComicLibrary", "comicID = '"+id.replace("'","''")+"'",null) > 0){
+    		file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/OpenComicReader/thumbs/" + id +".jpg");
+    		if(file.exists()) file.delete();
+    	}//if
+    	
+    	db.close();
+    }//func
+    
+    public static void resetProgress(Context context,String id){
+    	ContentValues cv = new ContentValues();
+    	cv.put("pgRead",0);
+    	cv.put("pgCurrent",0);
+    	sage.data.Sqlite.update(context,"ComicLibrary", cv,"comicID='"+id.replace("'","''")+"'",null);
+    }//func
+    
+    
 	/*========================================================
 	sync methods*/
     public static boolean startSync(Context context){

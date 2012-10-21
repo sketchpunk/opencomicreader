@@ -12,6 +12,7 @@ import sage.ui.ProgressCircle;
 import android.os.Bundle;
 import android.os.Environment;
 import android.app.ActionBar;
+import android.app.AlertDialog;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -195,16 +196,49 @@ public class MainActivity extends FragmentActivity
 	}//func
 	
 	@Override
-	public boolean onContextItemSelected(MenuItem item) {
-		//AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-		//final ListItemRef ref = (ListItemRef)info.targetView.getTag();
+	public boolean onContextItemSelected(MenuItem item){
+		if(mSelectedMode == 1 && mSeriesFilter.isEmpty()){
+			Toast.makeText(this,"Can not perform operation on series.",Toast.LENGTH_SHORT).show();
+			return false;
+		}//func
 		
-		//switch(item.getItemId()){
-		//	case 1:
-				
-		//	break;
-		//}//switch
-		Toast.makeText(this,"Feature not implemented (YET)",Toast.LENGTH_SHORT).show();
+		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+		final AdapterItemRef ref = (AdapterItemRef)info.targetView.getTag();
+		final String comicID = ref.id;
+		final Context context = this;
+		AlertDialog.Builder abBuilder;
+		
+		switch(item.getItemId()){
+			case 2://DELETE
+				abBuilder = new AlertDialog.Builder(this);
+				abBuilder.setTitle("Delete Comic : " + ref.lblTitle.getText().toString());
+				abBuilder.setMessage("You are able to remove the selected comic from the library or from the device competely.");
+				abBuilder.setCancelable(true);
+				abBuilder.setNegativeButton("Cancel",null);
+				abBuilder.setPositiveButton("Remove from library",new DialogInterface.OnClickListener(){
+					@Override
+					public void onClick(DialogInterface dialog, int which){ ComicLibrary.removeComic(context,comicID,false); refreshData(); }
+				});
+				abBuilder.setNeutralButton("Remove from device",new DialogInterface.OnClickListener(){
+					@Override
+					public void onClick(DialogInterface dialog, int which){ ComicLibrary.removeComic(context,comicID,true); refreshData(); }
+				});
+				abBuilder.show();
+				break;
+			case 1://Reset Progress
+				abBuilder = new AlertDialog.Builder(this);
+				abBuilder.setTitle("Reset Comic Progress : " + ref.lblTitle.getText().toString());
+				abBuilder.setMessage("Are you sure you want to reset the reading progress of this comics?");
+				abBuilder.setCancelable(true);
+				abBuilder.setNegativeButton("Cancel",null);
+				abBuilder.setPositiveButton("Ok",new DialogInterface.OnClickListener(){
+					@Override
+					public void onClick(DialogInterface dialog, int which){ ComicLibrary.resetProgress(context,comicID); refreshData(); }
+				});
+				abBuilder.show();
+				break;
+		}//func
+
 		return true;
 	}//func
 

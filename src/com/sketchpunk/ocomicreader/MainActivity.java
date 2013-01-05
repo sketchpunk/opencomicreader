@@ -11,6 +11,7 @@ import sage.ui.ProgressCircle;
 
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.ActionBar.OnNavigationListener;
@@ -18,6 +19,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 
@@ -46,7 +48,7 @@ public class MainActivity extends FragmentActivity
 	,ComicLibrary.SyncCallback
 	,OnItemClickListener, OnNavigationListener{
 
-	private int mSelectedMode = 0;
+	private int mFilterMode = 0;
 	private String[] mFilterModes = new String[]{"View All","View By Series","View Unread","View in Progress","View Read"};
 	private String mSeriesFilter = "";
 	private SpinnerAdapter mSpinAdapter;
@@ -77,6 +79,13 @@ public class MainActivity extends FragmentActivity
         setContentView(R.layout.activity_main);
         overridePendingTransition(R.anim.fadein, R.anim.fadeout);
 
+        //....................................        
+        //Get perferences
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+      	String tmp = prefs.getString("libraryFilter","0");
+        this.mFilterMode = Integer.parseInt(tmp);
+        
+        //....................................
         mThumbPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/OpenComicReader/thumbs/";
         mSpinAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_dropdown_item,mFilterModes);
         
@@ -86,7 +95,7 @@ public class MainActivity extends FragmentActivity
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
         mActionBar.setDisplayShowTitleEnabled(false);
         mActionBar.setListNavigationCallbacks(mSpinAdapter,this);
-        mActionBar.setSelectedNavigationItem(mSelectedMode);
+        mActionBar.setSelectedNavigationItem(mFilterMode);
         mActionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM|ActionBar.DISPLAY_USE_LOGO|ActionBar.DISPLAY_SHOW_HOME);
         mActionBar.setCustomView(R.layout.activity_main_actionbar);
         mCountLbl = (TextView)mActionBar.getCustomView().findViewById(R.id.lblCount);
@@ -171,8 +180,8 @@ public class MainActivity extends FragmentActivity
     
 	@Override
 	public boolean onNavigationItemSelected(int index, long id){
-		if(mSelectedMode != index){//initially, refreshdata gets called twice,its a waste.
-			mSelectedMode = index;
+		if(mFilterMode != index){//initially, refreshdata gets called twice,its a waste.
+			mFilterMode = index;
 			this.refreshData();
 		}//if
 		return false;
@@ -197,7 +206,7 @@ public class MainActivity extends FragmentActivity
 	
 	@Override
 	public boolean onContextItemSelected(MenuItem item){
-		if(mSelectedMode == 1 && mSeriesFilter.isEmpty()){
+		if(mFilterMode == 1 && mSeriesFilter.isEmpty()){
 			Toast.makeText(this,"Can not perform operation on series.",Toast.LENGTH_SHORT).show();
 			return false;
 		}//func
@@ -249,7 +258,7 @@ public class MainActivity extends FragmentActivity
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id){
 		AdapterItemRef itmRef = (AdapterItemRef)view.getTag();
 		
-		if(mSelectedMode == 1 && mSeriesFilter.isEmpty()){
+		if(mFilterMode == 1 && mSeriesFilter.isEmpty()){
 			mSeriesFilter = itmRef.series;
 			refreshData();
 		}else{
@@ -261,7 +270,7 @@ public class MainActivity extends FragmentActivity
 	
 	@Override
 	public void onBackPressed(){
-		if(mSelectedMode == 1 && !mSeriesFilter.isEmpty()){
+		if(mFilterMode == 1 && !mSeriesFilter.isEmpty()){
 			mSeriesFilter = "";
 			refreshData();
 		}else{
@@ -279,7 +288,7 @@ public class MainActivity extends FragmentActivity
     	String sql = "";
     	if(mSeriesLbl.getVisibility() != View.GONE) mSeriesLbl.setVisibility(View.GONE);
     	
-    	if(mSelectedMode == 1){//Filter by series
+    	if(mFilterMode == 1){//Filter by series
     		if(mSeriesFilter.isEmpty()){
     			sql = "SELECT min(comicID) [_id],series [title],sum(pgCount) [pgCount],sum(pgRead) [pgRead],min(isCoverExists) [isCoverExists],count(comicID) [cntIssue] FROM ComicLibrary GROUP BY series ORDER BY series";
     		}else{
@@ -289,7 +298,7 @@ public class MainActivity extends FragmentActivity
     		}//if
     	}else{ //Filter by reading progress.
     		String condWhere = "";
-    		switch(mSelectedMode){
+    		switch(mFilterMode){
     			case 2: condWhere = "WHERE pgRead=0"; break; //Unread;
     			case 3: condWhere = "WHERE pgRead > 0 AND pgRead < pgCount-1"; break;//Progress
     			case 4: condWhere = "WHERE pgRead >= pgCount-1"; break;//Read
@@ -349,7 +358,7 @@ public class MainActivity extends FragmentActivity
 			
 			//..............................................
 			String tmp = c.getString(mAdapter.getColIndex("title"));
-			if(mSelectedMode == 1 && mSeriesFilter.isEmpty()){
+			if(mFilterMode == 1 && mSeriesFilter.isEmpty()){
 				itmRef.series = tmp;
 				tmp += " ("+c.getString(mAdapter.getColIndex("cntIssue"))+")";
 			}else itmRef.series = "";

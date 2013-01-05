@@ -4,6 +4,10 @@
 		<sage.pref.FolderPref android:key="syncfolder1" android:title="Sync Folder 1" android:defaultValue=""/>
 		<sage.pref.FolderPref android:key="syncfolder2" android:title="Sync Folder 2" android:defaultValue=""/>
 	    
+		 <ListPreference android:key="libraryFilter"  android:title="Library Filter" android:defaultValue="0"
+           android:summary="Set the default of how the library should be filtered on launch."
+           android:entries="@array/libraryFilter" android:entryValues="@array/libraryFilter_v"/>
+		
 	    <!--
 		<sage.pref.DialogPref
 			android:title="Reset Quests"

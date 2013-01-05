@@ -114,7 +114,7 @@ public class FolderPref extends DialogPreference implements DialogInterface.OnCl
 		String path = (String)view.getTag();
 		if(path.equals("..")){
 			int pos = mCurrentPath.lastIndexOf('/');
-			path = mCurrentPath.substring(0,pos);
+			if(pos > 0) path = mCurrentPath.substring(0,pos);
 		}//if
 		
 		loadPath(path);

@@ -427,8 +427,11 @@ public class MainActivity extends FragmentActivity
 	@Override
 	public void onSyncComplete(int status){
 		//............................................
-		if(mProgress != null){ mProgress.dismiss(); mProgress = null; }//if
-		
+		try{
+			if(mProgress != null){ mProgress.dismiss(); mProgress = null; }//if
+		}catch(Exception e){
+			Toast.makeText(this,"Error closing progress dialog",Toast.LENGTH_LONG).show();
+		}//try
 		System.out.println("onSyncComplete");
 		
 		//............................................

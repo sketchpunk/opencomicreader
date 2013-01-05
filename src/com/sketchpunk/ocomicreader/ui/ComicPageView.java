@@ -166,7 +166,9 @@ public class ComicPageView extends View implements GestureDetector.OnGestureList
 	
 	@Override
 	protected void onDraw(Canvas canvas){
-		if(mBitmap != null) canvas.drawBitmap(mBitmap,mMatrix,mPaint);
+		if(mBitmap != null){
+			if(! mBitmap.isRecycled()) canvas.drawBitmap(mBitmap,mMatrix,mPaint);
+		}//if
 	}//func	
 
 	

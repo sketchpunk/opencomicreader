@@ -7,15 +7,19 @@ import com.sketchpunk.ocomicreader.lib.ComicLoader;
 import com.sketchpunk.ocomicreader.ui.ComicPageView;
 
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 public class ViewActivity extends Activity implements ComicPageView.CallBack,ComicLoader.CallBack,
@@ -25,6 +29,7 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
 	private String mComicID = "";
 	private Sqlite mDb = null;
 	private Toast mToast;
+	private Boolean mPref_ShowPgNum = true;
 
 	/*========================================================
 	View Events*/
@@ -56,10 +61,21 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
 	@Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_view);
-        this.getActionBar().hide();
-        this.overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         
+        //Get perferences
+      	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+    	this.mPref_ShowPgNum = prefs.getBoolean("showPageNum",true);
+    	if(prefs.getBoolean("fullScreen",false)){
+    		System.out.println("FULL SCREEN");
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            
+            View rootView = getWindow().getDecorView();
+            rootView.setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
+    	}//if
+
+        this.overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+    	setContentView(R.layout.activity_view);
         //.........................................
         Bundle b = this.getIntent().getExtras(); 
         mComicID = b.getString("comicid");
@@ -81,7 +97,7 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
         //.........................................
         mComicLoad = new ComicLoader(this,mImageView);
         if(mComicLoad.loadArchive(dbData.get("path"))){
-        	showToast("Loading Page...",1);
+        	if(this.mPref_ShowPgNum) showToast("Loading Page...",1);
         	mComicLoad.gotoPage(Integer.parseInt(dbData.get("pgCurrent"))); //Continue where user left off
         }else{
         	Toast.makeText(this,"Unable to load comic.",Toast.LENGTH_LONG).show();
@@ -115,6 +131,7 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
 			case R.id.mnu_scalew: mImageView.setScaleMode(ComicPageView.ScaleToWidth); break;
 			case R.id.mnu_scalen: mImageView.setScaleMode(ComicPageView.ScaleNone); break;
 			case R.id.mnu_goto: sage.ui.Dialogs.NumPicker(this,"Goto Page",1,mComicLoad.getPageCount(),mComicLoad.getCurrentPage()+1,this); break;
+			case R.id.mnu_exit: this.finish(); break;
 		}//switch
 		return true;
 	}//func
@@ -137,7 +154,7 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
 			
 			//....................................
 			//Display page number
-			showToast(String.format("%d / %d",currentPage+1,mComicLoad.getPageCount()),0);
+			if(this.mPref_ShowPgNum) showToast(String.format("%d / %d",currentPage+1,mComicLoad.getPageCount()),0);
 		}//if
 	}//func
 
@@ -151,18 +168,22 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
 			//.........................................		
 			case ComicPageView.FlingRight:
 			case ComicPageView.TapLeft:
-				showToast("Loading Page...",1);
+				if(this.mPref_ShowPgNum) showToast("Loading Page...",1);
 				switch(mComicLoad.prevPage()){
-					case 0: showToast("FIRST PAGE",1); break;
+					case 0:
+						if(this.mPref_ShowPgNum) showToast("FIRST PAGE",1);
+						break;
 					case -1: showToast("Still Preloading, Try again in one second",1); break;
 				}//switch
 				break;
 			//.........................................
 			case ComicPageView.FlingLeft:
 			case ComicPageView.TapRight:
-				showToast("Loading Page...",1);
+				if(this.mPref_ShowPgNum) showToast("Loading Page...",1);
 				switch(mComicLoad.nextPage()){
-					case 0: showToast("LAST PAGE",1); break;
+					case 0: 
+						if(this.mPref_ShowPgNum) showToast("LAST PAGE",1);
+						break;
 					case -1: showToast("Still Preloading, Try again in one second",1); break;
 				}//switch
 				break;

@@ -23,7 +23,14 @@
            android:summary="Set how the image should scale depending on the screen."
            android:entries="@array/scaleMode" android:entryValues="@array/scaleMode_v"/>
 	    
+		<CheckBoxPreference android:key="showPageNum" android:title="Show Page Number" android:defaultValue="true"
+	        android:summary="When switching pages, a toast alert appears in the corner telling you what page you're on."/>
+	    
+		<CheckBoxPreference android:key="fullScreen" android:title="Fullscreen" android:defaultValue="false"
+	        android:summary="Display comics at full screen. Tap and hold for options to exit when there is no virtual buttons."/>
+	    
 	    <CheckBoxPreference android:key="preLoading" android:title="Preload Next Page" android:defaultValue="true"
 	        android:summary="This feature speeds up page loading, but if there is out of memory issues then disable this feature."/>
+	    
 	</PreferenceCategory>
 </PreferenceScreen>

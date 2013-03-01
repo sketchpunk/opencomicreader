@@ -104,7 +104,7 @@ public class ComicRar implements iComicArchive{
 
 	public boolean getLibraryData(String[] outVar) {	
 		int pgCnt = 0;
-		String itmName,coverPath = "";
+		String itmName,compare,coverPath = "";
 
 		outVar[0] = "0"; //Page Count
 		outVar[1] = ""; //Path to Cover Entry
@@ -115,9 +115,10 @@ public class ComicRar implements iComicArchive{
 		for(FileHeader fh : files){
 			if(fh.isDirectory()) continue;
  
-			itmName = fh.getFileNameString().toLowerCase();
-			if(itmName.endsWith(".jpg") || itmName.endsWith(".gif") || itmName.endsWith(".png")){
-				if(pgCnt == 0) coverPath = fh.getFileNameString();
+			itmName = fh.getFileNameString();
+			compare = itmName.toLowerCase();
+			if(compare.endsWith(".jpg") || compare.endsWith(".gif") || compare.endsWith(".png")){
+				if(pgCnt == 0 || itmName.compareTo(coverPath) < 0) coverPath = itmName;
 				pgCnt++;
 			}//if
 		}//for

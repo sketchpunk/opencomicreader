@@ -97,9 +97,8 @@ public class ComicZip implements iComicArchive{
 
 		try{
 			int pgCnt = 0;
-			String coverPath = "";
-			
-			String itmName;
+			String itmName,compare,coverPath = "";
+
 			ZipEntry itm;
 			Enumeration entries = mArchive.entries();
 
@@ -108,9 +107,10 @@ public class ComicZip implements iComicArchive{
 				itm = (ZipEntry)entries.nextElement();
 				if(itm.isDirectory()) continue;
 				
-				itmName = itm.getName().toLowerCase();
-				if(itmName.endsWith(".jpg") || itmName.endsWith(".gif") || itmName.endsWith(".png")){
-					if(pgCnt == 0) coverPath = itm.getName();
+				itmName = itm.getName();
+				compare = itmName.toLowerCase();
+				if(compare.endsWith(".jpg") || compare.endsWith(".gif") || compare.endsWith(".png")){
+					if(pgCnt == 0 || itmName.compareTo(coverPath) < 0) coverPath = itmName;
 					pgCnt++;
 				}//if
 			}//while

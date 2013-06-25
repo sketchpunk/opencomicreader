@@ -155,13 +155,15 @@ public class ComicLibrary{
 		dbCoursor.close();
         mDb.close();
         
+        mDb.openWrite();
         // update their pgRead/pgCurrent values
         for (Map<String, String> comic : comics) {
             ContentValues cv = new ContentValues();
         	cv.put("pgRead", comic.get("pgCount"));
         	cv.put("pgCurrent", comic.get("pgCount"));
-        	sage.data.Sqlite.update(context,"ComicLibrary", cv,"comicID='"+comic.get("comicID").replace("'","''")+"'",null);
+        	mDb.update("ComicLibrary", cv,"comicID='"+comic.get("comicID").replace("'","''")+"'",null);
 		}
+        mDb.close();
     }
     
 	/*========================================================

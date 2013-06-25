@@ -207,7 +207,7 @@ public class MainActivity extends FragmentActivity
 	
 	@Override
 	public boolean onContextItemSelected(MenuItem item){
-		if(mFilterMode == 1 && mSeriesFilter.isEmpty() && item.getItemId() != 1 ){
+		if(mFilterMode == 1 && mSeriesFilter.isEmpty() && item.getItemId() != 3 && item.getItemId() != 1){
 			Toast.makeText(this,"Can not perform operation on series.",Toast.LENGTH_SHORT).show();
 			return false;
 		}//func
@@ -258,21 +258,14 @@ public class MainActivity extends FragmentActivity
 				abBuilder.show();
 				break;
 			case 3:// Mark Read
-				// just do it this is nothing serious
-				ComicLibrary.markAsRead(context, comicID);
-				refreshData();
-				/*
-				abBuilder = new AlertDialog.Builder(this);
-				abBuilder.setTitle("Mark Comic as Read : " + ref.lblTitle.getText().toString());
-				abBuilder.setMessage("Are you sure you want to mark this comic as read?");
-				abBuilder.setCancelable(true);
-				abBuilder.setNegativeButton("Cancel",null);
-				abBuilder.setPositiveButton("Ok",new DialogInterface.OnClickListener(){
-					@Override
-					public void onClick(DialogInterface dialog, int which){ComicLibrary.markAsRead(context, comicID); ComicLibrary.markAsRead(context, comicID); refreshData(); }
-				});
-				abBuilder.show();
-				*/			
+				if (mFilterMode == 1 && mSeriesFilter.isEmpty()) { // full series selected
+					ComicLibrary.markSeriesAsRead(context, comicID);
+					refreshData();
+				} else { // only single comic
+					// just do it this is nothing serious
+					ComicLibrary.markAsRead(context, comicID);
+					refreshData();
+				}
 				
 		}//func
 

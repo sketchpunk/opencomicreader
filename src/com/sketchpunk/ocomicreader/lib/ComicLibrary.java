@@ -135,6 +135,36 @@ public class ComicLibrary{
     	sage.data.Sqlite.update(context,"ComicLibrary", cv,"comicID='"+id.replace("'","''")+"'",null);
     }
     
+    public static void markSeriesAsRead(Context context, String oneComicId) {
+        
+    	LinkedList<Map<String, String>> comics = new LinkedList<Map<String,String>>();
+        Sqlite mDb = new Sqlite(context);
+        mDb.openRead();
+        //Get series from the id of a comic
+        Map<String,String> seriesData = mDb.scalarRow("SELECT series FROM ComicLibrary WHERE comicID = ?", new String[]{oneComicId});
+        String series = seriesData.get("series");
+        
+        // get all comics of the series
+        Cursor dbCoursor = mDb.raw("SELECT pgCount, comicID FROM ComicLibrary WHERE series = ?", new String[]{series});
+		for (boolean hasNext = dbCoursor.moveToFirst(); hasNext; hasNext = dbCoursor.moveToNext()) {
+			Map<String, String> comic = new HashMap<String, String>();
+			for(int i = 0; i < dbCoursor.getColumnCount(); i++){
+				comic.put(dbCoursor.getColumnName(i),dbCoursor.getString(i));
+			}
+			comics.add(comic);
+    	}
+		dbCoursor.close();
+        mDb.close();
+        
+        // update their pgRead/pgCurrent values
+        for (Map<String, String> comic : comics) {
+            ContentValues cv = new ContentValues();
+        	cv.put("pgRead", comic.get("pgCount"));
+        	cv.put("pgCurrent", comic.get("pgCount"));
+        	sage.data.Sqlite.update(context,"ComicLibrary", cv,"comicID='"+comic.get("comicID").replace("'","''")+"'",null);
+		}
+    }
+    
 	/*========================================================
 	sync methods*/
     public static boolean startSync(Context context){

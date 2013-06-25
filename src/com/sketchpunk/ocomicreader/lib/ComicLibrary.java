@@ -129,8 +129,9 @@ public class ComicLibrary{
         Map<String,String> dbData = mDb.scalarRow("SELECT pgCount FROM ComicLibrary WHERE comicID = ?", new String[]{id});
         mDb.close();
         ContentValues cv = new ContentValues();
-    	cv.put("pgRead",dbData.get("pgCount"));
-    	cv.put("pgCurrent",dbData.get("pgCount"));
+        String lastPage = String.valueOf(Integer.parseInt(dbData.get("pgCount"))-1);
+    	cv.put("pgRead",lastPage);
+    	cv.put("pgCurrent",lastPage);
     	sage.data.Sqlite.update(context,"ComicLibrary", cv,"comicID='"+id.replace("'","''")+"'",null);
     }
     
@@ -159,8 +160,9 @@ public class ComicLibrary{
         // update their pgRead/pgCurrent values
         for (Map<String, String> comic : comics) {
             ContentValues cv = new ContentValues();
-        	cv.put("pgRead", comic.get("pgCount"));
-        	cv.put("pgCurrent", comic.get("pgCount"));
+            String lastPage = String.valueOf(Integer.parseInt(comic.get("pgCount"))-1);
+        	cv.put("pgRead", lastPage);
+        	cv.put("pgCurrent", lastPage);
         	mDb.update("ComicLibrary", cv,"comicID='"+comic.get("comicID").replace("'","''")+"'",null);
 		}
         mDb.close();

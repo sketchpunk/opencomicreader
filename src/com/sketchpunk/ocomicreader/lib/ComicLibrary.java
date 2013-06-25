@@ -4,8 +4,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.lang.StringBuilder;
+
 import java.util.HashMap;
 import java.util.LinkedList;
+
+import java.util.Locale;
+
 import java.util.Map;
 import java.util.Stack;
 import java.util.UUID;
@@ -117,6 +121,18 @@ public class ComicLibrary{
         	mDb.update("ComicLibrary", cv,"comicID='"+comic.get("comicID").replace("'","''")+"'",null);
 		}
         mDb.close();
+	}
+
+    public static void markAsRead(Context context, String id) {
+        //Get comic information
+        Sqlite mDb = new Sqlite(context);
+        mDb.openRead();
+        Map<String,String> dbData = mDb.scalarRow("SELECT pgCount FROM ComicLibrary WHERE comicID = ?", new String[]{id});
+        mDb.close();
+        ContentValues cv = new ContentValues();
+    	cv.put("pgRead",dbData.get("pgCount"));
+    	cv.put("pgCurrent",dbData.get("pgCount"));
+    	sage.data.Sqlite.update(context,"ComicLibrary", cv,"comicID='"+id.replace("'","''")+"'",null);
     }
     
 	/*========================================================

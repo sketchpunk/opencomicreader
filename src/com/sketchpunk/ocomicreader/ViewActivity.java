@@ -147,6 +147,14 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
 	*/
 	@Override
 	public void onPageLoaded(boolean isSuccess,int currentPage){
+		if (isSuccess) {
+			if (mDb == null) {
+				mDb = new Sqlite(this);
+			}
+			if (!mDb.isOpen()) {
+				mDb.openRead();
+			}
+		}
 		if(isSuccess && mDb != null && mDb.isOpen()){ //Save reading progress.
 			String cp = Integer.toString(currentPage);
 			String sql = "UPDATE ComicLibrary SET pgCurrent="+cp+", pgRead=CASE WHEN pgRead < "+cp+" THEN "+cp+" ELSE pgRead END WHERE comicID = '" + mComicID + "'"; 

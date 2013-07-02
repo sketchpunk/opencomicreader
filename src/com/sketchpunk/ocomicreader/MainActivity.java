@@ -358,9 +358,11 @@ public class MainActivity extends FragmentActivity
 			
 			//..............................................
 			String tmp = c.getString(mAdapter.getColIndex("title"));
+			int subPages = 1; //store how many pages need to be substracted.
 			if(mFilterMode == 1 && mSeriesFilter.isEmpty()){
+				subPages = Integer.parseInt(c.getString(mAdapter.getColIndex("cntIssue")));
 				itmRef.series = tmp;
-				tmp += " ("+c.getString(mAdapter.getColIndex("cntIssue"))+")";
+				tmp += " ("+subPages+")";
 			}else itmRef.series = "";
 			itmRef.lblTitle.setText(tmp);
 			
@@ -378,7 +380,7 @@ public class MainActivity extends FragmentActivity
 			int pTotal = c.getInt(mAdapter.getColIndex("pgCount"));
 			if(pTotal > 0){
 				float pRead = c.getFloat(mAdapter.getColIndex("pgRead"));
-				progress = (pRead / ((float)pTotal-1)); //array starts at 0 not 1, so subtract.
+				progress = (pRead / ((float)pTotal-subPages)); //array starts at 0 not 1, so subtract.
 			}//if
 			
 			itmRef.pcProgress.setProgress(progress);

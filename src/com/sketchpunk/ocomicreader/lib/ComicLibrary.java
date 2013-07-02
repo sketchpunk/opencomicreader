@@ -18,7 +18,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.DatabaseUtils.InsertHelper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -293,16 +292,6 @@ public class ComicLibrary{
 	    	//............................................
 	    	//setup db stuff.
 	        SeriesParser sParser = new SeriesParser();
-	    	InsertHelper dbInsert = mDb.getInsertHelper("ComicLibrary");
-	    	
-			int iComicID = dbInsert.getColumnIndex("comicID");
-			int iTitle = dbInsert.getColumnIndex("title");
-			int iPath = dbInsert.getColumnIndex("path");
-			int iPgCount = dbInsert.getColumnIndex("pgCount");
-			int iPgRead = dbInsert.getColumnIndex("pgRead");
-			int iPgCurrent = dbInsert.getColumnIndex("pgCurrent");
-			int iIsCoverExists = dbInsert.getColumnIndex("isCoverExists");
-			int iSeries = dbInsert.getColumnIndex("series");
 			
 			mDb.beginTransaction();
 
@@ -329,17 +318,16 @@ public class ComicLibrary{
 	    				//------------------------------
 	    				//Not found, add it to library.
 	    				tmp = sage.io.Path.removeExt(file.getName());
-	    				dbInsert.prepareForInsert();
-						dbInsert.bind(iComicID,UUID.randomUUID().toString());
-	    				dbInsert.bind(iTitle,tmp);
-	    				dbInsert.bind(iPath,path);
-	    				dbInsert.bind(iPgCount,0);
-	    				dbInsert.bind(iPgRead,0);
-	    				dbInsert.bind(iPgCurrent,0);
-	    				dbInsert.bind(iIsCoverExists,0);
-	    				dbInsert.bind(iSeries,sParser.get(tmp));
-	    				
-						if(dbInsert.execute() == -1){System.out.println("ERROR");}//if
+	    				ContentValues cv = new ContentValues();
+	    				cv.put("comicID", UUID.randomUUID().toString());
+	    				cv.put("title", tmp);
+	    				cv.put("path", path);
+	    				cv.put("pgCount", 0);
+	    				cv.put("pgRead", 0);
+	    				cv.put("pgCurrent", 0);
+	    				cv.put("isCoverExists", 0);
+	    				cv.put("series",sParser.get(tmp));
+	    				mDb.insert("ComicLibrary", cv);
 	    			}//if
 	    		}//for
 	    	}//while

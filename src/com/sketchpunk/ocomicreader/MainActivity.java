@@ -79,11 +79,21 @@ public class MainActivity extends FragmentActivity
         setContentView(R.layout.activity_main);
         overridePendingTransition(R.anim.fadein, R.anim.fadeout);
 
+        //....................................
+        //Load state of filter from Bundle
+        if (savedInstanceState != null) {
+            mSeriesFilter = savedInstanceState.getString("mSeriesFilter");
+            mFilterMode = savedInstanceState.getInt("mFilterMode");
+            if (mSeriesFilter == null) mSeriesFilter = ""; // if no filter found
+        }
+
         //....................................        
         //Get perferences
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-      	String tmp = prefs.getString("libraryFilter","0");
-        this.mFilterMode = Integer.parseInt(tmp);
+        if (mFilterMode == 0) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            String tmp = prefs.getString("libraryFilter","0");
+            this.mFilterMode = Integer.parseInt(tmp);
+        }
         
         //....................................
         mThumbPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/OpenComicReader/thumbs/";
@@ -121,6 +131,12 @@ public class MainActivity extends FragmentActivity
     }//func
 
     
+    @Override
+    protected void onSaveInstanceState (Bundle outState) {
+        outState.putString("mSeriesFilter", mSeriesFilter);
+        outState.putInt("mFilterMode", mFilterMode);
+        super.onSaveInstanceState(outState);
+    }
 	/*========================================================
 	State*/
     @Override

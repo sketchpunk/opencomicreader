@@ -8,7 +8,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.DatabaseUtils.InsertHelper;
 
 public class Sqlite{
 	private SqliteHelper dbHelper;
@@ -33,13 +32,6 @@ public class Sqlite{
 	public void beginTransaction(){ mDb.beginTransaction(); }//func
 	public void endTransaction(){ mDb.endTransaction(); }//func
 	public void commit(){ mDb.setTransactionSuccessful(); }//func
-	
-
-	/*========================================================
-	*/
-	public InsertHelper getInsertHelper(String tblName){
-		return new InsertHelper(mDb,tblName);
-	}//func
 	
 
 	/*========================================================

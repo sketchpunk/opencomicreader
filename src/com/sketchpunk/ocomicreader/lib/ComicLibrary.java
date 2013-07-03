@@ -4,6 +4,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.lang.StringBuilder;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+
+import java.util.Locale;
+
+import java.util.Map;
 import java.util.Stack;
 import java.util.UUID;
 
@@ -11,7 +18,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.DatabaseUtils.InsertHelper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -19,7 +25,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
-
 import sage.data.Sqlite;
 
 public class ComicLibrary{
@@ -87,6 +92,81 @@ public class ComicLibrary{
     	sage.data.Sqlite.update(context,"ComicLibrary", cv,"comicID='"+id.replace("'","''")+"'",null);
     }//func
     
+    public static void resetSeriesProgress(Context context, String oneComicId) {
+    	LinkedList<Map<String, String>> comics = new LinkedList<Map<String,String>>();
+        Sqlite mDb = new Sqlite(context);
+        mDb.openRead();
+        //Get series from the id of a comic
+        Map<String,String> seriesData = mDb.scalarRow("SELECT series FROM ComicLibrary WHERE comicID = ?", new String[]{oneComicId});
+        String series = seriesData.get("series");
+        // get all comics of the series
+        Cursor dbCoursor = mDb.raw("SELECT pgCount, comicID FROM ComicLibrary WHERE series = ?", new String[]{series});
+		for (boolean hasNext = dbCoursor.moveToFirst(); hasNext; hasNext = dbCoursor.moveToNext()) {
+			Map<String, String> comic = new HashMap<String, String>();
+			for(int i = 0; i < dbCoursor.getColumnCount(); i++){
+				comic.put(dbCoursor.getColumnName(i),dbCoursor.getString(i));
+			}
+			comics.add(comic);
+    	}
+		dbCoursor.close();
+        mDb.close();
+        
+        mDb.openWrite();
+        // update their pgRead/pgCurrent values
+        for (Map<String, String> comic : comics) {
+            ContentValues cv = new ContentValues();
+            cv.put("pgRead",0);
+        	cv.put("pgCurrent",0);
+        	mDb.update("ComicLibrary", cv,"comicID='"+comic.get("comicID").replace("'","''")+"'",null);
+		}
+        mDb.close();
+	}
+
+    public static void markAsRead(Context context, String id) {
+        //Get comic information
+        Sqlite mDb = new Sqlite(context);
+        mDb.openRead();
+        Map<String,String> dbData = mDb.scalarRow("SELECT pgCount FROM ComicLibrary WHERE comicID = ?", new String[]{id});
+        mDb.close();
+        ContentValues cv = new ContentValues();
+        String lastPage = String.valueOf(Integer.parseInt(dbData.get("pgCount"))-1);
+    	cv.put("pgRead",lastPage);
+    	cv.put("pgCurrent",lastPage);
+    	sage.data.Sqlite.update(context,"ComicLibrary", cv,"comicID='"+id.replace("'","''")+"'",null);
+    }
+    
+    public static void markSeriesAsRead(Context context, String oneComicId) {
+        
+    	LinkedList<Map<String, String>> comics = new LinkedList<Map<String,String>>();
+        Sqlite mDb = new Sqlite(context);
+        mDb.openRead();
+        //Get series from the id of a comic
+        Map<String,String> seriesData = mDb.scalarRow("SELECT series FROM ComicLibrary WHERE comicID = ?", new String[]{oneComicId});
+        String series = seriesData.get("series");
+        
+        // get all comics of the series
+        Cursor dbCoursor = mDb.raw("SELECT pgCount, comicID FROM ComicLibrary WHERE series = ?", new String[]{series});
+		for (boolean hasNext = dbCoursor.moveToFirst(); hasNext; hasNext = dbCoursor.moveToNext()) {
+			Map<String, String> comic = new HashMap<String, String>();
+			for(int i = 0; i < dbCoursor.getColumnCount(); i++){
+				comic.put(dbCoursor.getColumnName(i),dbCoursor.getString(i));
+			}
+			comics.add(comic);
+    	}
+		dbCoursor.close();
+        mDb.close();
+        
+        mDb.openWrite();
+        // update their pgRead/pgCurrent values
+        for (Map<String, String> comic : comics) {
+            ContentValues cv = new ContentValues();
+            String lastPage = String.valueOf(Integer.parseInt(comic.get("pgCount"))-1);
+        	cv.put("pgRead", lastPage);
+        	cv.put("pgCurrent", lastPage);
+        	mDb.update("ComicLibrary", cv,"comicID='"+comic.get("comicID").replace("'","''")+"'",null);
+		}
+        mDb.close();
+    }
     
 	/*========================================================
 	sync methods*/
@@ -216,16 +296,6 @@ public class ComicLibrary{
 	    	//............................................
 	    	//setup db stuff.
 	        SeriesParser sParser = new SeriesParser();
-	    	InsertHelper dbInsert = mDb.getInsertHelper("ComicLibrary");
-	    	
-			int iComicID = dbInsert.getColumnIndex("comicID");
-			int iTitle = dbInsert.getColumnIndex("title");
-			int iPath = dbInsert.getColumnIndex("path");
-			int iPgCount = dbInsert.getColumnIndex("pgCount");
-			int iPgRead = dbInsert.getColumnIndex("pgRead");
-			int iPgCurrent = dbInsert.getColumnIndex("pgCurrent");
-			int iIsCoverExists = dbInsert.getColumnIndex("isCoverExists");
-			int iSeries = dbInsert.getColumnIndex("series");
 			
 			mDb.beginTransaction();
 
@@ -252,17 +322,16 @@ public class ComicLibrary{
 	    				//------------------------------
 	    				//Not found, add it to library.
 	    				tmp = sage.io.Path.removeExt(file.getName());
-	    				dbInsert.prepareForInsert();
-						dbInsert.bind(iComicID,UUID.randomUUID().toString());
-	    				dbInsert.bind(iTitle,tmp);
-	    				dbInsert.bind(iPath,path);
-	    				dbInsert.bind(iPgCount,0);
-	    				dbInsert.bind(iPgRead,0);
-	    				dbInsert.bind(iPgCurrent,0);
-	    				dbInsert.bind(iIsCoverExists,0);
-	    				dbInsert.bind(iSeries,sParser.get(tmp));
-	    				
-						if(dbInsert.execute() == -1){System.out.println("ERROR");}//if
+	    				ContentValues cv = new ContentValues();
+	    				cv.put("comicID", UUID.randomUUID().toString());
+	    				cv.put("title", tmp);
+	    				cv.put("path", path);
+	    				cv.put("pgCount", 0);
+	    				cv.put("pgRead", 0);
+	    				cv.put("pgCurrent", 0);
+	    				cv.put("isCoverExists", 0);
+	    				cv.put("series",sParser.get(tmp));
+	    				mDb.insert("ComicLibrary", cv);
 	    			}//if
 	    		}//for
 	    	}//while

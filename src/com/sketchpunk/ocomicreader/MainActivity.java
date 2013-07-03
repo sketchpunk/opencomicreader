@@ -206,7 +206,7 @@ public class MainActivity extends FragmentActivity
 	
 	@Override
 	public boolean onContextItemSelected(MenuItem item){
-		if(mFilterMode == 1 && mSeriesFilter.isEmpty()){
+		if(mFilterMode == 1 && mSeriesFilter.isEmpty() && item.getItemId() != 1 ){
 			Toast.makeText(this,"Can not perform operation on series.",Toast.LENGTH_SHORT).show();
 			return false;
 		}//func
@@ -236,14 +236,24 @@ public class MainActivity extends FragmentActivity
 				break;
 			case 1://Reset Progress
 				abBuilder = new AlertDialog.Builder(this);
-				abBuilder.setTitle("Reset Comic Progress : " + ref.lblTitle.getText().toString());
-				abBuilder.setMessage("Are you sure you want to reset the reading progress of this comics?");
+				
 				abBuilder.setCancelable(true);
 				abBuilder.setNegativeButton("Cancel",null);
-				abBuilder.setPositiveButton("Ok",new DialogInterface.OnClickListener(){
-					@Override
-					public void onClick(DialogInterface dialog, int which){ ComicLibrary.resetProgress(context,comicID); refreshData(); }
-				});
+				if (mFilterMode == 1 && mSeriesFilter.isEmpty()) {
+					abBuilder.setTitle("Reset Series Progress : " + ref.lblTitle.getText().toString());
+					abBuilder.setMessage("Are you sure you want to reset the reading progress of this series?");
+					abBuilder.setPositiveButton("Ok",new DialogInterface.OnClickListener(){
+						@Override
+						public void onClick(DialogInterface dialog, int which){ ComicLibrary.resetSeriesProgress(context,comicID); refreshData(); }
+					});
+				} else {
+					abBuilder.setTitle("Reset Comic Progress : " + ref.lblTitle.getText().toString());
+					abBuilder.setMessage("Are you sure you want to reset the reading progress of this comics?");
+					abBuilder.setPositiveButton("Ok",new DialogInterface.OnClickListener(){
+						@Override
+						public void onClick(DialogInterface dialog, int which){ ComicLibrary.resetProgress(context,comicID); refreshData(); }
+					});
+				}
 				abBuilder.show();
 				break;
 		}//func

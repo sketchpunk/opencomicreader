@@ -200,7 +200,6 @@ public class MainActivity extends FragmentActivity
 				menu.setHeaderTitle(ref.lblTitle.getText().toString());				
 				menu.add(0, 2, 0,"Delete");
 				menu.add(0, 1, 1,"Reset Progress");
-				menu.add(0, 3, 2,"Mark Read");
 			break;
 		}//switch
 	}//func
@@ -257,23 +256,6 @@ public class MainActivity extends FragmentActivity
 				}
 				abBuilder.show();
 				break;
-			case 3:// Mark Read
-				// just do it this is nothing serious
-				ComicLibrary.markAsRead(context, comicID);
-				refreshData();
-				/*
-				abBuilder = new AlertDialog.Builder(this);
-				abBuilder.setTitle("Mark Comic as Read : " + ref.lblTitle.getText().toString());
-				abBuilder.setMessage("Are you sure you want to mark this comic as read?");
-				abBuilder.setCancelable(true);
-				abBuilder.setNegativeButton("Cancel",null);
-				abBuilder.setPositiveButton("Ok",new DialogInterface.OnClickListener(){
-					@Override
-					public void onClick(DialogInterface dialog, int which){ComicLibrary.markAsRead(context, comicID); ComicLibrary.markAsRead(context, comicID); refreshData(); }
-				});
-				abBuilder.show();
-				*/			
-				
 		}//func
 
 		return true;

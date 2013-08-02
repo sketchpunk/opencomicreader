@@ -8,11 +8,13 @@
         <item>None</item>
         <item>Height</item>
         <item>Width</item>
+        <item>Auto</item>
     </string-array>
     <string-array name="scaleMode_v">
         <item>0</item>
         <item>1</item>
         <item>2</item>
+        <item>3</item>
     </string-array>
     
     <string-array name="libraryFilter">

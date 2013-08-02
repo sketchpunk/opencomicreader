@@ -39,6 +39,7 @@ public class ComicPageView extends View implements GestureDetector.OnGestureList
 	public static final int ScaleNone = 0;
 	public static final int ScaleToHeight = 1;
 	public static final int ScaleToWidth = 2;
+	public static final int ScaleAuto = 3;
 	
 	public static final int FlingLeft = 0;
 	public static final int FlingRight = 1;
@@ -108,7 +109,10 @@ public class ComicPageView extends View implements GestureDetector.OnGestureList
 		switch(mScaleMode){
 			case ComicPageView.ScaleToHeight: mImgSize.scale = (float)mViewSize.oHeight / mImgSize.oHeight; break;
 			case ComicPageView.ScaleToWidth: mImgSize.scale = (float)mViewSize.oWidth / mImgSize.oWidth; break;
-			case ComicPageView.ScaleNone: mImgSize.scale = 1f;
+			case ComicPageView.ScaleNone: mImgSize.scale = 1f; break;
+			case ComicPageView.ScaleAuto: 
+				mImgSize.scale = Math.min( ((float)mViewSize.oWidth / mImgSize.oWidth), ((float)mViewSize.oHeight / mImgSize.oHeight) );
+				break; 
 		}//swtich
 		
 		mMatrix.reset();

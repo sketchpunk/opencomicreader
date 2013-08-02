@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.lang.StringBuilder;
+import java.util.Locale;
 import java.util.Stack;
 import java.util.UUID;
 
@@ -80,14 +81,17 @@ public class ComicLibrary{
     	db.close();
     }//func
     
-    public static void resetProgress(Context context,String id){
-    	ContentValues cv = new ContentValues();
-    	cv.put("pgRead",0);
-    	cv.put("pgCurrent",0);
-    	sage.data.Sqlite.update(context,"ComicLibrary", cv,"comicID='"+id.replace("'","''")+"'",null);
+    public static void setComicProgress(Context context,String id,int state,boolean applySeries){
+    	String sql = "UPDATE ComicLibrary SET ";
+    	sql += (state == 0)?"pgRead=0,pgCurrent=0":"pgRead=pgCount,pgCurrent=pgCount"; //0-Reset or 1-Mark as Read.
+    	
+    	if(applySeries) sql += " WHERE series in (SELECT series FROM ComicLibrary WHERE comicID = '"+id+"')";
+    	else sql += " WHERE comicID = '"+id+"'";
+    	
+    	sage.data.Sqlite.execSql(context,sql,null);
     }//func
-    
-    
+
+
 	/*========================================================
 	sync methods*/
     public static boolean startSync(Context context){
@@ -216,6 +220,9 @@ public class ComicLibrary{
 	    	//............................................
 	    	//setup db stuff.
 	        SeriesParser sParser = new SeriesParser();
+	        
+	        //TODO: InsertHelper has been deprecated in API17. Google has no replacement for it's bulk insert functionality.
+	        //Research other ways for efficiently bulk inserts, Maybe something with Transactions.
 	    	InsertHelper dbInsert = mDb.getInsertHelper("ComicLibrary");
 	    	
 			int iComicID = dbInsert.getColumnIndex("comicID");
@@ -258,7 +265,7 @@ public class ComicLibrary{
 	    				dbInsert.bind(iPath,path);
 	    				dbInsert.bind(iPgCount,0);
 	    				dbInsert.bind(iPgRead,0);
-	    				dbInsert.bind(iPgCurrent,0);
+	    				dbInsert.bind(iPgCurrent,1);
 	    				dbInsert.bind(iIsCoverExists,0);
 	    				dbInsert.bind(iSeries,sParser.get(tmp));
 	    				
@@ -433,7 +440,7 @@ public class ComicLibrary{
     	public boolean accept(File o){
     		if(o.isDirectory()) return true; //Want to allow folders
     		for(String extension:mExtList){
-    			if(o.getName().toLowerCase().endsWith(extension)) return true;
+    			if(o.getName().toLowerCase(Locale.getDefault()).endsWith(extension)) return true;
     		}//for
     		return false;
     	}//func
@@ -442,7 +449,7 @@ public class ComicLibrary{
     protected static class ThumbFindFilter implements java.io.FileFilter{
     	public boolean accept(File o){
     		if(o.isDirectory()) return false;
-    		else if(o.getName().toLowerCase().endsWith(".jpg")) return true;
+    		else if(o.getName().toLowerCase(Locale.getDefault()).endsWith(".jpg")) return true;
     		return false;
     	}//func
     }//cls

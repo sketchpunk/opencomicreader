@@ -63,7 +63,7 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         
-        //Get perferences
+        //Get preferences
       	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
     	this.mPref_ShowPgNum = prefs.getBoolean("showPageNum",true);
     	if(prefs.getBoolean("fullScreen",false)){
@@ -71,7 +71,7 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
             
             View rootView = getWindow().getDecorView();
-            rootView.setSystemUiVisibility(View.STATUS_BAR_HIDDEN);
+            rootView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
     	}//if
 
         this.overridePendingTransition(R.anim.fadein, R.anim.fadeout);
@@ -93,12 +93,13 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
         //.........................................        
         mImageView = (ComicPageView)this.findViewById(R.id.pageView);
         registerForContextMenu(mImageView);
+        System.out.println(dbData.get("pgCurrent"));
         
         //.........................................
         mComicLoad = new ComicLoader(this,mImageView);
         if(mComicLoad.loadArchive(dbData.get("path"))){
         	if(this.mPref_ShowPgNum) showToast("Loading Page...",1);
-        	mComicLoad.gotoPage(Integer.parseInt(dbData.get("pgCurrent"))); //Continue where user left off
+        	mComicLoad.gotoPage(Math.max(Integer.parseInt(dbData.get("pgCurrent")),1)); //Continue where user left off. IF 0, Change to 1
         }else{
         	Toast.makeText(this,"Unable to load comic.",Toast.LENGTH_LONG).show();
         }//if
@@ -121,6 +122,7 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
     		case ComicPageView.ScaleNone: menu.findItem(R.id.mnu_scalen).setChecked(true); break;
     		case ComicPageView.ScaleToHeight: menu.findItem(R.id.mnu_scaleh).setChecked(true); break;
     		case ComicPageView.ScaleToWidth: menu.findItem(R.id.mnu_scalew).setChecked(true); break;
+    		case ComicPageView.ScaleAuto: menu.findItem(R.id.mnu_scalea).setChecked(true); break;
     	}//switch
     }//func
     
@@ -139,7 +141,7 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
 	//this is for the goto menu option and user clicks ok.
 	@Override
 	public void onClick(DialogInterface dialog, int which){
-		mComicLoad.gotoPage(which-1);
+		mComicLoad.gotoPage(which);
 	}//func
     
     
@@ -147,14 +149,19 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
 	*/
 	@Override
 	public void onPageLoaded(boolean isSuccess,int currentPage){
-		if(isSuccess && mDb != null && mDb.isOpen()){ //Save reading progress.
+		if(isSuccess){ //Save reading progress.
+			//Make sure database is open
+			if(mDb == null) mDb = new Sqlite(this);
+			if(!mDb.isOpen()) mDb.openRead();
+
+			//Save update
 			String cp = Integer.toString(currentPage);
 			String sql = "UPDATE ComicLibrary SET pgCurrent="+cp+", pgRead=CASE WHEN pgRead < "+cp+" THEN "+cp+" ELSE pgRead END WHERE comicID = '" + mComicID + "'"; 
 			mDb.execSql(sql,null);
 			
 			//....................................
 			//Display page number
-			if(this.mPref_ShowPgNum) showToast(String.format("%d / %d",currentPage+1,mComicLoad.getPageCount()),0);
+			if(this.mPref_ShowPgNum) showToast(String.format("%d / %d",currentPage,mComicLoad.getPageCount()),0);
 		}//if
 	}//func
 

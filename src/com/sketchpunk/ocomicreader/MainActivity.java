@@ -49,7 +49,6 @@ public class MainActivity extends FragmentActivity
 	,OnItemClickListener, OnNavigationListener{
 
 	private int mFilterMode = 0;
-	private String[] mFilterModes = new String[]{"View All","View By Series","View Unread","View in Progress","View Read"};
 	private String mSeriesFilter = "";
 	private SpinnerAdapter mSpinAdapter;
 	
@@ -69,7 +68,7 @@ public class MainActivity extends FragmentActivity
 	@Override
 	public void onDestroy(){
 		if(mDb != null){ mDb.close(); mDb = null; }
-
+		
 		super.onDestroy();
 	}//func
 	
@@ -79,15 +78,22 @@ public class MainActivity extends FragmentActivity
         setContentView(R.layout.activity_main);
         overridePendingTransition(R.anim.fadein, R.anim.fadeout);
 
-        //....................................        
-        //Get perferences
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-      	String tmp = prefs.getString("libraryFilter","0");
-        this.mFilterMode = Integer.parseInt(tmp);
+        //....................................
+        //Load state of filter from Bundle
+        if(savedInstanceState != null) {
+        	mSeriesFilter = savedInstanceState.getString("mSeriesFilter");
+        	mFilterMode = savedInstanceState.getInt("mFilterMode");
+        	if(mSeriesFilter == null) mSeriesFilter = ""; // if no filter found
+        }else{
+        	//if no state, load in default pref.
+        	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        	String tmp = prefs.getString("libraryFilter","0");
+        	this.mFilterMode = Integer.parseInt(tmp);
+        }//if
         
         //....................................
         mThumbPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/OpenComicReader/thumbs/";
-        mSpinAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_dropdown_item,mFilterModes);
+        mSpinAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_dropdown_item,this.getResources().getStringArray(R.array.libraryFilter));
         
         //....................................
         //Setup Actionbar
@@ -120,6 +126,14 @@ public class MainActivity extends FragmentActivity
         getSupportLoaderManager().initLoader(0,null,this);
     }//func
 
+    @Override
+    protected void onSaveInstanceState(Bundle siState){
+    	//Save the state of the filters so
+    	siState.putString("mSeriesFilter",mSeriesFilter);
+    	siState.putInt("mFilterMode",mFilterMode);
+    	super.onSaveInstanceState(siState);
+    }//func 
+    
     
 	/*========================================================
 	State*/
@@ -198,18 +212,21 @@ public class MainActivity extends FragmentActivity
 				AdapterItemRef ref = (AdapterItemRef)info.targetView.getTag();
 				
 				menu.setHeaderTitle(ref.lblTitle.getText().toString());				
-				menu.add(0, 2, 0,"Delete");
-				menu.add(0, 1, 1,"Reset Progress");
+				menu.add(0,2,0,"Delete");
+				menu.add(0,1,1,"Reset Progress");
+				menu.add(0,3,2,"Mark as Read");
 			break;
 		}//switch
 	}//func
 	
 	@Override
 	public boolean onContextItemSelected(MenuItem item){
-		if(mFilterMode == 1 && mSeriesFilter.isEmpty()){
+		int itmID = item.getItemId();
+		
+		if(isSeriesFiltered() && mSeriesFilter.isEmpty() && itmID == 2){
 			Toast.makeText(this,"Can not perform operation on series.",Toast.LENGTH_SHORT).show();
 			return false;
-		}//func
+		}//if
 		
 		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
 		final AdapterItemRef ref = (AdapterItemRef)info.targetView.getTag();
@@ -217,7 +234,8 @@ public class MainActivity extends FragmentActivity
 		final Context context = this;
 		AlertDialog.Builder abBuilder;
 		
-		switch(item.getItemId()){
+		switch(itmID){
+			//...................................
 			case 2://DELETE
 				abBuilder = new AlertDialog.Builder(this);
 				abBuilder.setTitle("Delete Comic : " + ref.lblTitle.getText().toString());
@@ -234,19 +252,41 @@ public class MainActivity extends FragmentActivity
 				});
 				abBuilder.show();
 				break;
+			//...................................
 			case 1://Reset Progress
 				abBuilder = new AlertDialog.Builder(this);
-				abBuilder.setTitle("Reset Comic Progress : " + ref.lblTitle.getText().toString());
-				abBuilder.setMessage("Are you sure you want to reset the reading progress of this comics?");
+				abBuilder.setTitle("Reset Progress : " + ref.lblTitle.getText().toString());
+				abBuilder.setMessage("Are you sure you want to reset the reading progress?");
 				abBuilder.setCancelable(true);
 				abBuilder.setNegativeButton("Cancel",null);
 				abBuilder.setPositiveButton("Ok",new DialogInterface.OnClickListener(){
 					@Override
-					public void onClick(DialogInterface dialog, int which){ ComicLibrary.resetProgress(context,comicID); refreshData(); }
+					public void onClick(DialogInterface dialog, int which){
+						boolean applySeries = (isSeriesFiltered() && mSeriesFilter.isEmpty());
+						ComicLibrary.setComicProgress(context,comicID,0,applySeries);
+						refreshData();
+					}
 				});
 				abBuilder.show();
 				break;
-		}//func
+			//...................................
+			case 3://Mark as Read
+				abBuilder = new AlertDialog.Builder(this);
+				abBuilder.setTitle("Mark as Read : " + ref.lblTitle.getText().toString());
+				abBuilder.setMessage("Are you sure you want to change the reading progress?");
+				abBuilder.setCancelable(true);
+				abBuilder.setNegativeButton("Cancel",null);
+				abBuilder.setPositiveButton("Ok",new DialogInterface.OnClickListener(){
+					@Override
+					public void onClick(DialogInterface dialog, int which){
+						boolean applySeries = (isSeriesFiltered() && mSeriesFilter.isEmpty());
+						ComicLibrary.setComicProgress(context,comicID,1,applySeries);
+						refreshData();
+					}
+				});
+				abBuilder.show();
+				break;
+		}//switch
 
 		return true;
 	}//func
@@ -258,10 +298,10 @@ public class MainActivity extends FragmentActivity
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id){
 		AdapterItemRef itmRef = (AdapterItemRef)view.getTag();
 		
-		if(mFilterMode == 1 && mSeriesFilter.isEmpty()){
+		if(isSeriesFiltered() && mSeriesFilter.isEmpty()){ //if series if selected but not filtered yet.
 			mSeriesFilter = itmRef.series;
 			refreshData();
-		}else{
+		}else{ //Open comic in viewer.
 			Intent intent = new Intent(this,ViewActivity.class);
 			intent.putExtra("comicid",itmRef.id);
 			this.startActivityForResult(intent,0);
@@ -270,7 +310,8 @@ public class MainActivity extends FragmentActivity
 	
 	@Override
 	public void onBackPressed(){
-		if(mFilterMode == 1 && !mSeriesFilter.isEmpty()){
+		//Override back press to make it easy to back out of series filter.
+		if(isSeriesFiltered() && !mSeriesFilter.isEmpty()){
 			mSeriesFilter = "";
 			refreshData();
 		}else{
@@ -288,7 +329,7 @@ public class MainActivity extends FragmentActivity
     	String sql = "";
     	if(mSeriesLbl.getVisibility() != View.GONE) mSeriesLbl.setVisibility(View.GONE);
     	
-    	if(mFilterMode == 1){//Filter by series
+    	if(isSeriesFiltered()){//Filter by series
     		if(mSeriesFilter.isEmpty()){
     			sql = "SELECT min(comicID) [_id],series [title],sum(pgCount) [pgCount],sum(pgRead) [pgRead],min(isCoverExists) [isCoverExists],count(comicID) [cntIssue] FROM ComicLibrary GROUP BY series ORDER BY series";
     		}else{
@@ -358,7 +399,7 @@ public class MainActivity extends FragmentActivity
 			
 			//..............................................
 			String tmp = c.getString(mAdapter.getColIndex("title"));
-			if(mFilterMode == 1 && mSeriesFilter.isEmpty()){
+			if(isSeriesFiltered() && mSeriesFilter.isEmpty()){
 				itmRef.series = tmp;
 				tmp += " ("+c.getString(mAdapter.getColIndex("cntIssue"))+")";
 			}else itmRef.series = "";
@@ -378,7 +419,7 @@ public class MainActivity extends FragmentActivity
 			int pTotal = c.getInt(mAdapter.getColIndex("pgCount"));
 			if(pTotal > 0){
 				float pRead = c.getFloat(mAdapter.getColIndex("pgRead"));
-				progress = (pRead / ((float)pTotal-1)); //array starts at 0 not 1, so subtract.
+				progress = (pRead / ((float)pTotal));
 			}//if
 			
 			itmRef.pcProgress.setProgress(progress);
@@ -452,4 +493,8 @@ public class MainActivity extends FragmentActivity
 			break;
 		}//switch
 	}//func
+
+	/*========================================================
+	Sync Library*/
+	private boolean isSeriesFiltered(){ return (mFilterMode == 1); }
 }//cls

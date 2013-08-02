@@ -26,7 +26,7 @@ public class PageLoader{
 		}//if
 
 		mTask = new LoadingTask(callback,archive,imgType);
-		mTask.execute(new Float(maxSize),imgPath);
+		mTask.execute(Float.valueOf(maxSize),imgPath);
 	}//func
 	
 	public void close(){
@@ -51,7 +51,7 @@ public class PageLoader{
 	//************************************************************
 	// Load Image through thread
 	//************************************************************
-	protected static class LoadingTask extends AsyncTask{
+	protected static class LoadingTask extends AsyncTask<Object,Object,Bitmap>{ //<Params, Progress, Result>
 		private WeakReference<iComicArchive> mArchive = null;
 		private WeakReference<CallBack> mCallBack = null;
 		private String errMsg = null;
@@ -65,7 +65,7 @@ public class PageLoader{
 		}//func
 		
 		@Override
-		protected Object doInBackground(Object... params) {
+		protected Bitmap doInBackground(Object... params) {
 			//...................................
 			final iComicArchive archive = mArchive.get();
 			if(archive == null) return null;
@@ -119,12 +119,12 @@ public class PageLoader{
 		}//func
 		
 		@Override
-		protected void onPostExecute(Object bmp){
+		protected void onPostExecute(Bitmap bmp){
 			//--------------------------
 			//if the task has been cancelled, don't bother doing anything else.
 			if(this.isCancelled()){
 				if(bmp != null){ 
-					((Bitmap)bmp).recycle();
+					bmp.recycle();
 					bmp = null;
 				}//if
 			}//if
@@ -133,7 +133,7 @@ public class PageLoader{
 			//When done loading the image, alert parent
 			if(mCallBack != null){
 				final CallBack cb = mCallBack.get();
-				if(cb != null) cb.onImageLoaded(errMsg,(Bitmap)bmp,mImgType);
+				if(cb != null) cb.onImageLoaded(errMsg,bmp,mImgType);
 			}//if
 		}//func
 	}//cls

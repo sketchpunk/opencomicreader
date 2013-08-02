@@ -18,6 +18,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteStatement;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -296,7 +297,7 @@ public class ComicLibrary{
 	    	//............................................
 	    	//setup db stuff.
 	        SeriesParser sParser = new SeriesParser();
-			
+			SQLiteStatement comicInsertStatement = mDb.compileStatement("INSERT INTO ComicLibrary (comicID, title, path, pgCount, pgRead, pgCurrent, isCoverExists, series) VALUES (?, ?, ?, ?, ?, ?, ?, ?);");
 			mDb.beginTransaction();
 
 			//............................................
@@ -322,16 +323,17 @@ public class ComicLibrary{
 	    				//------------------------------
 	    				//Not found, add it to library.
 	    				tmp = sage.io.Path.removeExt(file.getName());
-	    				ContentValues cv = new ContentValues();
-	    				cv.put("comicID", UUID.randomUUID().toString());
-	    				cv.put("title", tmp);
-	    				cv.put("path", path);
-	    				cv.put("pgCount", 0);
-	    				cv.put("pgRead", 0);
-	    				cv.put("pgCurrent", 0);
-	    				cv.put("isCoverExists", 0);
-	    				cv.put("series",sParser.get(tmp));
-	    				mDb.insert("ComicLibrary", cv);
+
+						comicInsertStatement.clearBindings();
+						comicInsertStatement.bindString(1, UUID.randomUUID().toString());
+						comicInsertStatement.bindString(2, tmp);
+						comicInsertStatement.bindString(3, path);
+						comicInsertStatement.bindString(4, "0");
+						comicInsertStatement.bindString(5, "0");
+						comicInsertStatement.bindString(6, "0");
+						comicInsertStatement.bindString(7, "0");
+						comicInsertStatement.bindString(8, sParser.get(tmp));
+						comicInsertStatement.executeInsert();
 	    			}//if
 	    		}//for
 	    	}//while

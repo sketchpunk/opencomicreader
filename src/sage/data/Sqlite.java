@@ -8,6 +8,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 
 public class Sqlite{
 	private SqliteHelper dbHelper;
@@ -131,6 +132,11 @@ public class Sqlite{
 	public int update(String sTable,ContentValues cv,String where,String[] whereArgs){
 		return mDb.update(sTable,cv,where,whereArgs);
 	}//func
+
+	public SQLiteStatement compileStatement(String sql) {
+		return mDb.compileStatement(sql);
+	}//func
+
 	
 	
 	/*========================================================

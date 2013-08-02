@@ -1,0 +1,7 @@
+TROUBLE SHOOTING
+
+error - unable to resolve superclass of MainActivity
+-- Right Click on your Project then
+-- Goto Build Path-> Configure Build Path -> Order and Export
+-- when you are there you should check the Android Private Libraries and then click OK.
+-- if you still face the problem delete all the files inside your bin folder and rebuilt you project.

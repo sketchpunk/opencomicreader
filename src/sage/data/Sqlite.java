@@ -104,6 +104,13 @@ public class Sqlite{
 		return rtn;
 	}//func
 	
+	public static void execSql(Context c,String sql,String[] args){
+		Sqlite db = new Sqlite(c);
+		db.openWrite();
+		db.execSql(sql,args);
+		db.close();
+	}//func
+	
 	
 	/*========================================================
 	Modifying db operations*/

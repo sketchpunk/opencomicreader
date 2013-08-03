@@ -23,6 +23,9 @@ public class ComicZip implements iComicArchive{
 	
 	/*--------------------------------------------------------
 	*/
+	public void clearCache(){}
+	public boolean isStreamResetable(){ return false; }
+	
 	public void close(){
 		mLastItemReq = null;
 		if(mArchive != null){ 

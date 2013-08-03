@@ -91,7 +91,7 @@ public class PageLoader{
 							if(bmpOption.outHeight > bmpOption.outWidth) scale = Math.round((float)bmpOption.outHeight / maxSize);
 							else scale = Math.round((float)bmpOption.outWidth / maxSize);
 						}//if
-						
+
 						bmpOption.inSampleSize = scale;
 						bmpOption.inJustDecodeBounds = false;
 						bmpOption.inScaled = false;
@@ -99,11 +99,18 @@ public class PageLoader{
 
 					//....................................
 					//Load bitmap
-					iStream.close(); iStream = null;
 					if(!this.isCancelled()){
-						iStream = archive.getItemInputStream(imagePath);
+						//Rar stream can be reset which is better, but zip's can not, new stream must be created.
+						if(archive.isStreamResetable()) iStream.reset();
+						else{
+							iStream.close(); iStream = null;
+							iStream = archive.getItemInputStream(imagePath);
+						}//if
+						
 						bmp = BitmapFactory.decodeStream(iStream,null,bmpOption);
 					}//if
+					
+					archive.clearCache(); //Rar caches the data, clear it out since it's already been saved as an image.
 				}catch(Exception e){
 					//System.err.println("Error loading comic page " + e.getMessage());
 					errMsg = "Error loading comic page. Email comic file to sketchpunk@ymail.com for troubleshooting.";

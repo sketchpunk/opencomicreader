@@ -30,6 +30,7 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
 	private Sqlite mDb = null;
 	private Toast mToast;
 	private Boolean mPref_ShowPgNum = true;
+	private Boolean mPref_FlingEnabled = true;
 
 	/*========================================================
 	View Events*/
@@ -68,6 +69,7 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
       	int winFlags = 0;
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
     	this.mPref_ShowPgNum = prefs.getBoolean("showPageNum",true);
+    	this.mPref_FlingEnabled = prefs.getBoolean("flingEnabled",true);
     	
     	//Full screen, force navigation
     	if(prefs.getBoolean("fullScreen",false)){
@@ -179,6 +181,10 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
 
 	@Override
 	public void onComicPageGesture(int gestureID){
+		//Check if fling is allowed.
+		if(!this.mPref_FlingEnabled && (gestureID == ComicPageView.FlingRight || gestureID == ComicPageView.FlingLeft)) return;
+
+		//Perform Gesture
 		switch(gestureID){
 			//.........................................
 			case ComicPageView.LongPress:

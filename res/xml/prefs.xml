@@ -28,6 +28,9 @@
 	    
 		<CheckBoxPreference android:key="fullScreen" android:title="Fullscreen" android:defaultValue="false"
 	        android:summary="Display comics at full screen. Tap and hold for options to exit when there is no virtual buttons."/>
+
+		<CheckBoxPreference android:key="flingEnabled" android:title="Fling Navigation" android:defaultValue="true"
+	        android:summary="Use the left/Right fling gesture to move to next or previous page."/>
 		
 	    <CheckBoxPreference android:key="preLoading" android:title="Preload Next Page" android:defaultValue="true"
 	        android:summary="This feature speeds up page loading, but if there is out of memory issues then disable this feature."/>

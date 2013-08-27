@@ -63,20 +63,32 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         
+        //........................................
         //Get preferences
-      	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+      	int winFlags = 0;
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
     	this.mPref_ShowPgNum = prefs.getBoolean("showPageNum",true);
+    	
+    	//Full screen, force navigation
     	if(prefs.getBoolean("fullScreen",false)){
     		System.out.println("FULL SCREEN");
-            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
-            
+    		winFlags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+
             View rootView = getWindow().getDecorView();
             rootView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
     	}//if
+    	
+    	//Keep screen on
+    	if(prefs.getBoolean("keepScreenOn",true)) winFlags |= WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
 
+    	//Apply Flags
+    	if(winFlags != 0) getWindow().addFlags(winFlags);
+
+    	//.........................................
         this.overridePendingTransition(R.anim.fadein, R.anim.fadeout);
     	setContentView(R.layout.activity_view);
-        //.........................................
+        
+    	//.........................................
         Bundle b = this.getIntent().getExtras(); 
         mComicID = b.getString("comicid");
 

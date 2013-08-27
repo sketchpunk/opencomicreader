@@ -28,9 +28,15 @@
 	    
 		<CheckBoxPreference android:key="fullScreen" android:title="Fullscreen" android:defaultValue="false"
 	        android:summary="Display comics at full screen. Tap and hold for options to exit when there is no virtual buttons."/>
-	    
+		
 	    <CheckBoxPreference android:key="preLoading" android:title="Preload Next Page" android:defaultValue="true"
 	        android:summary="This feature speeds up page loading, but if there is out of memory issues then disable this feature."/>
+	    
+	    <CheckBoxPreference android:key="keepScreenOn" android:title="Keep Screen On" android:defaultValue="true"
+	        android:summary="Prevent screen from timing out while viewing a comic."/>
+	    
+	    <CheckBoxPreference android:key="scaleDownImage" android:title="Scale Down Pages" android:defaultValue="false"
+	        android:summary="Some images can exceed the size your device can handle. Turn ON if there is errors viewing specific pages."/>
 	    
 	</PreferenceCategory>
 </PreferenceScreen>

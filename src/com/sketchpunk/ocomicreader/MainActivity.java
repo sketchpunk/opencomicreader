@@ -77,7 +77,7 @@ public class MainActivity extends FragmentActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         overridePendingTransition(R.anim.fadein, R.anim.fadeout);
-
+        
         //....................................
         //Load state of filter from Bundle
         if(savedInstanceState != null) {

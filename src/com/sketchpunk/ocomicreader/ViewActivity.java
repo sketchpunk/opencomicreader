@@ -6,11 +6,13 @@ import sage.data.Sqlite;
 import com.sketchpunk.ocomicreader.lib.ComicLoader;
 import com.sketchpunk.ocomicreader.ui.ComicPageView;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.view.ContextMenu;
@@ -73,7 +75,6 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
     	
     	//Full screen, force navigation
     	if(prefs.getBoolean("fullScreen",false)){
-    		System.out.println("FULL SCREEN");
     		winFlags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
 
             View rootView = getWindow().getDecorView();
@@ -89,31 +90,40 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
     	//.........................................
         this.overridePendingTransition(R.anim.fadein, R.anim.fadeout);
     	setContentView(R.layout.activity_view);
-        
-    	//.........................................
-        Bundle b = this.getIntent().getExtras(); 
-        mComicID = b.getString("comicid");
-
+       
         //.........................................
         mToast = Toast.makeText(this,"",Toast.LENGTH_SHORT);
 		mToast.setGravity(Gravity.TOP | Gravity.RIGHT, 0, 0);
-        
-        //.........................................
-        //Get comic information
-        mDb = new Sqlite(this);
-        mDb.openRead();
-        Map<String,String> dbData = mDb.scalarRow("SELECT path,pgCurrent FROM ComicLibrary WHERE comicID = ?",new String[]{mComicID});
-        
+       
+    	//.........................................
+    	int currentPage = 1;
+    	String filePath = "";
+    	
+		Intent intent = this.getIntent();
+    	Uri uri = intent.getData();
+    	if(uri != null){
+    		filePath = Uri.decode(uri.toString().replace("file://",""));
+    	}else{
+    		Bundle b = intent.getExtras(); 
+            mComicID = b.getString("comicid");
+
+            mDb = new Sqlite(this);
+            mDb.openRead();
+            Map<String,String> dbData = mDb.scalarRow("SELECT path,pgCurrent FROM ComicLibrary WHERE comicID = ?",new String[]{mComicID});
+            
+            filePath = dbData.get("path");
+            currentPage = Math.max(Integer.parseInt(dbData.get("pgCurrent")),1);
+    	}//if
+    	
         //.........................................        
         mImageView = (ComicPageView)this.findViewById(R.id.pageView);
         registerForContextMenu(mImageView);
-        System.out.println(dbData.get("pgCurrent"));
-        
+
         //.........................................
         mComicLoad = new ComicLoader(this,mImageView);
-        if(mComicLoad.loadArchive(dbData.get("path"))){
+        if(mComicLoad.loadArchive(filePath)){
         	if(this.mPref_ShowPgNum) showToast("Loading Page...",1);
-        	mComicLoad.gotoPage(Math.max(Integer.parseInt(dbData.get("pgCurrent")),1)); //Continue where user left off. IF 0, Change to 1
+        	mComicLoad.gotoPage(currentPage); //Continue where user left off. IF 0, Change to 1
         }else{
         	Toast.makeText(this,"Unable to load comic.",Toast.LENGTH_LONG).show();
         }//if
@@ -164,15 +174,17 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
 	@Override
 	public void onPageLoaded(boolean isSuccess,int currentPage){
 		if(isSuccess){ //Save reading progress.
-			//Make sure database is open
-			if(mDb == null) mDb = new Sqlite(this);
-			if(!mDb.isOpen()) mDb.openRead();
+			if(mComicID != ""){
+				//Make sure database is open
+				if(mDb == null) mDb = new Sqlite(this);
+				if(!mDb.isOpen()) mDb.openRead();
+	
+				//Save update
+				String cp = Integer.toString(currentPage);
+				String sql = "UPDATE ComicLibrary SET pgCurrent="+cp+", pgRead=CASE WHEN pgRead < "+cp+" THEN "+cp+" ELSE pgRead END WHERE comicID = '" + mComicID + "'"; 
+				mDb.execSql(sql,null);
+			}//if
 
-			//Save update
-			String cp = Integer.toString(currentPage);
-			String sql = "UPDATE ComicLibrary SET pgCurrent="+cp+", pgRead=CASE WHEN pgRead < "+cp+" THEN "+cp+" ELSE pgRead END WHERE comicID = '" + mComicID + "'"; 
-			mDb.execSql(sql,null);
-			
 			//....................................
 			//Display page number
 			if(this.mPref_ShowPgNum) showToast(String.format("%d / %d",currentPage,mComicLoad.getPageCount()),0);

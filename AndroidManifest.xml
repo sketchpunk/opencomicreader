@@ -19,7 +19,22 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ViewActivity" android:label="@string/title_activity_view" android:theme="@style/CustomTheme" android:configChanges="orientation|screenSize"></activity>
+        <activity android:name=".ViewActivity" android:label="Open Comic Reader" android:theme="@style/CustomTheme" android:configChanges="orientation|screenSize">
+            <intent-filter>
+				<action android:name="android.intent.action.VIEW"/>
+				<action android:name="android.intent.action.EDIT"/>
+				<action android:name="android.intent.action.PICK"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:scheme="file"/>
+                <data android:mimeType="*/*"/>
+                <data android:pathPattern=".*\\.cbz"/>
+                <data android:pathPattern=".*\\.cbr"/>
+                <data android:pathPattern=".*\\.zip"/>
+                <data android:pathPattern=".*\\.rar"/>
+                <data android:host="*"/>
+			</intent-filter>
+        </activity>
+        
 		<activity android:name=".PrefActivity" android:theme="@android:style/Theme.Black.NoTitleBar"></activity>
     </application>
 </manifest>

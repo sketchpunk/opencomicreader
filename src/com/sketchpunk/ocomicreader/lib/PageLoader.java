@@ -15,7 +15,8 @@ public class PageLoader{
     /*========================================================
 	*/
 	private LoadingTask mTask;
-	public PageLoader(){}
+	
+	public PageLoader(){}//func
 	
 	public void loadImage(CallBack callback,String imgPath,float maxSize,iComicArchive archive,int imgType){
 		if(mTask != null){
@@ -71,7 +72,7 @@ public class PageLoader{
 			if(archive == null) return null;
 			
 			//...................................			
-			float maxSize = ((Float)params[0]).floatValue();
+			//float maxSize = ((Float)params[0]).floatValue(); //Might use this later for force scale down value.
 			imagePath = (String)params[1];
 			
 			InputStream iStream = archive.getItemInputStream(imagePath);
@@ -85,20 +86,20 @@ public class PageLoader{
 					bmpOption.inJustDecodeBounds = true;
 					if(!this.isCancelled()) BitmapFactory.decodeStream(iStream,null,bmpOption);
 					
-					int scale = 0;
+					//Check for scaling
 					if(!this.isCancelled()){
-						if(Math.max(bmpOption.outHeight,bmpOption.outWidth) > maxSize){
-							if(bmpOption.outHeight > bmpOption.outWidth) scale = Math.round((float)bmpOption.outHeight / maxSize);
-							else scale = Math.round((float)bmpOption.outWidth / maxSize);
+						//--------------------------------------
+						//if over bitmap limit of 2048x2048, must scale down.
+						if(bmpOption.outHeight > 2040 || bmpOption.outWidth > 2040){
+							bmpOption.inScaled = false;
+							bmpOption.inJustDecodeBounds = false;
+							bmpOption.inSampleSize = 2; //Can only scale by whole numbers, Would be nice to scale by float. Min Scale is Half.
+						}else{ //Image is fine, load original size.
+							bmpOption = null;
 						}//if
-
-						bmpOption.inSampleSize = scale;
-						bmpOption.inJustDecodeBounds = false;
-						bmpOption.inScaled = false;
 					}//if
-
-					//....................................
-					//Load bitmap
+					
+					//Load image scaled or not.
 					if(!this.isCancelled()){
 						//Rar stream can be reset which is better, but zip's can not, new stream must be created.
 						if(archive.isStreamResetable()) iStream.reset();
@@ -106,7 +107,7 @@ public class PageLoader{
 							iStream.close(); iStream = null;
 							iStream = archive.getItemInputStream(imagePath);
 						}//if
-						
+	
 						bmp = BitmapFactory.decodeStream(iStream,null,bmpOption);
 					}//if
 					

@@ -53,9 +53,15 @@ public class ComicLoader implements PageLoader.CallBack{//LoadImageView.OnImageL
 	public ComicLoader(Context context,ComicPageView o){
 		mImageView = o;
 		mContext = context;
-		
+
+	    //............................
 		//Save Callback
 		if(context instanceof CallBack) mCallBack = (CallBack)context;
+		
+		//............................
+		//Get perferences
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		mIsPreloading = prefs.getBoolean("preLoading",false);
 		
 		//............................
 		//Get the window size
@@ -66,10 +72,6 @@ public class ComicLoader implements PageLoader.CallBack{//LoadImageView.OnImageL
 		
 		mPageLoader = new PageLoader();
 		mCurrentPage = -1;
-		
-		//Get perferences
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		mIsPreloading = prefs.getBoolean("preLoading",true);
 	}//func
 
 	/*--------------------------------------------------------

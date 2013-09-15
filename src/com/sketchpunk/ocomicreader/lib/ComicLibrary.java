@@ -279,7 +279,7 @@ public class ComicLibrary{
 	    				dbInsert.bind(iPgRead,0);
 	    				dbInsert.bind(iPgCurrent,1);
 	    				dbInsert.bind(iIsCoverExists,0);
-	    				dbInsert.bind(iSeries,sParser.get(tmp));
+						dbInsert.bind(iSeries,sParser.get(path));
 	    				
 						if(dbInsert.execute() == -1){System.out.println("ERROR");}//if
 	    			}//if

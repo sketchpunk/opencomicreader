@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:paddingLeft="0dp"
     android:paddingRight="0dp"
-    android:paddingTop="40dp"
+    android:paddingTop="20dp"
     android:paddingBottom="20dp"
     android:gravity="center_horizontal"
     android:id="@+id/listitem_main_medium">
@@ -14,44 +14,44 @@
         android:layout_height="wrap_content">
         
         <View android:background="@drawable/comicshadow"
-            android:layout_width="152dp"
-            android:layout_height="204dp"
-            android:layout_marginTop="11dp"
+            android:layout_width="76dp"
+            android:layout_height="102dp"
+            android:layout_marginTop="6dp"
             android:layout_centerHorizontal="true"/>
         
         <View android:background="@drawable/comicbg"
-            android:layout_width="146dp"
-            android:layout_height="206dp"
-            android:layout_marginTop="10dp"
+            android:layout_width="73dp"
+            android:layout_height="103dp"
+            android:layout_marginTop="5dp"
             android:layout_centerInParent="true"/>
         
         <ImageView android:id="@+id/imgCover"
-            android:layout_width="140dp"
-            android:layout_height="200dp"
-            android:maxHeight="200dp"
-            android:minHeight="200dp"
+            android:layout_width="70dp"
+            android:layout_height="100dp"
+            android:maxHeight="100dp"
+            android:minHeight="100dp"
             android:scaleType="fitXY"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:layout_centerInParent="true"
             android:adjustViewBounds="false"/>
         
         <View android:background="@drawable/comicborder"
-            android:layout_width="146dp"
-            android:layout_height="206dp"
-            android:layout_marginTop="10dp"
+            android:layout_width="76dp"
+            android:layout_height="106dp"
+            android:layout_marginTop="5dp"
             android:layout_centerInParent="true"/>
         
         <sage.ui.ProgressCircle android:id="@+id/pcProgress"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
            	android:layout_marginTop="0dp"
-           	android:layout_marginLeft="126dp"/>
+           	android:layout_marginLeft="61dp"/>
     </RelativeLayout>
 
     <TextView android:id="@+id/lblTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:maxWidth="200dp"
+        android:maxWidth="100dp"
         android:textSize="15dp"
         android:textColor="#e6e6e6"
         android:text=""/>

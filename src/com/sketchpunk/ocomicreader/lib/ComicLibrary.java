@@ -8,11 +8,10 @@ import java.util.Locale;
 import java.util.Stack;
 import java.util.UUID;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.DatabaseUtils.InsertHelper;
+import android.database.sqlite.SQLiteStatement;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -20,7 +19,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
-
 import sage.data.Sqlite;
 
 public class ComicLibrary{
@@ -232,19 +230,13 @@ public class ComicLibrary{
 	    	//............................................
 	    	//setup db stuff.
 	        SeriesParser sParser = new SeriesParser();
-	        
-	        //TODO: InsertHelper has been deprecated in API17. Google has no replacement for it's bulk insert functionality.
-	        //Research other ways for efficiently bulk inserts, Maybe something with Transactions.
-			InsertHelper dbInsert = mDb.getInsertHelper(DB_TABLE_NAME_COMIC);
-	    	
-			int iComicID = dbInsert.getColumnIndex(DB_COLUMN_NAME_COMICID);
-			int iTitle = dbInsert.getColumnIndex(DB_COLUMN_NAME_TITLE);
-			int iPath = dbInsert.getColumnIndex(DB_COLUMN_NAME_PATH);
-			int iPgCount = dbInsert.getColumnIndex(DB_COLUMN_NAME_PGCOUNT);
-			int iPgRead = dbInsert.getColumnIndex(DB_COLUMN_NAME_PGREAD);
-			int iPgCurrent = dbInsert.getColumnIndex(DB_COLUMN_NAME_PGCURRENT);
-			int iIsCoverExists = dbInsert.getColumnIndex(DB_COLUMN_NAME_ISCOVEREXISTS);
-			int iSeries = dbInsert.getColumnIndex(DB_COLUMN_NAME_SERIES);
+			SQLiteStatement comicInsertStatement = mDb.compileStatement("INSERT INTO "+
+			DB_TABLE_NAME_COMIC+
+			" ("+DB_COLUMN_NAME_COMICID+", "+DB_COLUMN_NAME_TITLE+", "+
+			DB_COLUMN_NAME_PATH+", "+DB_COLUMN_NAME_PGCOUNT+", "+
+			DB_COLUMN_NAME_PGREAD+", "+DB_COLUMN_NAME_PGCURRENT+", "
+			+DB_COLUMN_NAME_SERIES+", "+DB_COLUMN_NAME_ISCOVEREXISTS+
+			") VALUES (?, ?, ?, ?, ?, ?, ?, ?);");
 			
 			mDb.beginTransaction();
 
@@ -271,17 +263,17 @@ public class ComicLibrary{
 	    				//------------------------------
 	    				//Not found, add it to library.
 	    				tmp = sage.io.Path.removeExt(file.getName());
-	    				dbInsert.prepareForInsert();
-						dbInsert.bind(iComicID,UUID.randomUUID().toString());
-	    				dbInsert.bind(iTitle,tmp);
-	    				dbInsert.bind(iPath,path);
-	    				dbInsert.bind(iPgCount,0);
-	    				dbInsert.bind(iPgRead,0);
-	    				dbInsert.bind(iPgCurrent,1);
-	    				dbInsert.bind(iIsCoverExists,0);
-						dbInsert.bind(iSeries,sParser.get(path));
-	    				
-						if(dbInsert.execute() == -1){System.out.println("ERROR");}//if
+						comicInsertStatement.clearBindings();
+						comicInsertStatement.
+							bindString(1, UUID.randomUUID().toString());
+						comicInsertStatement.bindString(2, tmp);
+						comicInsertStatement.bindString(3, path);
+						comicInsertStatement.bindString(4, "0");//pgCount
+						comicInsertStatement.bindString(5, "0");//pgRead
+						comicInsertStatement.bindString(6, "1");//pgCurrent
+						comicInsertStatement.bindString(7, sParser.get(path));
+						comicInsertStatement.bindString(8, "0");
+						comicInsertStatement.execute();
 	    			}//if
 	    		}//for
 	    	}//while

@@ -138,7 +138,7 @@ public class ComicLoader implements PageLoader.CallBack{//LoadImageView.OnImageL
 	/*--------------------------------------------------------
 	Paging Methods*/
 	public int gotoPage(int pos){
-		if(pos < 1 || pos >= mPageLen+1 || pos == mCurrentPage+1) return 0;
+		if(pos < 1 || pos > mPageLen || pos == mCurrentPage+1) return 0;
 		
 		//Arrays start ay 0, but pages start at 1.
 		if(pos == mCurrentPage+2) return nextPage();

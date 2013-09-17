@@ -345,7 +345,7 @@ public class ComicLibrary{
 				tmp = cur.getString(3);
 				if(tmp == null || tmp.isEmpty()){
 					if(sParser == null) sParser = new SeriesParser(); //JIT
-					tmp = cur.getString(4);
+					tmp = cur.getString(1);
 					if(tmp == null || tmp.isEmpty()) continue;
 					
 					tmp = sParser.get(tmp);

@@ -1,13 +1,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/mnu_exit" android:title="Back to Library" android:orderInCategory="100" android:showAsAction="never"/>
-    <item android:id="@+id/mnu_goto" android:title="Goto Page" android:orderInCategory="100" android:showAsAction="never"/>
-    <item android:id="@+id/mnu_scale" android:title="Scale" android:orderInCategory="100" android:showAsAction="never">
+    <item android:id="@+id/mnu_exit" android:title="@string/back_to_library" android:orderInCategory="100" android:showAsAction="never"/>
+    <item android:id="@+id/mnu_goto" android:title="@string/goto_page" android:orderInCategory="100" android:showAsAction="never"/>
+    <item android:id="@+id/mnu_scale" android:title="@string/scale" android:orderInCategory="100" android:showAsAction="never">
         <menu>
             <group android:checkableBehavior="single">
-            	<item android:id="@+id/mnu_scalen" android:title="Off" android:checkable="true"/>
-            	<item android:id="@+id/mnu_scalea" android:title="Auto" android:checkable="true"/>
-            	<item android:id="@+id/mnu_scaleh" android:title="Screen Height" android:checkable="true"/>
-            	<item android:id="@+id/mnu_scalew" android:title="Screen Width" android:checkable="true"/>
+                <item android:id="@+id/mnu_scalen" android:title="@string/scale_off" android:checkable="true"/>
+                <item android:id="@+id/mnu_scalea" android:title="@string/scale_auto" android:checkable="true"/>
+                <item android:id="@+id/mnu_scaleh" android:title="@string/scale_screen_height" android:checkable="true"/>
+                <item android:id="@+id/mnu_scalew" android:title="@string/scale_screen_width" android:checkable="true"/>
             </group>
         </menu>
 	</item>

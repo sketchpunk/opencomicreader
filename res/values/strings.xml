@@ -33,4 +33,11 @@
     </string-array>
         <string name="sync">SYNC</string>
         <string name="reset">Reset</string>
+        <string name="back_to_library">Back to Library</string>
+        <string name="goto_page">Goto Page</string>
+        <string name="scale">Scale</string>
+        <string name="scale_off">Off</string>
+        <string name="scale_auto">Auto</string>
+        <string name="scale_screen_height">Screen Height</string>
+        <string name="scale_screen_width">Screen Width</string>
 </resources>

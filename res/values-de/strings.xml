@@ -1,0 +1,43 @@
+<resources>
+    <string name="app_name">Open ComicReader ModbySpeedProg</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_view">ViewActivity</string>
+
+    <string-array name="scaleMode">
+        <item>Keine</item>
+        <item>Bildschirm Höhe</item>
+        <item>Bildschirm Breite</item>
+        <item>Automatisch</item>
+    </string-array>
+    <string-array name="scaleMode_v">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="libraryFilter">
+        <item>Zeige Alle</item>
+        <item>Gruppiere nach Serie</item>
+        <item>Zeige Ungelesene</item>
+        <item>Zeige Angefangene</item>
+        <item>Zeige Gelesene</item>
+    </string-array>
+    <string-array name="libraryFilter_v">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+        <string name="sync">SYNC</string>
+        <string name="reset">Zurücksetzen</string>
+        <string name="back_to_library">Zurück zur Bibliothek</string>
+        <string name="goto_page">Seite Wechseln</string>
+        <string name="scale">Skalieren</string>
+        <string name="scale_off">Keine</string>
+        <string name="scale_auto">Automatisch</string>
+        <string name="scale_screen_height">Bildschirm Höhe</string>
+        <string name="scale_screen_width">Bildschirm Breite</string>
+</resources>

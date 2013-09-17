@@ -40,7 +40,7 @@
         <string name="scale_auto">Auto</string>
         <string name="scale_screen_height">Screen Height</string>
         <string name="scale_screen_width">Screen Width</string>
-        <string name="msg_removing_reference">Removing reference to </string>
-        <string name="msg_cover_for">Cover for </string>
+        <string name="msg_removing_reference">Removing reference to</string>
+        <string name="msg_cover_for">Cover for</string>
         <string name="msg_cleaning_library">Cleaning up library…</string>
 </resources>

@@ -304,7 +304,7 @@ public class ComicLibrary{
 				//.........................................
 				//if file does not exist, remove from library.
 				if(!file.exists()){
-					sendProgress(mContext.getString(R.string.msg_removing_reference) + cur.getString(1));
+					sendProgress(mContext.getString(R.string.msg_removing_reference) + " " + cur.getString(1));
 					
 					if(delList.length() != 0) delList.append(",");
 					delList.append("'"+cur.getString(0)+"'");
@@ -321,7 +321,7 @@ public class ComicLibrary{
 				//.........................................
 				//if cover exists, then it's been processed.
 				if(cur.getString(2).equals("0")){
-					sendProgress(mContext.getString(R.string.msg_cover_for) + cur.getString(1));
+					sendProgress(mContext.getString(R.string.msg_cover_for) + " " + cur.getString(1));
 					processArchive(cur.getString(0),cur.getString(1),outVar);
 					
 					if(outVar[0] > 0){//if pagecnt is at least 1, update library.

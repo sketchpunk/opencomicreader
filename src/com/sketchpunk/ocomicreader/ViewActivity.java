@@ -122,7 +122,7 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
         //.........................................
         mComicLoad = new ComicLoader(this,mImageView);
         if(mComicLoad.loadArchive(filePath)){
-        	if(this.mPref_ShowPgNum) showToast("Loading Page...",1);
+			if(this.mPref_ShowPgNum) showToast(getString(R.string.va_toast_loading_page),1);
         	mComicLoad.gotoPage(currentPage); //Continue where user left off. IF 0, Change to 1
         }else{
         	Toast.makeText(this,"Unable to load comic.",Toast.LENGTH_LONG).show();
@@ -205,23 +205,23 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
 			//.........................................		
 			case ComicPageView.FlingRight:
 			case ComicPageView.TapLeft:
-				if(this.mPref_ShowPgNum) showToast("Loading Page...",1);
+				if(this.mPref_ShowPgNum) showToast(getString(R.string.va_toast_loading_page),1);
 				switch(mComicLoad.prevPage()){
 					case 0:
-						if(this.mPref_ShowPgNum) showToast("FIRST PAGE",1);
+						if(this.mPref_ShowPgNum) showToast(getString(R.string.va_toast_first_page),1);
 						break;
-					case -1: showToast("Still Preloading, Try again in one second",1); break;
+					case -1: showToast(getString(R.string.va_toast_try_again),1); break;
 				}//switch
 				break;
 			//.........................................
 			case ComicPageView.FlingLeft:
 			case ComicPageView.TapRight:
-				if(this.mPref_ShowPgNum) showToast("Loading Page...",1);
+				if(this.mPref_ShowPgNum) showToast(getString(R.string.va_toast_loading_page),1);
 				switch(mComicLoad.nextPage()){
 					case 0: 
-						if(this.mPref_ShowPgNum) showToast("LAST PAGE",1);
+						if(this.mPref_ShowPgNum) showToast(getString(R.string.va_toast_last_page),1);
 						break;
-					case -1: showToast("Still Preloading, Try again in one second",1); break;
+					case -1: showToast(getString(R.string.va_toast_try_again),1); break;
 				}//switch
 				break;
 		}//switch

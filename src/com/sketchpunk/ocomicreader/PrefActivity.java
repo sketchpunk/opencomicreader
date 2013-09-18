@@ -80,10 +80,10 @@ public class PrefActivity extends PreferenceActivity{
             //.............................................
             //Set current values to summary.
             Preference p = this.findPreference("syncfolder1");
-            if(p != null) p.setSummary(prefs.getString("syncfolder1","- no folder selected -"));
+            if(p != null) p.setSummary(prefs.getString("syncfolder1",getActivity().getString(R.string.pref_summary_no_folder_selected)));
             
             p = this.findPreference("syncfolder2");
-            if(p != null) p.setSummary(prefs.getString("syncfolder2","- no folder selected -"));
+            if(p != null) p.setSummary(prefs.getString("syncfolder2",getActivity().getString(R.string.pref_summary_no_folder_selected)));
         }//func
     }//cls
 }//cls

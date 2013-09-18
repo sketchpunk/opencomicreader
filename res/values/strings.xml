@@ -71,4 +71,20 @@
         <string name="ma_toast_sync_did_not_start">Sync did not start</string>
         <string name="ma_toast_error_closing_progress_dialog">Error closing progress dialog</string>
         <string name="ma_toast_no_sync_folders_have_been_set">No sync folders have been set. Go to settings.</string>
+        <string name="pref_summary_no_folder_selected">- no folder selected -</string>
+        <string name="pref_lib_filter_summary">Set the default of how the library should be filtered on launch.</string>
+        <string name="pref_scale_summary">Set how the image should scale depending on the screen.</string>
+        <string name="pref_show_page_num_summary">When switching pages, a toast alert appears in the corner telling you what page you\'re on.</string>
+        <string name="pref_fullscreen_summary">Display comics at full screen. Tap and hold for options to exit when there is no virtual buttons.</string>
+        <string name="pref_fling_summary">Use the left/Right fling gesture to move to next or previous page.</string>
+        <string name="pref_preloading_summary">This feature speeds up page loading, but if there is out of memory issues then disable this feature.</string>
+        <string name="pref_keepscreenon_summary">Prevent screen from timing out while viewing a comic.</string>
+        <string name="pref_cat_library_settings_title">LIBRARY SETTINGS</string>
+        <string name="pref_cat_viewing_settings_title">VIEWING SETTINGS</string>
+        <string name="pref_show_page_number_title">Show Page Number</string>
+        <string name="pref_fullscreen_title">Fullscreen</string>
+        <string name="pref_fling_title">Fling Navigation</string>
+        <string name="pref_preloading_title">Preload Next Page</string>
+        <string name="pref_keepscreenon_title">Keep Screen On</string>
+        <string name="pref_lib_filter_title">Library Filter</string>
 </resources>

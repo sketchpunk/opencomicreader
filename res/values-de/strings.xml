@@ -71,4 +71,22 @@
         <string name="ma_toast_sync_did_not_start">Synchronisierung konnte nicht starten</string>
         <string name="ma_toast_error_closing_progress_dialog">Es trat ein Fehler beim schließen der Vortschrittsanzeige auf.</string>
         <string name="ma_toast_no_sync_folders_have_been_set">Es wurden noch keine Ordner zur Synchronisation festgelegt. Benutzen sie die Einstellungen.</string>
+        <string name="pref_listitemsize_summary">Stellen sie ein wie groß das Titelbild dargestellt werden soll.</string>
+        <string name="pref_listitemsize_title">Listeneintrag Größe</string>
+        <string name="pref_summary_no_folder_selected">- Kein Ordner ausgewählt -</string>
+        <string name="pref_lib_filter_summary">Stellen sie ein wie die Bibliothek nach dem Starten gefiltert sein soll.</string>
+        <string name="pref_scale_summary">Stellen sie ein wie das Bild abhängig vom Bildschirm skaliert werden soll.</string>
+        <string name="pref_show_page_num_summary">Beim Seitenwechsel erscheint eine Anzeige in der Ecke darüber auf welcher Seite sie sich befinden.</string>
+        <string name="pref_fullscreen_summary">Den Comic im Vollbildmodus anzeigen. Klicken und halten um Aktionen zum beenden zu bekommen, falls keine Schalter vorhanden ist.</string>
+        <string name="pref_fling_summary">Benutze die Links/Rechts Wischgeste um auf die vorherige/nächste Seite zu wechseln.</string>
+        <string name="pref_preloading_summary">Diese Option beschläunigt das laden der nächsten Seite, aber falls sie Probleme mit dem Speicher (Out of Memory Error) bekommen, deaktivieren sie diese Option.</string>
+        <string name="pref_keepscreenon_summary">Diese Option hindert den Bildschirm daran in Ruhezustand zu gehen.</string>
+        <string name="pref_cat_library_settings_title">BIBLIOTHEKS EINSTELLUNGEN</string>
+        <string name="pref_cat_viewing_settings_title">ANZEIGE EINSTELLUNGEN</string>
+        <string name="pref_show_page_number_title">Zeige Seitennummer</string>
+        <string name="pref_fullscreen_title">Vollbildmodus</string>
+        <string name="pref_fling_title">Wischgestennavigation</string>
+        <string name="pref_preloading_title">Nächste Seite Vorladen</string>
+        <string name="pref_keepscreenon_title">Bildschirm aktiv halten</string>
+        <string name="pref_lib_filter_title">Bibliotheksfilter</string>
 </resources>

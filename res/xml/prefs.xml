@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
-	<PreferenceCategory android:key="setiLibrary" android:title="LIBRARY SETTINGS" android:summary="">
+	<PreferenceCategory android:key="setiLibrary" android:title="@string/pref_cat_library_settings_title" android:summary="">
 		<sage.pref.FolderPref android:key="syncfolder1" android:title="Sync Folder 1" android:defaultValue=""/>
 		<sage.pref.FolderPref android:key="syncfolder2" android:title="Sync Folder 2" android:defaultValue=""/>
 	    
-		 <ListPreference android:key="libraryFilter"  android:title="Library Filter" android:defaultValue="0"
-           android:summary="Set the default of how the library should be filtered on launch."
+		 <ListPreference android:key="libraryFilter"  android:title="@string/pref_lib_filter_title" android:defaultValue="0"
+           android:summary="@string/pref_lib_filter_summary"
            android:entries="@array/libraryFilter" android:entryValues="@array/libraryFilter_v"/>
 		
 	    <!--
@@ -18,24 +18,24 @@
 		-->
 	</PreferenceCategory>
 	
-	<PreferenceCategory android:key="setiViewing" android:title="VIEWING SETTINGS" android:summary="">
+	<PreferenceCategory android:key="setiViewing" android:title="@string/pref_cat_viewing_settings_title" android:summary="">
 	    <ListPreference android:key="scaleMode"  android:title="Scale Mode" android:defaultValue="1"
-           android:summary="Set how the image should scale depending on the screen."
+           android:summary="@string/pref_scale_summary"
            android:entries="@array/scaleMode" android:entryValues="@array/scaleMode_v"/>
 	    
-		<CheckBoxPreference android:key="showPageNum" android:title="Show Page Number" android:defaultValue="true"
-	        android:summary="When switching pages, a toast alert appears in the corner telling you what page you're on."/>
+		<CheckBoxPreference android:key="showPageNum" android:title="@string/pref_show_page_number_title" android:defaultValue="true"
+	        android:summary="@string/pref_show_page_num_summary"/>
 	    
-		<CheckBoxPreference android:key="fullScreen" android:title="Fullscreen" android:defaultValue="false"
-	        android:summary="Display comics at full screen. Tap and hold for options to exit when there is no virtual buttons."/>
+		<CheckBoxPreference android:key="fullScreen" android:title="@string/pref_fullscreen_title" android:defaultValue="false"
+	        android:summary="@string/pref_fullscreen_summary"/>
 
-		<CheckBoxPreference android:key="flingEnabled" android:title="Fling Navigation" android:defaultValue="true"
-	        android:summary="Use the left/Right fling gesture to move to next or previous page."/>
+		<CheckBoxPreference android:key="flingEnabled" android:title="@string/pref_fling_title" android:defaultValue="true"
+	        android:summary="@string/pref_fling_summary"/>
 		
-	    <CheckBoxPreference android:key="preLoading" android:title="Preload Next Page" android:defaultValue="false"
-	        android:summary="This feature speeds up page loading, but if there is out of memory issues then disable this feature."/>
+	    <CheckBoxPreference android:key="preLoading" android:title="@string/pref_preloading_title" android:defaultValue="false"
+	        android:summary="@string/pref_preloading_summary"/>
 	    
-	    <CheckBoxPreference android:key="keepScreenOn" android:title="Keep Screen On" android:defaultValue="true"
-	        android:summary="Prevent screen from timing out while viewing a comic."/>
+	    <CheckBoxPreference android:key="keepScreenOn" android:title="@string/pref_keepscreenon_title" android:defaultValue="true"
+	        android:summary="@string/pref_keepscreenon_summary"/>
 	</PreferenceCategory>
 </PreferenceScreen>

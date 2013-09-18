@@ -487,7 +487,7 @@ public class MainActivity extends FragmentActivity
 		if(ComicLibrary.startSync(this)){
 			if(mProgress != null){
 				if(!mProgress.isShowing()){
-					mProgress.show(this,"Library Syncing","",true);
+					mProgress = ProgressDialog.show(this,"Library Syncing","",true);
 					return;
 				}//if
 			}//if

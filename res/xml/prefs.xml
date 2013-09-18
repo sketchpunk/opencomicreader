@@ -37,5 +37,8 @@
 	    
 	    <CheckBoxPreference android:key="keepScreenOn" android:title="Keep Screen On" android:defaultValue="true"
 	        android:summary="Prevent screen from timing out while viewing a comic."/>
+
+	    <ListPreference android:key="listItemSize" android:title="@string/pref_listitemsize_title" android:defaultValue="1" android:summary="@string/pref_listitemsize_summary"
+	        android:entries="@array/listitemSizes" android:entryValues="@array/listitemSizes_v"/>
 	</PreferenceCategory>
 </PreferenceScreen>

@@ -1,5 +1,7 @@
 package sage.data;
 
+import com.sketchpunk.ocomicreader.lib.ComicLibrary;
+
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -28,7 +30,7 @@ public class SqliteHelper extends SQLiteOpenHelper{
 	@Override
 	public void onCreate(SQLiteDatabase db){		
 		db.execSQL("CREATE TABLE IF NOT EXISTS [ComicLibrary]("
-			+"comicID VARCHAR(40) PRIMARY KEY NOT NULL"
+			+""+ComicLibrary.DB_COLUMN_NAME_COMICID+" VARCHAR(40) PRIMARY KEY NOT NULL"
 			+",title VARCHAR(255) NOT NULL,path VARCHAR(255) NOT NULL,isCoverExists INT NOT NULL"
 			+",pgCount INT NOT NULL,pgRead INT NOT NULL,pgCurrent INT NOT NULL,series VARCHAR(300) NULL);");
 	}//func

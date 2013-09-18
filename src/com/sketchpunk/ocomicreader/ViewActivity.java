@@ -3,6 +3,8 @@
 import java.util.Map;
 
 import sage.data.Sqlite;
+
+import com.sketchpunk.ocomicreader.lib.ComicLibrary;
 import com.sketchpunk.ocomicreader.lib.ComicLoader;
 import com.sketchpunk.ocomicreader.ui.ComicPageView;
 
@@ -109,10 +111,10 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
 
             mDb = new Sqlite(this);
             mDb.openRead();
-            Map<String,String> dbData = mDb.scalarRow("SELECT path,pgCurrent FROM ComicLibrary WHERE comicID = ?",new String[]{mComicID});
+            Map<String,String> dbData = mDb.scalarRow("SELECT "+ComicLibrary.DB_COLUMN_NAME_PATH+","+ComicLibrary.DB_COLUMN_NAME_PGCURRENT+" FROM "+ComicLibrary.DB_TABLE_NAME_COMIC+" WHERE "+ComicLibrary.DB_COLUMN_NAME_COMICID+" = ?",new String[]{mComicID});
             
-            filePath = dbData.get("path");
-            currentPage = Math.max(Integer.parseInt(dbData.get("pgCurrent")),1);
+            filePath = dbData.get(ComicLibrary.DB_COLUMN_NAME_PATH);
+            currentPage = Math.max(Integer.parseInt(dbData.get(ComicLibrary.DB_COLUMN_NAME_PGCURRENT)),1);
     	}//if
     	
         //.........................................        
@@ -181,7 +183,7 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
 	
 				//Save update
 				String cp = Integer.toString(currentPage);
-				String sql = "UPDATE ComicLibrary SET pgCurrent="+cp+", pgRead=CASE WHEN pgRead < "+cp+" THEN "+cp+" ELSE pgRead END WHERE comicID = '" + mComicID + "'"; 
+				String sql = "UPDATE "+ComicLibrary.DB_TABLE_NAME_COMIC+" SET "+ComicLibrary.DB_COLUMN_NAME_PGCURRENT+"="+cp+", "+ComicLibrary.DB_COLUMN_NAME_PGREAD+"=CASE WHEN "+ComicLibrary.DB_COLUMN_NAME_PGREAD+" < "+cp+" THEN "+cp+" ELSE "+ComicLibrary.DB_COLUMN_NAME_PGREAD+" END WHERE "+ComicLibrary.DB_COLUMN_NAME_COMICID+" = '" + mComicID + "'"; 
 				mDb.execSql(sql,null);
 			}//if
 

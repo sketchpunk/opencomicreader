@@ -454,14 +454,14 @@ public class MainActivity extends FragmentActivity
 		if(ComicLibrary.startSync(this)){
 			if(mProgress != null){
 				if(!mProgress.isShowing()){
-					mProgress.show(this,"Library Syncing","",true);
+					mProgress = ProgressDialog.show(this,getString(R.string.dialog_title_library_syncing),"",true);
 					return;
 				}//if
 			}//if
 
-			mProgress = ProgressDialog.show(this,"Library Syncing","",true);
+			mProgress = ProgressDialog.show(this,getString(R.string.dialog_title_library_syncing),"",true);
 		}else{
-			Toast.makeText(this,"Sync did not start", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this,R.string.ma_toast_sync_did_not_start, Toast.LENGTH_SHORT).show();
 		}//if
 	}//func
 
@@ -480,7 +480,7 @@ public class MainActivity extends FragmentActivity
 		try{
 			if(mProgress != null){ mProgress.dismiss(); mProgress = null; }//if
 		}catch(Exception e){
-			Toast.makeText(this,"Error closing progress dialog",Toast.LENGTH_LONG).show();
+			Toast.makeText(this,R.string.ma_toast_error_closing_progress_dialog,Toast.LENGTH_LONG).show();
 		}//try
 		System.out.println("onSyncComplete");
 		
@@ -489,7 +489,7 @@ public class MainActivity extends FragmentActivity
 			case ComicLibrary.STATUS_COMPLETE: refreshData(); break;
 		
 			case ComicLibrary.STATUS_NOSETTINGS:
-				Toast.makeText(this,"No sync folders have been set. Go to settings.",Toast.LENGTH_LONG).show();
+				Toast.makeText(this,R.string.ma_toast_no_sync_folders_have_been_set,Toast.LENGTH_LONG).show();
 			break;
 		}//switch
 	}//func

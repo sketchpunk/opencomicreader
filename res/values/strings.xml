@@ -67,4 +67,8 @@
         <string name="va_toast_first_page">FIRST PAGE</string>
         <string name="va_toast_try_again">Still Preloading, Try again in one second</string>
         <string name="va_toast_last_page">LAST PAGE</string>
+        <string name="dialog_title_library_syncing">Library Syncing</string>
+        <string name="ma_toast_sync_did_not_start">Sync did not start</string>
+        <string name="ma_toast_error_closing_progress_dialog">Error closing progress dialog</string>
+        <string name="ma_toast_no_sync_folders_have_been_set">No sync folders have been set. Go to settings.</string>
 </resources>

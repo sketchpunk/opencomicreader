@@ -31,7 +31,7 @@
         <item>3</item>
         <item>4</item>
     </string-array>
-        <string name="sync">SYNC</string>
+        <string name="sync">Synchronisieren</string>
         <string name="reset">Zurücksetzen</string>
         <string name="back_to_library">Zurück zur Bibliothek</string>
         <string name="goto_page">Seite Wechseln</string>
@@ -67,4 +67,8 @@
         <string name="va_toast_first_page">ERSTE SEITE</string>
         <string name="va_toast_try_again">Es wird noch vorgeladen, Versuche es in einer Sekunde noch einmal</string>
         <string name="va_toast_last_page">LETZTE SEITE</string>
+        <string name="dialog_title_library_syncing">Bibliothek Synchronisierung</string>
+        <string name="ma_toast_sync_did_not_start">Synchronisierung konnte nicht starten</string>
+        <string name="ma_toast_error_closing_progress_dialog">Es trat ein Fehler beim schließen der Vortschrittsanzeige auf.</string>
+        <string name="ma_toast_no_sync_folders_have_been_set">Es wurden noch keine Ordner zur Synchronisation festgelegt. Benutzen sie die Einstellungen.</string>
 </resources>

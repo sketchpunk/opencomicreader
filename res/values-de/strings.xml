@@ -89,4 +89,5 @@
         <string name="pref_preloading_title">Nächste Seite Vorladen</string>
         <string name="pref_keepscreenon_title">Bildschirm aktiv halten</string>
         <string name="pref_lib_filter_title">Bibliotheksfilter</string>
+        <string name="va_ctxmenu_title">Einstellungen</string>
 </resources>

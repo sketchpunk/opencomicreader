@@ -140,7 +140,7 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
     public void onCreateContextMenu(ContextMenu menu, View v,ContextMenuInfo menuInfo) {
     	//super.onCreateContextMenu(menu, v, menuInfo);
     	getMenuInflater().inflate(R.menu.activity_view, menu);
-    	menu.setHeaderTitle("Options");
+		menu.setHeaderTitle(R.string.va_ctxmenu_title);
     	
     	switch(mImageView.getScaleMode()){
     		case ComicPageView.ScaleNone: menu.findItem(R.id.mnu_scalen).setChecked(true); break;

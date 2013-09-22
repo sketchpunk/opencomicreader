@@ -335,7 +335,7 @@ public class MainActivity extends FragmentActivity
 	
     @Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle arg){
-		String selectFrom = "", groupBy = "", orderBy = "", where = "";
+		String selectFrom = "", groupBy = "", orderBy = "", where = "", having = "";
 		StringBuilder sqlStatement = new StringBuilder();
 		if(mSeriesLbl.getVisibility() != View.GONE) mSeriesLbl.setVisibility(View.GONE);
 
@@ -365,20 +365,37 @@ public class MainActivity extends FragmentActivity
 				where += " AND ";
 			}
 		}
-		switch(mFilterMode){
-			case 1: where += " pgRead=0";
+
+		if (isSeriesFiltered() && mSeriesFilter.isEmpty()) {
+			switch(mFilterMode){
+			case 1: having += " sum(pgRead)=0";
 					break; //Unread;
-			case 2: where += " pgRead > 0 AND pgRead < pgCount-1";
+			case 2: having += " sum(pgRead) > 0 AND"
+					+ " sum(pgRead) < sum(pgCount)";
 					break;//Progress
-			case 3: where = " pgRead >= pgCount-1";
+			case 3: having += " sum(pgRead) >= sum(pgCount)";
 					break;//Read
-		}//switch
+			}//switch
+		} else {
+			switch(mFilterMode){
+				case 1: where += " pgRead=0";
+						break; //Unread;
+				case 2: where += " pgRead > 0 AND pgRead < pgCount";
+						break;//Progress
+				case 3: where = " pgRead >= pgCount";
+						break;//Read
+			}//switch
+		}
 		sqlStatement.append(selectFrom);
 		if (!where.equals("")) {
 			sqlStatement.append(" WHERE");
 			sqlStatement.append(where);
 		}
 		sqlStatement.append(groupBy);
+		if (!having.equals("")) {
+			sqlStatement.append(" HAVING");
+			sqlStatement.append(having);
+		}
 		sqlStatement.append(orderBy);
 		sqlStatement.append(";");
     	//............................................

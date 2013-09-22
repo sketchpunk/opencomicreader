@@ -50,6 +50,7 @@ public class MainActivity extends FragmentActivity
 
 	private int mFilterMode = 0;
 	private String mSeriesFilter = "";
+	private boolean mGroupBySeries = false;
 	private SpinnerAdapter mSpinAdapter;
 	
 	private GridView mGridView;
@@ -84,12 +85,17 @@ public class MainActivity extends FragmentActivity
         	mSeriesFilter = savedInstanceState.getString("mSeriesFilter");
         	mFilterMode = savedInstanceState.getInt("mFilterMode");
         	if(mSeriesFilter == null) mSeriesFilter = ""; // if no filter found
+			mGroupBySeries = savedInstanceState.getBoolean("mGroupBySeries");
         }else{
         	//if no state, load in default pref.
         	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         	String tmp = prefs.getString("libraryFilter","0");
         	this.mFilterMode = Integer.parseInt(tmp);
+			mGroupBySeries = prefs.getBoolean("SeriesMode", false);
         }//if
+		if (mFilterMode > 3) {
+			mFilterMode = 3;
+		}
         
         //....................................
         mThumbPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/OpenComicReader/thumbs/";
@@ -153,6 +159,9 @@ public class MainActivity extends FragmentActivity
         
         if(!mIsFirstRun) this.refreshData();
         else mIsFirstRun = false;
+
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		mGroupBySeries = prefs.getBoolean("SeriesMode", false);
     }//func
     
     
@@ -326,30 +335,55 @@ public class MainActivity extends FragmentActivity
 	
     @Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle arg){
-    	String sql = "";
-    	if(mSeriesLbl.getVisibility() != View.GONE) mSeriesLbl.setVisibility(View.GONE);
-    	
-    	if(isSeriesFiltered()){//Filter by series
-    		if(mSeriesFilter.isEmpty()){
-    			sql = "SELECT min(comicID) [_id],series [title],sum(pgCount) [pgCount],sum(pgRead) [pgRead],min(isCoverExists) [isCoverExists],count(comicID) [cntIssue] FROM ComicLibrary GROUP BY series ORDER BY series";
-    		}else{
-    			mSeriesLbl.setText("Series > " + mSeriesFilter);
-    			mSeriesLbl.setVisibility(View.VISIBLE);
-    			sql = "SELECT comicID [_id],title,pgCount,pgRead,isCoverExists FROM ComicLibrary WHERE series = '"+mSeriesFilter.replace("'", "''")+"' ORDER BY title";
-    		}//if
-    	}else{ //Filter by reading progress.
-    		String condWhere = "";
-    		switch(mFilterMode){
-    			case 2: condWhere = "WHERE pgRead=0"; break; //Unread;
-    			case 3: condWhere = "WHERE pgRead > 0 AND pgRead < pgCount-1"; break;//Progress
-    			case 4: condWhere = "WHERE pgRead >= pgCount-1"; break;//Read
-    		}//switch
-    		sql = "SELECT comicID [_id],title,pgCount,pgRead,isCoverExists FROM ComicLibrary "+condWhere+" ORDER BY title";
-    	}//if
-   
+		String selectFrom = "", groupBy = "", orderBy = "", where = "";
+		StringBuilder sqlStatement = new StringBuilder();
+		if(mSeriesLbl.getVisibility() != View.GONE) mSeriesLbl.setVisibility(View.GONE);
+
+		if(isSeriesFiltered()){//Filter by series
+			if(mSeriesFilter.isEmpty()){
+				selectFrom = "SELECT min(comicID) [_id],series [title],"
+						+ "sum(pgCount) [pgCount],sum(pgRead) [pgRead],"
+						+ "min(isCoverExists) [isCoverExists],"
+						+ "count(comicID) [cntIssue] FROM ComicLibrary";
+				groupBy = " GROUP BY series";
+				orderBy = " ORDER BY series";
+			}else{
+				mSeriesLbl.setText("Series > " + mSeriesFilter);
+				mSeriesLbl.setVisibility(View.VISIBLE);
+				selectFrom = "SELECT comicID [_id],title,pgCount,pgRead,"
+						+ "isCoverExists FROM ComicLibrary";
+				where = " series = '"+
+						mSeriesFilter.replace("'", "''")+"'";
+				orderBy = " ORDER BY title";
+			}//if
+		} else {
+			selectFrom = "SELECT comicID [_id],title,pgCount,pgRead,isCoverExists FROM ComicLibrary";
+			orderBy = " ORDER BY title";
+		}
+		if (mFilterMode > 0 && mFilterMode < 4) {
+			if (!where.equals("")) {
+				where += " AND ";
+			}
+		}
+		switch(mFilterMode){
+			case 1: where += " pgRead=0";
+					break; //Unread;
+			case 2: where += " pgRead > 0 AND pgRead < pgCount-1";
+					break;//Progress
+			case 3: where = " pgRead >= pgCount-1";
+					break;//Read
+		}//switch
+		sqlStatement.append(selectFrom);
+		if (!where.equals("")) {
+			sqlStatement.append(" WHERE");
+			sqlStatement.append(where);
+		}
+		sqlStatement.append(groupBy);
+		sqlStatement.append(orderBy);
+		sqlStatement.append(";");
     	//............................................
-    	SqlCursorLoader cursorLoader = new SqlCursorLoader(this,mDb);
-    	cursorLoader.setRaw(sql);
+		SqlCursorLoader cursorLoader = new SqlCursorLoader(this,mDb);
+		cursorLoader.setRaw(sqlStatement.toString());
     	return cursorLoader;
 	}//func
     
@@ -496,5 +530,5 @@ public class MainActivity extends FragmentActivity
 
 	/*========================================================
 	Sync Library*/
-	private boolean isSeriesFiltered(){ return (mFilterMode == 1); }
+	private boolean isSeriesFiltered(){ return mGroupBySeries; }
 }//cls

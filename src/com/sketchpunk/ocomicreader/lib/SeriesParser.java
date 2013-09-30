@@ -9,10 +9,11 @@ public class SeriesParser{
 	
 	public SeriesParser(){
 		mParseList = new ArrayList<ParseItem>();
-		mParseList.add(new ParseItem("([\\s_]+v(ol)?(ume)?[\\s_]*\\d+)"));
-		mParseList.add(new ParseItem("([\\s_]+c(h)?(apter)?[\\s_]*\\d+)"));
-		mParseList.add(new ParseItem("([\\s_]+-)"));
-		mParseList.add(new ParseItem("([\\s_]+[tT]*\\d+)"));
+		mParseList.add(new ParseItem("[\\w\\W]+?/([\\w\\W&&[^/]]+)/Chapter .*"));
+		mParseList.add(new ParseItem("(?:[\\w\\W]+?/){0,1}(.+)(?:[\\s_]+v(?:ol)?(?:ume)?[\\s_]*\\d+)"));
+		mParseList.add(new ParseItem("(?:[\\w\\W]+?/){0,1}(.+)(?:[\\s_]+c(?:h)?(?:apter)?[\\s_]*\\d+)"));
+		mParseList.add(new ParseItem("(?:[\\w\\W]+?/){0,1}(.+)(?:[\\s_]+-)"));
+		mParseList.add(new ParseItem("(?:[\\w\\W]+?/){0,1}(.+)(?:[\\s_]+[tT]*\\d+)"));
 	}//func
 	
 	public String get(String txt){
@@ -34,7 +35,7 @@ public class SeriesParser{
 		
 		public String parse(String txt){
 			Matcher m = mPat.matcher(txt);
-			if(m.find()) return txt.substring(0,m.start()).replace("_"," ").trim();
+			if(m.find()) return m.group(1).replace("_"," ").trim();
 			return "";
 		}//func
 	}//cls

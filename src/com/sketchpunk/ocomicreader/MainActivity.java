@@ -331,20 +331,53 @@ public class MainActivity extends FragmentActivity
     	
     	if(isSeriesFiltered()){//Filter by series
     		if(mSeriesFilter.isEmpty()){
-    			sql = "SELECT min(comicID) [_id],series [title],sum(pgCount) [pgCount],sum(pgRead) [pgRead],min(isCoverExists) [isCoverExists],count(comicID) [cntIssue] FROM ComicLibrary GROUP BY series ORDER BY series";
+				sql = "SELECT min("+ComicLibrary.DB_COLUMN_NAME_COMICID+
+						") [_id],"+ComicLibrary.DB_COLUMN_NAME_SERIES+
+						" ["+ComicLibrary.DB_COLUMN_NAME_TITLE+"],sum("+
+						ComicLibrary.DB_COLUMN_NAME_PGCOUNT+") ["+
+						ComicLibrary.DB_COLUMN_NAME_PGCOUNT+"],sum("+
+						ComicLibrary.DB_COLUMN_NAME_PGREAD+") ["+
+						ComicLibrary.DB_COLUMN_NAME_PGREAD+"],min("+
+						ComicLibrary.DB_COLUMN_NAME_ISCOVEREXISTS+") ["+
+						ComicLibrary.DB_COLUMN_NAME_ISCOVEREXISTS+"],count("+
+						ComicLibrary.DB_COLUMN_NAME_COMICID+
+						") [cntIssue] FROM "+ComicLibrary.DB_TABLE_NAME_COMIC+
+						" GROUP BY "+ComicLibrary.DB_COLUMN_NAME_SERIES+
+						" ORDER BY "+ComicLibrary.DB_COLUMN_NAME_SERIES;
     		}else{
     			mSeriesLbl.setText("Series > " + mSeriesFilter);
     			mSeriesLbl.setVisibility(View.VISIBLE);
-    			sql = "SELECT comicID [_id],title,pgCount,pgRead,isCoverExists FROM ComicLibrary WHERE series = '"+mSeriesFilter.replace("'", "''")+"' ORDER BY title";
+				sql = "SELECT "+ComicLibrary.DB_COLUMN_NAME_COMICID+" [_id],"+
+						ComicLibrary.DB_COLUMN_NAME_TITLE+","+
+						ComicLibrary.DB_COLUMN_NAME_PGCOUNT+","+
+						ComicLibrary.DB_COLUMN_NAME_PGREAD+","+
+						ComicLibrary.DB_COLUMN_NAME_ISCOVEREXISTS+" FROM "+
+						ComicLibrary.DB_TABLE_NAME_COMIC+" WHERE "+
+						ComicLibrary.DB_COLUMN_NAME_SERIES+" = '"+
+						mSeriesFilter.replace("'", "''")+"' ORDER BY "+
+						ComicLibrary.DB_COLUMN_NAME_TITLE;
     		}//if
     	}else{ //Filter by reading progress.
     		String condWhere = "";
     		switch(mFilterMode){
-    			case 2: condWhere = "WHERE pgRead=0"; break; //Unread;
-    			case 3: condWhere = "WHERE pgRead > 0 AND pgRead < pgCount-1"; break;//Progress
-    			case 4: condWhere = "WHERE pgRead >= pgCount-1"; break;//Read
+				case 2: condWhere = "WHERE "+ComicLibrary.DB_COLUMN_NAME_PGREAD
+						+"=0";
+						break; //Unread;
+				case 3: condWhere = "WHERE "+ComicLibrary.DB_COLUMN_NAME_PGREAD
+						+" > 0 AND "+ComicLibrary.DB_COLUMN_NAME_PGREAD+" < "+
+						ComicLibrary.DB_COLUMN_NAME_PGCOUNT+"-1";
+						break;//Progress
+				case 4: condWhere = "WHERE "+ComicLibrary.DB_COLUMN_NAME_PGREAD
+						+" >= "+ComicLibrary.DB_COLUMN_NAME_PGCOUNT+"-1";
+						break;//Read
     		}//switch
-    		sql = "SELECT comicID [_id],title,pgCount,pgRead,isCoverExists FROM ComicLibrary "+condWhere+" ORDER BY title";
+			sql = "SELECT "+ComicLibrary.DB_COLUMN_NAME_COMICID+" [_id],"+
+					ComicLibrary.DB_COLUMN_NAME_TITLE+","+
+					ComicLibrary.DB_COLUMN_NAME_PGCOUNT+","+
+					ComicLibrary.DB_COLUMN_NAME_PGREAD+","+
+					ComicLibrary.DB_COLUMN_NAME_ISCOVEREXISTS+
+					" FROM "+ComicLibrary.DB_TABLE_NAME_COMIC+" "+condWhere+
+					" ORDER BY "+ComicLibrary.DB_COLUMN_NAME_TITLE;
     	}//if
    
     	//............................................
@@ -398,7 +431,7 @@ public class MainActivity extends FragmentActivity
 			AdapterItemRef itmRef = (AdapterItemRef)v.getTag();
 			
 			//..............................................
-			String tmp = c.getString(mAdapter.getColIndex("title"));
+			String tmp = c.getString(mAdapter.getColIndex(ComicLibrary.DB_COLUMN_NAME_TITLE));
 			if(isSeriesFiltered() && mSeriesFilter.isEmpty()){
 				itmRef.series = tmp;
 				tmp += " ("+c.getString(mAdapter.getColIndex("cntIssue"))+")";
@@ -409,16 +442,16 @@ public class MainActivity extends FragmentActivity
 
 			//..............................................
 			//load Cover Image
-			if(c.getString(mAdapter.getColIndex("isCoverExists")).equals("1")){
+			if(c.getString(mAdapter.getColIndex(ComicLibrary.DB_COLUMN_NAME_ISCOVEREXISTS)).equals("1")){
 				LoadImageView.loadImage(mThumbPath + itmRef.id + ".jpg",itmRef.imgCover,this);
 			}//if
 			
 			//..............................................
 			//display reading progress
 			float progress = 0f;
-			int pTotal = c.getInt(mAdapter.getColIndex("pgCount"));
+			int pTotal = c.getInt(mAdapter.getColIndex(ComicLibrary.DB_COLUMN_NAME_PGCOUNT));
 			if(pTotal > 0){
-				float pRead = c.getFloat(mAdapter.getColIndex("pgRead"));
+				float pRead = c.getFloat(mAdapter.getColIndex(ComicLibrary.DB_COLUMN_NAME_PGREAD));
 				progress = (pRead / ((float)pTotal));
 			}//if
 			
@@ -454,7 +487,7 @@ public class MainActivity extends FragmentActivity
 		if(ComicLibrary.startSync(this)){
 			if(mProgress != null){
 				if(!mProgress.isShowing()){
-					mProgress.show(this,"Library Syncing","",true);
+					mProgress = ProgressDialog.show(this,"Library Syncing","",true);
 					return;
 				}//if
 			}//if

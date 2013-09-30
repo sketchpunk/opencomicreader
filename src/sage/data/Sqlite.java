@@ -8,6 +8,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 import android.database.DatabaseUtils.InsertHelper;
 
 public class Sqlite{
@@ -111,6 +112,9 @@ public class Sqlite{
 		db.close();
 	}//func
 	
+	public SQLiteStatement compileStatement(String sql) {
+		return mDb.compileStatement(sql);
+	}//func
 	
 	/*========================================================
 	Modifying db operations*/

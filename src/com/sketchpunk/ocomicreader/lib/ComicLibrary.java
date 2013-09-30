@@ -8,11 +8,10 @@ import java.util.Locale;
 import java.util.Stack;
 import java.util.UUID;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.DatabaseUtils.InsertHelper;
+import android.database.sqlite.SQLiteStatement;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -20,7 +19,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
-
 import sage.data.Sqlite;
 
 public class ComicLibrary{
@@ -31,6 +29,18 @@ public class ComicLibrary{
 	public final static int STATUS_NOSETTINGS = 1;
 	public final static int STATUS_COMPLETE = 0;
 
+	/*========================================================
+	 * Comic Database contract constants
+	 */
+	public final static String DB_TABLE_NAME_COMIC = "ComicLibrary";
+	public final static String DB_COLUMN_NAME_COMICID = "comicID";
+	public final static String DB_COLUMN_NAME_TITLE = "title";
+	public final static String DB_COLUMN_NAME_PATH = "path";
+	public final static String DB_COLUMN_NAME_PGCOUNT = "pgCount";
+	public final static String DB_COLUMN_NAME_PGREAD = "pgRead";
+	public final static String DB_COLUMN_NAME_PGCURRENT = "pgCurrent";
+	public final static String DB_COLUMN_NAME_ISCOVEREXISTS = "isCoverExists";
+	public final static String DB_COLUMN_NAME_SERIES = "series";
 	
 	/*========================================================
 	Thread safe messaging*/
@@ -65,7 +75,7 @@ public class ComicLibrary{
     	db.openWrite();
     	
     	if(delComic){ //Delete comic from device
-    		String comicPath = db.scalar("SELECT path FROM ComicLibrary WHERE comicID = '"+id.replace("'","''")+"';",null);
+			String comicPath = db.scalar("SELECT "+DB_COLUMN_NAME_PATH+" FROM "+DB_TABLE_NAME_COMIC+" WHERE "+DB_COLUMN_NAME_COMICID+" = '"+id.replace("'","''")+"';",null);
     		if(comicPath != null && !comicPath.isEmpty()){
     			file = new File(comicPath);
     			if(file.exists()) file.delete();
@@ -73,7 +83,7 @@ public class ComicLibrary{
     	}//if
     	
     	//Delete comic from library
-    	if(db.delete("ComicLibrary", "comicID = '"+id.replace("'","''")+"'",null) > 0){
+		if(db.delete(DB_TABLE_NAME_COMIC, DB_COLUMN_NAME_COMICID+" = '"+id.replace("'","''")+"'",null) > 0){
     		file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/OpenComicReader/thumbs/" + id +".jpg");
     		if(file.exists()) file.delete();
     	}//if
@@ -82,11 +92,11 @@ public class ComicLibrary{
     }//func
     
     public static void setComicProgress(Context context,String id,int state,boolean applySeries){
-    	String sql = "UPDATE ComicLibrary SET ";
-    	sql += (state == 0)?"pgRead=0,pgCurrent=0":"pgRead=pgCount,pgCurrent=pgCount"; //0-Reset or 1-Mark as Read.
+		String sql = "UPDATE "+DB_TABLE_NAME_COMIC+" SET ";
+		sql += (state == 0)?DB_COLUMN_NAME_PGREAD+"=0,"+DB_COLUMN_NAME_PGCURRENT+"=0":DB_COLUMN_NAME_PGREAD+"="+DB_COLUMN_NAME_PGCOUNT+","+DB_COLUMN_NAME_PGCURRENT+"="+DB_COLUMN_NAME_PGCOUNT; //0-Reset or 1-Mark as Read.
     	
-    	if(applySeries) sql += " WHERE series in (SELECT series FROM ComicLibrary WHERE comicID = '"+id+"')";
-    	else sql += " WHERE comicID = '"+id+"'";
+		if(applySeries) sql += " WHERE "+DB_COLUMN_NAME_SERIES+" in (SELECT "+DB_COLUMN_NAME_SERIES+" FROM "+DB_TABLE_NAME_COMIC+" WHERE "+DB_COLUMN_NAME_COMICID+" = '"+id+"')";
+		else sql += " WHERE "+DB_COLUMN_NAME_COMICID+" = '"+id+"'";
     	
     	sage.data.Sqlite.execSql(context,sql,null);
     }//func
@@ -220,19 +230,13 @@ public class ComicLibrary{
 	    	//............................................
 	    	//setup db stuff.
 	        SeriesParser sParser = new SeriesParser();
-	        
-	        //TODO: InsertHelper has been deprecated in API17. Google has no replacement for it's bulk insert functionality.
-	        //Research other ways for efficiently bulk inserts, Maybe something with Transactions.
-	    	InsertHelper dbInsert = mDb.getInsertHelper("ComicLibrary");
-	    	
-			int iComicID = dbInsert.getColumnIndex("comicID");
-			int iTitle = dbInsert.getColumnIndex("title");
-			int iPath = dbInsert.getColumnIndex("path");
-			int iPgCount = dbInsert.getColumnIndex("pgCount");
-			int iPgRead = dbInsert.getColumnIndex("pgRead");
-			int iPgCurrent = dbInsert.getColumnIndex("pgCurrent");
-			int iIsCoverExists = dbInsert.getColumnIndex("isCoverExists");
-			int iSeries = dbInsert.getColumnIndex("series");
+			SQLiteStatement comicInsertStatement = mDb.compileStatement("INSERT INTO "+
+			DB_TABLE_NAME_COMIC+
+			" ("+DB_COLUMN_NAME_COMICID+", "+DB_COLUMN_NAME_TITLE+", "+
+			DB_COLUMN_NAME_PATH+", "+DB_COLUMN_NAME_PGCOUNT+", "+
+			DB_COLUMN_NAME_PGREAD+", "+DB_COLUMN_NAME_PGCURRENT+", "
+			+DB_COLUMN_NAME_SERIES+", "+DB_COLUMN_NAME_ISCOVEREXISTS+
+			") VALUES (?, ?, ?, ?, ?, ?, ?, ?);");
 			
 			mDb.beginTransaction();
 
@@ -253,23 +257,23 @@ public class ComicLibrary{
 	    				sendProgress(file.getName());
 	    				path = file.getPath(); //System.out.println(path);
 
-	    				tmp = mDb.scalar("SELECT comicID FROM ComicLibrary WHERE path = '"+path.replace("'","''")+"'",null);
+						tmp = mDb.scalar("SELECT "+DB_COLUMN_NAME_COMICID+" FROM "+DB_TABLE_NAME_COMIC+" WHERE "+DB_COLUMN_NAME_PATH+" = '"+path.replace("'","''")+"'",null);
 	    				if(!tmp.isEmpty()) continue;
 
 	    				//------------------------------
 	    				//Not found, add it to library.
 	    				tmp = sage.io.Path.removeExt(file.getName());
-	    				dbInsert.prepareForInsert();
-						dbInsert.bind(iComicID,UUID.randomUUID().toString());
-	    				dbInsert.bind(iTitle,tmp);
-	    				dbInsert.bind(iPath,path);
-	    				dbInsert.bind(iPgCount,0);
-	    				dbInsert.bind(iPgRead,0);
-	    				dbInsert.bind(iPgCurrent,1);
-	    				dbInsert.bind(iIsCoverExists,0);
-	    				dbInsert.bind(iSeries,sParser.get(tmp));
-	    				
-						if(dbInsert.execute() == -1){System.out.println("ERROR");}//if
+						comicInsertStatement.clearBindings();
+						comicInsertStatement.
+							bindString(1, UUID.randomUUID().toString());
+						comicInsertStatement.bindString(2, tmp);
+						comicInsertStatement.bindString(3, path);
+						comicInsertStatement.bindString(4, "0");//pgCount
+						comicInsertStatement.bindString(5, "0");//pgRead
+						comicInsertStatement.bindString(6, "1");//pgCurrent
+						comicInsertStatement.bindString(7, sParser.get(path));
+						comicInsertStatement.bindString(8, "0");
+						comicInsertStatement.execute();
 	    			}//if
 	    		}//for
 	    	}//while
@@ -291,7 +295,10 @@ public class ComicLibrary{
 			int[] outVar = {0,0}; //PageCount,IsCoverCreated
 			File file;
 			String tmp;
-			Cursor cur = mDb.raw("SELECT comicID,path,isCoverExists,series,title FROM ComicLibrary",null);
+			Cursor cur = mDb.raw("SELECT "+DB_COLUMN_NAME_COMICID+","+
+					DB_COLUMN_NAME_PATH+","+DB_COLUMN_NAME_ISCOVEREXISTS+","+
+					DB_COLUMN_NAME_SERIES+","+DB_COLUMN_NAME_TITLE+
+					" FROM "+DB_TABLE_NAME_COMIC+"",null);
 			SeriesParser sParser = null;
 			
 			for(boolean isOk = cur.moveToFirst(); isOk; isOk = cur.moveToNext()){
@@ -321,7 +328,12 @@ public class ComicLibrary{
 					processArchive(cur.getString(0),cur.getString(1),outVar);
 					
 					if(outVar[0] > 0){//if pagecnt is at least 1, update library.
-						mDb.execSql(String.format("UPDATE ComicLibrary SET pgCount=%d,isCoverExists=%d WHERE comicID = '%s'",outVar[0],outVar[1],cur.getString(0)),null);
+						mDb.execSql(String.format("UPDATE "+
+								DB_TABLE_NAME_COMIC+" SET "+
+								DB_COLUMN_NAME_PGCOUNT+"=%d,"+
+								DB_COLUMN_NAME_ISCOVEREXISTS+"=%d WHERE "+
+								DB_COLUMN_NAME_COMICID+" = '%s'",
+								outVar[0],outVar[1],cur.getString(0)),null);
 					}else{ //if no pages found, its not a comic archive. Delete.
 						if(delList.length() != 0) delList.append(",");
 						delList.append("'"+cur.getString(0)+"'");
@@ -333,12 +345,16 @@ public class ComicLibrary{
 				tmp = cur.getString(3);
 				if(tmp == null || tmp.isEmpty()){
 					if(sParser == null) sParser = new SeriesParser(); //JIT
-					tmp = cur.getString(4);
+					tmp = cur.getString(1);
 					if(tmp == null || tmp.isEmpty()) continue;
 					
 					tmp = sParser.get(tmp);
 					if(!tmp.isEmpty()){
-						mDb.execSql(String.format("UPDATE ComicLibrary SET series='%s' WHERE comicID = '%s'",tmp.replace("'","''"),cur.getString(0)),null);
+						mDb.execSql(String.format("UPDATE "+
+								DB_TABLE_NAME_COMIC+" SET "+
+								DB_COLUMN_NAME_SERIES+"='%s' WHERE "+
+								DB_COLUMN_NAME_COMICID+" = '%s'",
+								tmp.replace("'","''"),cur.getString(0)),null);
 					}//if
 				}//if
 			}//for
@@ -348,7 +364,9 @@ public class ComicLibrary{
 			//if there is a list of items to delete, do it now in one swoop.
 			if(delList.length() > 0){
 				sendProgress("Cleaning up library...");
-				mDb.execSql(String.format("DELETE FROM ComicLibrary WHERE comicID in (%s)",delList.toString()),null);
+				mDb.execSql(String.format("DELETE FROM "+DB_TABLE_NAME_COMIC+
+						" WHERE "+DB_COLUMN_NAME_COMICID+
+						" in (%s)",delList.toString()),null);
 			}//if
 		}//func
 

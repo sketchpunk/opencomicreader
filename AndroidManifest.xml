@@ -31,6 +31,24 @@
                 <data android:pathPattern=".*\\.cbr"/>
                 <data android:pathPattern=".*\\.zip"/>
                 <data android:pathPattern=".*\\.rar"/>
+		<!-- These have to be added becouse the '*' symbol is not greedy it will only match first dot -->
+		<!-- These are needed to match files with more the one 'dot' in the file namme or path -->
+		<!-- Two dots -->
+		<data android:pathPattern=".*\\.*\\.cbz"/>
+                <data android:pathPattern=".*\\.*\\.cbr"/>
+                <data android:pathPattern=".*\\.*\\.zip"/>
+                <data android:pathPattern=".*\\.*\\.rar"/>
+		<!-- Three dots -->
+		<data android:pathPattern=".*\\.*\\.*\\.cbz"/>
+                <data android:pathPattern=".*\\.*\\.*\\.cbr"/>
+                <data android:pathPattern=".*\\.*\\.*\\.zip"/>
+                <data android:pathPattern=".*\\.*\\.*\\.rar"/>
+		<!-- Four dots -->
+		<data android:pathPattern=".*\\.*\\.*\\.*\\.cbz"/>
+                <data android:pathPattern=".*\\.*\\.*\\.*\\.cbr"/>
+                <data android:pathPattern=".*\\.*\\.*\\.*\\.zip"/>
+                <data android:pathPattern=".*\\.*\\.*\\.*\\.rar"/>
+
                 <data android:host="*"/>
 			</intent-filter>
         </activity>

@@ -23,6 +23,9 @@ import android.preference.PreferenceManager;
 
 import sage.data.Sqlite;
 
+//TODO: https://github.com/SpeedProg/opencomicreader/commit/f9bfe03e0a48f54db8041b11014a4e2b6274120c
+//Read up on Sqlite.SqliteStatements as a replacement for Insert helper and fix any areas that could use this improvement.
+
 public class ComicLibrary{
 	private static Thread mWorkerThread = null;
 	

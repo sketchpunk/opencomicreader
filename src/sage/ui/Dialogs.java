@@ -1,5 +1,7 @@
 package sage.ui;
 
+import com.sketchpunk.ocomicreader.R;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,8 +14,8 @@ public class Dialogs{
 		abBuilder.setTitle(title);
 		abBuilder.setMessage(msg);
 		abBuilder.setCancelable(false);
-		abBuilder.setNegativeButton("No",null);
-		abBuilder.setPositiveButton("Yes",onOk);
+		abBuilder.setNegativeButton(R.string.dialog_confirmbot_button_no,null);
+		abBuilder.setPositiveButton(R.string.dialog_confirmbot_button_yes,onOk);
 		abBuilder.show();
 	}//func
 	
@@ -24,8 +26,8 @@ public class Dialogs{
 		
 		//setup dialog
 		abBuilder.setTitle(title);
-		abBuilder.setNegativeButton("Cancel",null);
-		abBuilder.setPositiveButton("Ok",new DialogInterface.OnClickListener(){  
+		abBuilder.setNegativeButton(R.string.dialog_numpicker_button_cancel,null);
+		abBuilder.setPositiveButton(R.string.dialog_numpicker_button_ok,new DialogInterface.OnClickListener(){  
             public void onClick(DialogInterface dialog, int whichButton){ onOk.onClick(null,np.getValue()); return; }  
 		});
 		

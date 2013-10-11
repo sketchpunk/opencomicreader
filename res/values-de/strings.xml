@@ -90,4 +90,8 @@
         <string name="pref_keepscreenon_title">Bildschirm aktiv halten</string>
         <string name="pref_lib_filter_title">Bibliotheksfilter</string>
         <string name="va_ctxmenu_title">Einstellungen</string>
+        <string name="dialog_confirmbot_button_yes">Ja</string>
+        <string name="dialog_confirmbot_button_no">Nein</string>
+        <string name="dialog_numpicker_button_cancel">Abbrechen</string>
+        <string name="dialog_numpicker_button_ok">OK</string>
 </resources>

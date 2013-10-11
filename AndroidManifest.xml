@@ -26,11 +26,25 @@
 				<action android:name="android.intent.action.PICK"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <data android:scheme="file"/>
-                <data android:mimeType="*/*"/>
-                <data android:pathPattern=".*\\.cbz"/>
+                <data android:mimeType="*/*"/>               
+				<!--These have to be added because the '*' symbol is not greedy, it will only match the first dot.
+				These are needed to match files with more the one 'dot' in the file name or path-->
+				<data android:pathPattern=".*\\.cbz"/>
                 <data android:pathPattern=".*\\.cbr"/>
                 <data android:pathPattern=".*\\.zip"/>
-                <data android:pathPattern=".*\\.rar"/>
+                <data android:pathPattern=".*\\.rar"/> 
+				<data android:pathPattern=".*\\.*\\.cbz"/>
+				<data android:pathPattern=".*\\.*\\.cbr"/>
+				<data android:pathPattern=".*\\.*\\.zip"/>
+				<data android:pathPattern=".*\\.*\\.rar"/>
+				<data android:pathPattern=".*\\.*\\.*\\.cbz"/>
+				<data android:pathPattern=".*\\.*\\.*\\.cbr"/>
+				<data android:pathPattern=".*\\.*\\.*\\.zip"/>
+				<data android:pathPattern=".*\\.*\\.*\\.rar"/>
+				<data android:pathPattern=".*\\.*\\.*\\.*\\.cbz"/>
+				<data android:pathPattern=".*\\.*\\.*\\.*\\.cbr"/>
+				<data android:pathPattern=".*\\.*\\.*\\.*\\.zip"/>
+				<data android:pathPattern=".*\\.*\\.*\\.*\\.rar"/> 
                 <data android:host="*"/>
 			</intent-filter>
         </activity>

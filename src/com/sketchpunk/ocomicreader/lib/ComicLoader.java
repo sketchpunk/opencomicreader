@@ -138,11 +138,11 @@ public class ComicLoader implements PageLoader.CallBack{//LoadImageView.OnImageL
 	/*--------------------------------------------------------
 	Paging Methods*/
 	public int gotoPage(int pos){
-		if(pos < 1 || pos >= mPageLen || pos == mCurrentPage+1) return 0;
-		
-		//Arrays start ay 0, but pages start at 1.
-		if(pos == mCurrentPage+2) return nextPage();
-		else if(pos == mCurrentPage-2) return prevPage();
+		if(pos < 1 || pos > mPageLen || pos == mCurrentPage+1) return 0;
+
+		//Arrays start at 0, but pages start at 1.
+		if(pos == mCurrentPage+1) return nextPage();
+		else if(pos == mCurrentPage-1) return prevPage();
 		else{
 			mCurrentPage = pos-1; //Page to Index Conversion
 			mPageLoader.loadImage((PageLoader.CallBack)this,mPageList.get(mCurrentPage),mMaxSize,mArchive,0);

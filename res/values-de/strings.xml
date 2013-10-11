@@ -40,8 +40,8 @@
         <string name="scale_auto">Automatisch</string>
         <string name="scale_screen_height">Bildschirm Höhe</string>
         <string name="scale_screen_width">Bildschirm Breite</string>
-        <string name="msg_removing_reference">Es wird entfernt:</string>
-        <string name="msg_cover_for">Titelbild für</string>
+        <string name="msg_removing_reference">"Es wird entfernt: "</string>
+        <string name="msg_cover_for">"Titelbild für "</string>
         <string name="msg_cleaning_library">Räume die Bibliothek auf…</string>
         <string name="confirm_title_reset_library">Zurücksetzen der Bibliothek</string>
         <string name="confirm_question_reset_library">Wollen sie wirklich die Bibliothek zurücksetzen?</string>

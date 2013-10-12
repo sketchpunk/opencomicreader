@@ -33,18 +33,18 @@
                 <data android:pathPattern=".*\\.cbr"/>
                 <data android:pathPattern=".*\\.zip"/>
                 <data android:pathPattern=".*\\.rar"/> 
-				<data android:pathPattern=".*\\.*\\.cbz"/>
-				<data android:pathPattern=".*\\.*\\.cbr"/>
-				<data android:pathPattern=".*\\.*\\.zip"/>
-				<data android:pathPattern=".*\\.*\\.rar"/>
-				<data android:pathPattern=".*\\.*\\.*\\.cbz"/>
-				<data android:pathPattern=".*\\.*\\.*\\.cbr"/>
-				<data android:pathPattern=".*\\.*\\.*\\.zip"/>
-				<data android:pathPattern=".*\\.*\\.*\\.rar"/>
-				<data android:pathPattern=".*\\.*\\.*\\.*\\.cbz"/>
-				<data android:pathPattern=".*\\.*\\.*\\.*\\.cbr"/>
-				<data android:pathPattern=".*\\.*\\.*\\.*\\.zip"/>
-				<data android:pathPattern=".*\\.*\\.*\\.*\\.rar"/> 
+				<data android:pathPattern=".*\\..*\\.cbz"/>
+				<data android:pathPattern=".*\\..*\\.cbr"/>
+				<data android:pathPattern=".*\\..*\\.zip"/>
+				<data android:pathPattern=".*\\..*\\.rar"/>
+				<data android:pathPattern=".*\\..*\\..*\\.cbz"/>
+				<data android:pathPattern=".*\\..*\\..*\\.cbr"/>
+				<data android:pathPattern=".*\\..*\\..*\\.zip"/>
+				<data android:pathPattern=".*\\..*\\..*\\.rar"/>
+				<data android:pathPattern=".*\\..*\\..*\\..*\\.cbz"/>
+				<data android:pathPattern=".*\\..*\\..*\\..*\\.cbr"/>
+				<data android:pathPattern=".*\\..*\\..*\\..*\\.zip"/>
+				<data android:pathPattern=".*\\..*\\..*\\..*\\.rar"/> 
                 <data android:host="*"/>
 			</intent-filter>
         </activity>

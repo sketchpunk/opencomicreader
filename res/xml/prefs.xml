@@ -8,6 +8,9 @@
            android:summary="Set the default of how the library should be filtered on launch."
            android:entries="@array/libraryFilter" android:entryValues="@array/libraryFilter_v"/>
 		
+
+		<CheckBoxPreference android:key="SeriesMode" android:title="Series Mode"
+			android:summary="Group Library by Series" android:defaultValue="false"/>
 	    <!--
 		<sage.pref.DialogPref
 			android:title="Reset Quests"

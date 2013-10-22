@@ -1,8 +1,6 @@
 package com.sketchpunk.ocomicreader;
 
 import com.sketchpunk.ocomicreader.lib.ComicLibrary;
-import com.sketchpunk.ocomicreader.lib.SeriesParser;
-
 import sage.data.Sqlite;
 import sage.data.SqlCursorLoader;
 import sage.adapter.SqlCursorAdapter;

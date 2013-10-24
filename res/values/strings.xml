@@ -30,5 +30,66 @@
         <item>2</item>
         <item>3</item>
         <item>4</item>
-    </string-array>  
+    </string-array>
+        <string name="sync">SYNC</string>
+        <string name="reset">Reset</string>
+        <string name="back_to_library">Back to Library</string>
+        <string name="goto_page">Goto Page</string>
+        <string name="scale">Scale</string>
+        <string name="scale_off">Off</string>
+        <string name="scale_auto">Auto</string>
+        <string name="scale_screen_height">Screen Height</string>
+        <string name="scale_screen_width">Screen Width</string>
+        <string name="msg_removing_reference">"Removing reference to "</string>
+        <string name="msg_cover_for">"Cover for "</string>
+        <string name="msg_cleaning_library">Cleaning up library…</string>
+        <string name="confirm_title_reset_library">Reset Library</string>
+        <string name="confirm_question_reset_library">Are you sure you want to reset the library?</string>
+        <string name="confirm_title_sync_library">Sync Library</string>
+        <string name="confirm_question_sync_library">Are you sure you want sync the library?</string>
+        <string name="ma_ctxmenu_delete">Delete</string>
+        <string name="ma_ctxmenu_reset_progress">Reset Progress</string>
+        <string name="ma_ctxmenu_mark_as_read">Mark as Read</string>
+        <string name="ma_ctxmenu_export_status">Export Status</string>
+        <string name="ma_ctxmenu_warning_can_not_perform_on_series">Can not perform operation on series.</string>
+        <string name="ma_ctxmenu_warning_can_only_perform_on_series">Can only perform operation on series.</string>
+        <string name="ma_ctxmenu_delete_comic_question_title">"Delete Comic : "</string>
+        <string name="ma_ctxmenu_delete_comic_question_text">You are able to remove the selected comic from the library or from the device competely.</string>
+        <string name="ma_ctxmenu_delete_comic_question_option_remove_from_library">Remove from library</string>
+        <string name="ma_ctxmenu_delete_comic_question_option_remove_from_device">Remove from device</string>
+        <string name="ma_ctxmenu_reset_progress_question_title">"Reset Progress : "</string>
+        <string name="ma_ctxmenu_reset_progress_question_text">Are you sure you want to reset the reading progress?</string>
+        <string name="ma_ctxmenu_option_ok">OK</string>
+        <string name="ma_ctxmenu_option_cancel">Cancel</string>
+        <string name="ma_ctxmenu_mark_read_question_title">"Mark as Read : "</string>
+        <string name="ma_ctxmenu_mark_read_question_text">Are you sure you want to change the reading progress?</string>
+        <string name="va_toast_loading_page">Loading Page…</string>
+        <string name="va_toast_first_page">FIRST PAGE</string>
+        <string name="va_toast_try_again">Still Preloading, Try again in one second</string>
+        <string name="va_toast_last_page">LAST PAGE</string>
+        <string name="dialog_title_library_syncing">Library Syncing</string>
+        <string name="ma_toast_sync_did_not_start">Sync did not start</string>
+        <string name="ma_toast_error_closing_progress_dialog">Error closing progress dialog</string>
+        <string name="ma_toast_no_sync_folders_have_been_set">No sync folders have been set. Go to settings.</string>
+        <string name="pref_summary_no_folder_selected">- no folder selected -</string>
+        <string name="pref_lib_filter_summary">Set the default of how the library should be filtered on launch.</string>
+        <string name="pref_scale_summary">Set how the image should scale depending on the screen.</string>
+        <string name="pref_show_page_num_summary">When switching pages, a toast alert appears in the corner telling you what page you\'re on.</string>
+        <string name="pref_fullscreen_summary">Display comics at full screen. Tap and hold for options to exit when there is no virtual buttons.</string>
+        <string name="pref_fling_summary">Use the left/Right fling gesture to move to next or previous page.</string>
+        <string name="pref_preloading_summary">This feature speeds up page loading, but if there is out of memory issues then disable this feature.</string>
+        <string name="pref_keepscreenon_summary">Prevent screen from timing out while viewing a comic.</string>
+        <string name="pref_cat_library_settings_title">LIBRARY SETTINGS</string>
+        <string name="pref_cat_viewing_settings_title">VIEWING SETTINGS</string>
+        <string name="pref_show_page_number_title">Show Page Number</string>
+        <string name="pref_fullscreen_title">Fullscreen</string>
+        <string name="pref_fling_title">Fling Navigation</string>
+        <string name="pref_preloading_title">Preload Next Page</string>
+        <string name="pref_keepscreenon_title">Keep Screen On</string>
+        <string name="pref_lib_filter_title">Library Filter</string>
+        <string name="va_ctxmenu_title">Options</string>
+        <string name="dialog_confirmbot_button_yes">Yes</string>
+        <string name="dialog_confirmbot_button_no">No</string>
+        <string name="dialog_numpicker_button_cancel">Cancel</string>
+        <string name="dialog_numpicker_button_ok">OK</string>
 </resources>

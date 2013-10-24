@@ -1,0 +1,97 @@
+<resources>
+    <string name="app_name">Open ComicReader ModbySpeedProg</string>
+    <string name="menu_settings">Einstellungen</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_view">ViewActivity</string>
+
+    <string-array name="scaleMode">
+        <item>Keine</item>
+        <item>Bildschirm Höhe</item>
+        <item>Bildschirm Breite</item>
+        <item>Automatisch</item>
+    </string-array>
+    <string-array name="scaleMode_v">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="libraryFilter">
+        <item>Zeige Alle</item>
+        <item>Gruppiere nach Serie</item>
+        <item>Zeige Ungelesene</item>
+        <item>Zeige Angefangene</item>
+        <item>Zeige Gelesene</item>
+    </string-array>
+    <string-array name="libraryFilter_v">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+        <string name="sync">Synchronisieren</string>
+        <string name="reset">Zurücksetzen</string>
+        <string name="back_to_library">Zurück zur Bibliothek</string>
+        <string name="goto_page">Seite Wechseln</string>
+        <string name="scale">Skalieren</string>
+        <string name="scale_off">Keine</string>
+        <string name="scale_auto">Automatisch</string>
+        <string name="scale_screen_height">Bildschirm Höhe</string>
+        <string name="scale_screen_width">Bildschirm Breite</string>
+        <string name="msg_removing_reference">"Es wird entfernt: "</string>
+        <string name="msg_cover_for">"Titelbild für "</string>
+        <string name="msg_cleaning_library">Räume die Bibliothek auf…</string>
+        <string name="confirm_title_reset_library">Zurücksetzen der Bibliothek</string>
+        <string name="confirm_question_reset_library">Wollen sie wirklich die Bibliothek zurücksetzen?</string>
+        <string name="confirm_title_sync_library">Bibliothek synchronisieren</string>
+        <string name="confirm_question_sync_library">Wollen sie wirklich die Bibliothek synchronisieren?</string>
+        <string name="ma_ctxmenu_delete">Löschen</string>
+        <string name="ma_ctxmenu_reset_progress">Fortschritt zurücksetzen</string>
+        <string name="ma_ctxmenu_mark_as_read">Als gelesen markieren</string>
+        <string name="ma_ctxmenu_export_status">Status exportieren</string>
+        <string name="ma_ctxmenu_warning_can_not_perform_on_series">Diese Aktion kann nicht auf einer Serie ausgeführt werde.</string>
+        <string name="ma_ctxmenu_warning_can_only_perform_on_series">Diese Aktion kann nur auf einer Serie ausgeführt werden.</string>
+        <string name="ma_ctxmenu_delete_comic_question_title">"Lösche Comic : "</string>
+        <string name="ma_ctxmenu_delete_comic_question_text">Sie können den ausgewählten Comic aus der Bibliothek oder komplett vom Gerät entfernen.</string>
+        <string name="ma_ctxmenu_delete_comic_question_option_remove_from_library">Aus der Bibliothek entfernen</string>
+        <string name="ma_ctxmenu_delete_comic_question_option_remove_from_device">Komplett vom Gerät entfernen</string>
+        <string name="ma_ctxmenu_reset_progress_question_title">"Vortschritt zurücksetzen : "</string>
+        <string name="ma_ctxmenu_reset_progress_question_text">Sind die sicher, dass sie den Lesevortschritt zurücksetzen wollen?</string>
+        <string name="ma_ctxmenu_option_ok">OK</string>
+        <string name="ma_ctxmenu_option_cancel">Abbrechen</string>
+        <string name="ma_ctxmenu_mark_read_question_title">"Als gelesen makieren : "</string>
+        <string name="ma_ctxmenu_mark_read_question_text">Wollen sie sicher den Lesefortschritt verändern?</string>
+        <string name="va_toast_loading_page">Lade Seite…</string>
+        <string name="va_toast_first_page">ERSTE SEITE</string>
+        <string name="va_toast_try_again">Es wird noch vorgeladen, Versuche es in einer Sekunde noch einmal</string>
+        <string name="va_toast_last_page">LETZTE SEITE</string>
+        <string name="dialog_title_library_syncing">Bibliothek Synchronisierung</string>
+        <string name="ma_toast_sync_did_not_start">Synchronisierung konnte nicht starten</string>
+        <string name="ma_toast_error_closing_progress_dialog">Es trat ein Fehler beim schließen der Vortschrittsanzeige auf.</string>
+        <string name="ma_toast_no_sync_folders_have_been_set">Es wurden noch keine Ordner zur Synchronisation festgelegt. Benutzen sie die Einstellungen.</string>
+        <string name="pref_listitemsize_summary">Stellen sie ein wie groß das Titelbild dargestellt werden soll.</string>
+        <string name="pref_listitemsize_title">Listeneintrag Größe</string>
+        <string name="pref_summary_no_folder_selected">- Kein Ordner ausgewählt -</string>
+        <string name="pref_lib_filter_summary">Stellen sie ein wie die Bibliothek nach dem Starten gefiltert sein soll.</string>
+        <string name="pref_scale_summary">Stellen sie ein wie das Bild abhängig vom Bildschirm skaliert werden soll.</string>
+        <string name="pref_show_page_num_summary">Beim Seitenwechsel erscheint eine Anzeige in der Ecke darüber auf welcher Seite sie sich befinden.</string>
+        <string name="pref_fullscreen_summary">Den Comic im Vollbildmodus anzeigen. Klicken und halten um Aktionen zum beenden zu bekommen, falls keine Schalter vorhanden ist.</string>
+        <string name="pref_fling_summary">Benutze die Links/Rechts Wischgeste um auf die vorherige/nächste Seite zu wechseln.</string>
+        <string name="pref_preloading_summary">Diese Option beschläunigt das laden der nächsten Seite, aber falls sie Probleme mit dem Speicher (Out of Memory Error) bekommen, deaktivieren sie diese Option.</string>
+        <string name="pref_keepscreenon_summary">Diese Option hindert den Bildschirm daran in Ruhezustand zu gehen.</string>
+        <string name="pref_cat_library_settings_title">BIBLIOTHEKS EINSTELLUNGEN</string>
+        <string name="pref_cat_viewing_settings_title">ANZEIGE EINSTELLUNGEN</string>
+        <string name="pref_show_page_number_title">Zeige Seitennummer</string>
+        <string name="pref_fullscreen_title">Vollbildmodus</string>
+        <string name="pref_fling_title">Wischgestennavigation</string>
+        <string name="pref_preloading_title">Nächste Seite Vorladen</string>
+        <string name="pref_keepscreenon_title">Bildschirm aktiv halten</string>
+        <string name="pref_lib_filter_title">Bibliotheksfilter</string>
+        <string name="va_ctxmenu_title">Einstellungen</string>
+        <string name="dialog_confirmbot_button_yes">Ja</string>
+        <string name="dialog_confirmbot_button_no">Nein</string>
+        <string name="dialog_numpicker_button_cancel">Abbrechen</string>
+        <string name="dialog_numpicker_button_ok">OK</string>
+</resources>

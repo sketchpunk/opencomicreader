@@ -175,14 +175,14 @@ public class MainActivity extends FragmentActivity
         	//................................................
         	case R.id.menu_reset:
         		final Context oThis = this;
-        		sage.ui.Dialogs.ConfirmBox(this,"Reset Library","Are you sure you want to reset the library?",new DialogInterface.OnClickListener(){
+				sage.ui.Dialogs.ConfirmBox(this,getString(R.string.confirm_title_reset_library),getString(R.string.confirm_question_reset_library),new DialogInterface.OnClickListener(){
 					public void onClick(DialogInterface dialog,int id){ComicLibrary.clearAll(oThis); refreshData(); }
 				});
         		break;
         	
         	//................................................
         	case R.id.menu_import:
-        		sage.ui.Dialogs.ConfirmBox(this,"Sync Library","Are you sure you want sync the library?",new DialogInterface.OnClickListener(){
+				sage.ui.Dialogs.ConfirmBox(this,getString(R.string.confirm_title_sync_library),getString(R.string.confirm_question_sync_library),new DialogInterface.OnClickListener(){
 					public void onClick(DialogInterface dialog,int id){startSync();}
 				});
         		break;
@@ -210,9 +210,9 @@ public class MainActivity extends FragmentActivity
 				AdapterItemRef ref = (AdapterItemRef)info.targetView.getTag();
 				
 				menu.setHeaderTitle(ref.lblTitle.getText().toString());				
-				menu.add(0,2,0,"Delete");
-				menu.add(0,1,1,"Reset Progress");
-				menu.add(0,3,2,"Mark as Read");
+				menu.add(0,2,0,R.string.ma_ctxmenu_delete);
+				menu.add(0,1,1,R.string.ma_ctxmenu_reset_progress);
+				menu.add(0,3,2,R.string.ma_ctxmenu_mark_as_read);
 			break;
 		}//switch
 	}//func
@@ -222,7 +222,7 @@ public class MainActivity extends FragmentActivity
 		int itmID = item.getItemId();
 		
 		if(isSeriesFiltered() && mSeriesFilter.isEmpty() && itmID == 2){
-			Toast.makeText(this,"Can not perform operation on series.",Toast.LENGTH_SHORT).show();
+			Toast.makeText(this,R.string.ma_ctxmenu_warning_can_not_perform_on_series,Toast.LENGTH_SHORT).show();
 			return false;
 		}//if
 		
@@ -236,15 +236,15 @@ public class MainActivity extends FragmentActivity
 			//...................................
 			case 2://DELETE
 				abBuilder = new AlertDialog.Builder(this);
-				abBuilder.setTitle("Delete Comic : " + ref.lblTitle.getText().toString());
-				abBuilder.setMessage("You are able to remove the selected comic from the library or from the device competely.");
+				abBuilder.setTitle(R.string.ma_ctxmenu_delete_comic_question_title + ref.lblTitle.getText().toString());
+				abBuilder.setMessage(R.string.ma_ctxmenu_delete_comic_question_text);
 				abBuilder.setCancelable(true);
-				abBuilder.setNegativeButton("Cancel",null);
-				abBuilder.setPositiveButton("Remove from library",new DialogInterface.OnClickListener(){
+				abBuilder.setNegativeButton(R.string.ma_ctxmenu_option_cancel,null);
+				abBuilder.setPositiveButton(R.string.ma_ctxmenu_delete_comic_question_option_remove_from_library,new DialogInterface.OnClickListener(){
 					@Override
 					public void onClick(DialogInterface dialog, int which){ ComicLibrary.removeComic(context,comicID,false); refreshData(); }
 				});
-				abBuilder.setNeutralButton("Remove from device",new DialogInterface.OnClickListener(){
+				abBuilder.setNeutralButton(R.string.ma_ctxmenu_delete_comic_question_option_remove_from_device,new DialogInterface.OnClickListener(){
 					@Override
 					public void onClick(DialogInterface dialog, int which){ ComicLibrary.removeComic(context,comicID,true); refreshData(); }
 				});
@@ -253,11 +253,11 @@ public class MainActivity extends FragmentActivity
 			//...................................
 			case 1://Reset Progress
 				abBuilder = new AlertDialog.Builder(this);
-				abBuilder.setTitle("Reset Progress : " + ref.lblTitle.getText().toString());
-				abBuilder.setMessage("Are you sure you want to reset the reading progress?");
+				abBuilder.setTitle(R.string.ma_ctxmenu_reset_progress_question_title + ref.lblTitle.getText().toString());
+				abBuilder.setMessage(R.string.ma_ctxmenu_reset_progress_question_text);
 				abBuilder.setCancelable(true);
-				abBuilder.setNegativeButton("Cancel",null);
-				abBuilder.setPositiveButton("Ok",new DialogInterface.OnClickListener(){
+				abBuilder.setNegativeButton(R.string.ma_ctxmenu_option_cancel,null);
+				abBuilder.setPositiveButton(R.string.ma_ctxmenu_option_ok,new DialogInterface.OnClickListener(){
 					@Override
 					public void onClick(DialogInterface dialog, int which){
 						boolean applySeries = (isSeriesFiltered() && mSeriesFilter.isEmpty());
@@ -270,11 +270,11 @@ public class MainActivity extends FragmentActivity
 			//...................................
 			case 3://Mark as Read
 				abBuilder = new AlertDialog.Builder(this);
-				abBuilder.setTitle("Mark as Read : " + ref.lblTitle.getText().toString());
-				abBuilder.setMessage("Are you sure you want to change the reading progress?");
+				abBuilder.setTitle(R.string.ma_ctxmenu_mark_read_question_title + ref.lblTitle.getText().toString());
+				abBuilder.setMessage(R.string.ma_ctxmenu_mark_read_question_text);
 				abBuilder.setCancelable(true);
-				abBuilder.setNegativeButton("Cancel",null);
-				abBuilder.setPositiveButton("Ok",new DialogInterface.OnClickListener(){
+				abBuilder.setNegativeButton(R.string.ma_ctxmenu_option_cancel,null);
+				abBuilder.setPositiveButton(R.string.ma_ctxmenu_option_ok,new DialogInterface.OnClickListener(){
 					@Override
 					public void onClick(DialogInterface dialog, int which){
 						boolean applySeries = (isSeriesFiltered() && mSeriesFilter.isEmpty());
@@ -452,14 +452,14 @@ public class MainActivity extends FragmentActivity
 		if(ComicLibrary.startSync(this)){
 			if(mProgress != null){
 				if(!mProgress.isShowing()){
-					mProgress.show(this,"Library Syncing","",true);
+					mProgress = ProgressDialog.show(this,getString(R.string.dialog_title_library_syncing),"",true);
 					return;
 				}//if
 			}//if
 
-			mProgress = ProgressDialog.show(this,"Library Syncing","",true);
+			mProgress = ProgressDialog.show(this,getString(R.string.dialog_title_library_syncing),"",true);
 		}else{
-			Toast.makeText(this,"Sync did not start", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this,R.string.ma_toast_sync_did_not_start, Toast.LENGTH_SHORT).show();
 		}//if
 	}//func
 
@@ -478,7 +478,7 @@ public class MainActivity extends FragmentActivity
 		try{
 			if(mProgress != null){ mProgress.dismiss(); mProgress = null; }//if
 		}catch(Exception e){
-			Toast.makeText(this,"Error closing progress dialog",Toast.LENGTH_LONG).show();
+			Toast.makeText(this,R.string.ma_toast_error_closing_progress_dialog,Toast.LENGTH_LONG).show();
 		}//try
 		System.out.println("onSyncComplete");
 		
@@ -487,7 +487,7 @@ public class MainActivity extends FragmentActivity
 			case ComicLibrary.STATUS_COMPLETE: refreshData(); break;
 		
 			case ComicLibrary.STATUS_NOSETTINGS:
-				Toast.makeText(this,"No sync folders have been set. Go to settings.",Toast.LENGTH_LONG).show();
+				Toast.makeText(this,R.string.ma_toast_no_sync_folders_have_been_set,Toast.LENGTH_LONG).show();
 			break;
 		}//switch
 	}//func

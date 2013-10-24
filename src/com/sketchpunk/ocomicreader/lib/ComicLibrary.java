@@ -8,6 +8,8 @@ import java.util.Locale;
 import java.util.Stack;
 import java.util.UUID;
 
+import com.sketchpunk.ocomicreader.R;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -20,7 +22,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
-
 import sage.data.Sqlite;
 
 //TODO: https://github.com/SpeedProg/opencomicreader/commit/f9bfe03e0a48f54db8041b11014a4e2b6274120c
@@ -303,7 +304,7 @@ public class ComicLibrary{
 				//.........................................
 				//if file does not exist, remove from library.
 				if(!file.exists()){
-					sendProgress("Removing reference to " + cur.getString(1));
+					sendProgress(mContext.getString(R.string.msg_removing_reference) + cur.getString(1));
 					
 					if(delList.length() != 0) delList.append(",");
 					delList.append("'"+cur.getString(0)+"'");
@@ -320,7 +321,7 @@ public class ComicLibrary{
 				//.........................................
 				//if cover exists, then it's been processed.
 				if(cur.getString(2).equals("0")){
-					sendProgress("Cover for " + cur.getString(1));
+					sendProgress(mContext.getString(R.string.msg_cover_for) + cur.getString(1));
 					processArchive(cur.getString(0),cur.getString(1),outVar);
 					
 					if(outVar[0] > 0){//if pagecnt is at least 1, update library.
@@ -350,7 +351,7 @@ public class ComicLibrary{
 			//.........................................
 			//if there is a list of items to delete, do it now in one swoop.
 			if(delList.length() > 0){
-				sendProgress("Cleaning up library...");
+				sendProgress(mContext.getString(R.string.msg_cleaning_library));
 				mDb.execSql(String.format("DELETE FROM ComicLibrary WHERE comicID in (%s)",delList.toString()),null);
 			}//if
 		}//func

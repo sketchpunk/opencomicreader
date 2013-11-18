@@ -8,7 +8,9 @@
            android:summary="Set the default of how the library should be filtered on launch."
            android:entries="@array/libraryFilter" android:entryValues="@array/libraryFilter_v"/>
 		
-	    <!--
+		<ListPreference android:key="listItemSize" android:title="@string/pref_listitemsize_title" android:defaultValue="1" android:summary="@string/pref_listitemsize_summary"
+			android:entries="@array/listitemSizes" android:entryValues="@array/listitemSizes_v"/>
+		<!--
 		<sage.pref.DialogPref
 			android:title="Reset Quests"
             android:summary="Reset all quest-progress."
@@ -37,5 +39,7 @@
 	    
 	    <CheckBoxPreference android:key="keepScreenOn" android:title="Keep Screen On" android:defaultValue="true"
 	        android:summary="Prevent screen from timing out while viewing a comic."/>
+
+
 	</PreferenceCategory>
 </PreferenceScreen>

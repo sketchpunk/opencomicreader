@@ -60,6 +60,9 @@ public class MainActivity extends FragmentActivity
 	private String mThumbPath;
 	private ProgressDialog mProgress;
 	private boolean mIsFirstRun = true;
+	private int mGridSmallWidthPx;
+	private int mGridMediumWidthPx;
+	private int mGridBigWidthPx;
 	
 	/*========================================================
 	Main*/
@@ -75,6 +78,10 @@ public class MainActivity extends FragmentActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+		mGridSmallWidthPx = App.convertDpToPixels(50, this);
+		mGridMediumWidthPx = App.convertDpToPixels(100, this);
+		mGridBigWidthPx = App.convertDpToPixels(200, this);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         
         //....................................
         //Load state of filter from Bundle
@@ -84,7 +91,6 @@ public class MainActivity extends FragmentActivity
         	if(mSeriesFilter == null) mSeriesFilter = ""; // if no filter found
         }else{
         	//if no state, load in default pref.
-        	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         	String tmp = prefs.getString("libraryFilter","0");
         	this.mFilterMode = Integer.parseInt(tmp);
         }//if
@@ -108,9 +114,28 @@ public class MainActivity extends FragmentActivity
         //....................................
         //Setup Main View Area
         mAdapter = new SqlCursorAdapter(this);
-        mAdapter.setItemLayout(R.layout.listitem_main);
         
         mGridView = (GridView) findViewById(R.id.lvMain);
+		String tmp = prefs.getString("listItemSize", "1");
+		int listsize = Integer.parseInt(tmp);
+		switch (listsize) {
+		case 0:
+			mAdapter.setItemLayout(R.layout.listitem_main_small);
+			mGridView.setColumnWidth(mGridSmallWidthPx);
+			break;
+		case 1:
+			mAdapter.setItemLayout(R.layout.listitem_main_medium);
+			mGridView.setColumnWidth(mGridMediumWidthPx);
+			break;
+		case 2:
+			mAdapter.setItemLayout(R.layout.listitem_main_big);
+			mGridView.setColumnWidth(mGridBigWidthPx);
+			break;
+		default:
+			mAdapter.setItemLayout(R.layout.listitem_main_medium);
+			mGridView.setColumnWidth(mGridMediumWidthPx);
+			break;
+		}
         mGridView.setAdapter(mAdapter);
         mGridView.setOnItemClickListener(this);
         
@@ -151,8 +176,28 @@ public class MainActivity extends FragmentActivity
         
         if(!mIsFirstRun) this.refreshData();
         else mIsFirstRun = false;
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		String tmp = prefs.getString("listItemSize", "1");
+		int listsize = Integer.parseInt(tmp);
+		switch (listsize) {
+		case 0:
+			mAdapter.setItemLayout(R.layout.listitem_main_small);
+			mGridView.setColumnWidth(mGridSmallWidthPx);
+			break;
+		case 1:
+			mAdapter.setItemLayout(R.layout.listitem_main_medium);
+			mGridView.setColumnWidth(mGridMediumWidthPx);
+			break;
+		case 2:
+			mAdapter.setItemLayout(R.layout.listitem_main_big);
+			mGridView.setColumnWidth(mGridBigWidthPx);
+			break;
+		default:
+			mAdapter.setItemLayout(R.layout.listitem_main_medium);
+			mGridView.setColumnWidth(mGridMediumWidthPx);
+			break;
+		}
     }//func
-    
     
     /*========================================================
 	Action Bar Menu*/

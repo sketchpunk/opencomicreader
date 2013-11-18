@@ -116,8 +116,9 @@ public class SqlCursorAdapter extends CursorAdapter{
 	public View getView(int position, View view, ViewGroup parent){
 		Cursor c = getCursor();
 		if(!c.moveToPosition(position)) throw new IllegalStateException("couldn't move cursor to position " + position);
-
-	    if(view == null) view = newView(mContext,c,parent);
+		if(view == null || view.getId() != mItemLayout) {
+			view = newView(mContext,c,parent);
+		}
 
 	    bindView(view,mContext,c);
 	    return view;

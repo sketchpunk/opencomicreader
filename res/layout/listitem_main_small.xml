@@ -5,53 +5,55 @@
     android:orientation="vertical"
     android:paddingLeft="0dp"
     android:paddingRight="0dp"
-    android:paddingTop="40dp"
+    android:paddingTop="20dp"
     android:paddingBottom="20dp"
-    android:gravity="center_horizontal">
+    android:gravity="center_horizontal"
+    android:id="@+id/listitem_main_small">"
 
     <RelativeLayout android:layout_width="wrap_content"
         android:layout_height="wrap_content">
         
-        <View android:background="@drawable/comicshadow"
-            android:layout_width="152dp"
-            android:layout_height="204dp"
-            android:layout_marginTop="11dp"
-            android:layout_centerHorizontal="true"/>
+        <View
+            android:layout_width="45dp"
+            android:layout_height="61dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/comicshadow" />
         
         <View android:background="@drawable/comicbg"
-            android:layout_width="146dp"
-            android:layout_height="206dp"
-            android:layout_marginTop="10dp"
+            android:layout_width="43dp"
+            android:layout_height="61dp"
+            android:layout_marginTop="3dp"
             android:layout_centerInParent="true"/>
         
         <ImageView android:id="@+id/imgCover"
-            android:layout_width="140dp"
-            android:layout_height="200dp"
-            android:maxHeight="200dp"
-            android:minHeight="200dp"
+            android:layout_width="40dp"
+            android:layout_height="58dp"
+            android:maxHeight="60dp"
+            android:minHeight="60dp"
             android:scaleType="fitXY"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="3dp"
             android:layout_centerInParent="true"
             android:adjustViewBounds="false"/>
         
         <View android:background="@drawable/comicborder"
-            android:layout_width="146dp"
-            android:layout_height="206dp"
-            android:layout_marginTop="10dp"
+            android:layout_width="45dp"
+            android:layout_height="63dp"
+            android:layout_marginTop="3dp"
             android:layout_centerInParent="true"/>
         
         <sage.ui.ProgressCircle android:id="@+id/pcProgress"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="9dp"
+            android:layout_height="9dp"
            	android:layout_marginTop="0dp"
-           	android:layout_marginLeft="126dp"/>
+           	android:layout_marginLeft="36dp"/>
     </RelativeLayout>
 
     <TextView android:id="@+id/lblTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:maxWidth="200dp"
-        android:textSize="15dp"
+        android:maxWidth="60dp"
+        android:textSize="12sp"
         android:textColor="#e6e6e6"
         android:text=""/>
 </LinearLayout>

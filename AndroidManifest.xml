@@ -1,54 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.sketchpunk.ocomicreader" android:versionCode="11" android:versionName="0.1.1 beta">
+    package="com.sketchpunk.ocomicreader"
+    android:versionCode="11"
+    android:versionName="0.1.1 beta" >
 
-    <uses-sdk android:minSdkVersion="15" android:targetSdkVersion="18"/>
+    <uses-sdk
+        android:minSdkVersion="15"
+        android:targetSdkVersion="18" />
+
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-    <application android:name="App"
+    <application
+        android:name="com.sketchpunk.ocomicreader.App"
         android:allowBackup="true"
         android:allowClearUserData="true"
         android:hardwareAccelerated="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name="com.sketchpunk.ocomicreader.MainActivity"
+            android:label="Open Comic Reader"
+            android:theme="@style/CustomTheme" >
 
-        <activity android:name=".MainActivity" android:label="Open Comic Reader" android:theme="@style/CustomTheme">
+        </activity>
+        <activity
+            android:name="com.sketchpunk.ocomicreader.ViewActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="Open Comic Reader"
+            android:theme="@style/CustomTheme" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.EDIT" />
+                <action android:name="android.intent.action.PICK" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="file" />
+                <data android:mimeType="*/*" />
+                <!--
+                These have to be added because the '*' symbol is not greedy, it will only match the first dot.
+				These are needed to match files with more the one 'dot' in the file name or path
+                -->
+                <data android:pathPattern=".*\\.cbz" />
+                <data android:pathPattern=".*\\.cbr" />
+                <data android:pathPattern=".*\\.zip" />
+                <data android:pathPattern=".*\\.rar" />
+                <data android:pathPattern=".*\\..*\\.cbz" />
+                <data android:pathPattern=".*\\..*\\.cbr" />
+                <data android:pathPattern=".*\\..*\\.zip" />
+                <data android:pathPattern=".*\\..*\\.rar" />
+                <data android:pathPattern=".*\\..*\\..*\\.cbz" />
+                <data android:pathPattern=".*\\..*\\..*\\.cbr" />
+                <data android:pathPattern=".*\\..*\\..*\\.zip" />
+                <data android:pathPattern=".*\\..*\\..*\\.rar" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.cbz" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.cbr" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.zip" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.rar" />
+                <data android:host="*" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.sketchpunk.ocomicreader.PrefActivity"
+            android:theme="@android:style/Theme.Black.NoTitleBar" >
+        </activity>
+        <activity
+            android:name="com.sketchpunk.ocomicreader.LibraryActivity"
+            android:label="Open Comic Reader"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            >
+            
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".ViewActivity" android:label="Open Comic Reader" android:theme="@style/CustomTheme" android:configChanges="orientation|screenSize">
-            <intent-filter>
-				<action android:name="android.intent.action.VIEW"/>
-				<action android:name="android.intent.action.EDIT"/>
-				<action android:name="android.intent.action.PICK"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <data android:scheme="file"/>
-                <data android:mimeType="*/*"/>               
-				<!--These have to be added because the '*' symbol is not greedy, it will only match the first dot.
-				These are needed to match files with more the one 'dot' in the file name or path-->
-				<data android:pathPattern=".*\\.cbz"/>
-                <data android:pathPattern=".*\\.cbr"/>
-                <data android:pathPattern=".*\\.zip"/>
-                <data android:pathPattern=".*\\.rar"/> 
-				<data android:pathPattern=".*\\..*\\.cbz"/>
-				<data android:pathPattern=".*\\..*\\.cbr"/>
-				<data android:pathPattern=".*\\..*\\.zip"/>
-				<data android:pathPattern=".*\\..*\\.rar"/>
-				<data android:pathPattern=".*\\..*\\..*\\.cbz"/>
-				<data android:pathPattern=".*\\..*\\..*\\.cbr"/>
-				<data android:pathPattern=".*\\..*\\..*\\.zip"/>
-				<data android:pathPattern=".*\\..*\\..*\\.rar"/>
-				<data android:pathPattern=".*\\..*\\..*\\..*\\.cbz"/>
-				<data android:pathPattern=".*\\..*\\..*\\..*\\.cbr"/>
-				<data android:pathPattern=".*\\..*\\..*\\..*\\.zip"/>
-				<data android:pathPattern=".*\\..*\\..*\\..*\\.rar"/> 
-                <data android:host="*"/>
-			</intent-filter>
-        </activity>
-        
-		<activity android:name=".PrefActivity" android:theme="@android:style/Theme.Black.NoTitleBar"></activity>
     </application>
+
 </manifest>

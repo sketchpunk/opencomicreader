@@ -1,0 +1,62 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".LibraryActivity">
+	
+    <GridView android:id="@+id/lvMain"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+		android:numColumns="2"		
+		android:stretchMode="columnWidth"
+		android:clipToPadding="false"
+		android:scrollbarStyle="insideOverlay"
+		android:gravity="center"
+		android:listSelector="@android:color/transparent">
+    </GridView>
+    
+   	<RelativeLayout
+		android:layout_height="40dp"
+		android:layout_width="match_parent"
+		android:layout_alignParentTop="true"
+		android:background="#aa000000">
+		    
+   	    <Spinner android:id="@+id/spFilter"
+	   		android:layout_width="150dp"
+	   		android:layout_marginLeft="8dp"
+	    	android:layout_height="wrap_content"
+	    	android:layout_alignParentLeft="true"
+	    	android:layout_centerInParent="true"
+	    	style="@android:style/Widget.Holo.Spinner"/>
+   	    
+   	    <LinearLayout
+   	        android:layout_alignParentRight="true"
+   	        android:layout_centerInParent="true"
+   	        android:orientation="horizontal"
+   	        android:layout_width="wrap_content"
+   	        android:layout_height="wrap_content">
+   	        
+   	        <Button android:id="@+id/btnSync"
+   	            android:paddingLeft="16dp"
+   	            android:paddingRight="8dp"
+   	            android:textColor="@android:color/white"
+   	            android:background="@drawable/btn_clear"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Sync"
+				android:drawableLeft="@android:drawable/ic_menu_add" />
+   	        
+   	        <Button android:id="@+id/btnMenu"
+   	            android:paddingLeft="8dp"
+   	            android:paddingRight="16dp"
+   	            android:textColor="@android:color/white"
+   	            android:background="?android:selectableItemBackground"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Menu"
+				android:drawableLeft="@android:drawable/ic_menu_more" />
+   	        
+   	    </LinearLayout>
+   </RelativeLayout>
+</RelativeLayout>

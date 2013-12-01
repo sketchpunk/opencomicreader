@@ -31,12 +31,12 @@ public class ProgressCircle extends View{
 		mInCircleFill.setStyle(Paint.Style.FILL);
 		
 		mCircleStroke = new Paint(Paint.ANTI_ALIAS_FLAG);
-		mCircleStroke.setColor(0xFF505050);
+		mCircleStroke.setColor(0xFFA0A0A0); //0xFF505050
 		mCircleStroke.setStyle(Paint.Style.STROKE);
 		mCircleStroke.setStrokeWidth(2);
 
 		mArcFill = new Paint(Paint.ANTI_ALIAS_FLAG);
-		mArcFill.setColor(0xFFB0B0B0);
+		mArcFill.setColor(0xFFE0E0E0); //B0B0B0
 		mArcFill.setStyle(Paint.Style.FILL);
 		
 		mPercent = 0.0f;
@@ -57,12 +57,12 @@ public class ProgressCircle extends View{
 		float deg = 360 * mPercent;
 		if(mArcRect == null) mArcRect = new RectF(mArcPad,mArcPad,w-mArcPad,h-mArcPad);
 		
-		canvas.drawCircle(x,y,x-1,mCircleFill);
+		//canvas.drawCircle(x,y,x-1,mCircleFill);
 		canvas.drawCircle(x,y,x-1,mCircleStroke);
 		
 		if(deg > 0.0f){
 			canvas.drawArc(mArcRect,270,deg,true,mArcFill);
-			canvas.drawCircle(x,y,3,mInCircleFill);
+			//canvas.drawCircle(x,y,3,mInCircleFill);
 		}//if
 	}//func	
 }//cls

@@ -2,6 +2,7 @@
 
 import java.util.Map;
 
+import android.os.Build;
 import sage.data.Sqlite;
 import com.sketchpunk.ocomicreader.lib.ComicLoader;
 import com.sketchpunk.ocomicreader.ui.ComicPageView;
@@ -72,15 +73,28 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
     	this.mPref_ShowPgNum = prefs.getBoolean("showPageNum",true);
     	this.mPref_FlingEnabled = prefs.getBoolean("flingEnabled",true);
-    	
+        int currentApiVersion = android.os.Build.VERSION.SDK_INT;
+        int kitKatApiVersion = Build.VERSION_CODES.KITKAT;
+        View rootView = getWindow().getDecorView();
     	//Full screen, force navigation
     	if(prefs.getBoolean("fullScreen",false)){
-    		winFlags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
 
-            View rootView = getWindow().getDecorView();
-            rootView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
-    	}//if
-    	
+            //enable immersive mode if device build version is at 4.4 or higher
+            if (currentApiVersion >= kitKatApiVersion)
+                rootView.setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+                            | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+    	//if
+            //else enable legacy fullscreen mode
+            else{
+                rootView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
+                winFlags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+            }
+        }
     	//Keep screen on
     	if(prefs.getBoolean("keepScreenOn",true)) winFlags |= WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
 

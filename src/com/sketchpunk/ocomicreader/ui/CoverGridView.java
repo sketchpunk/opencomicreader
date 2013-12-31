@@ -14,10 +14,12 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.support.v4.content.Loader;
 import android.util.AttributeSet;
 import android.view.ContextMenu;
@@ -32,41 +34,23 @@ import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.support.v4.app.FragmentActivity;
 
 public class CoverGridView extends GridView implements
-	SqlCursorAdapter.AdapterCallback
-	,OnItemClickListener
-	,LoaderManager.LoaderCallbacks<Cursor>
-	,LoadImageView.OnImageLoadedListener{
+		SqlCursorAdapter.AdapterCallback
+		,OnItemClickListener
+		,LoaderManager.LoaderCallbacks<Cursor>
+		,LoadImageView.OnImageLoadedListener{
+	
+	public interface iCallback{ void onDataRefreshComplete(); }
+	
 	private SqlCursorAdapter mAdapter;
 	private Sqlite mDb;
-	
+		
 	public int recordCount = 0;
 	private int mFilterMode = 0;
 	private String mSeriesFilter = "";
 	
-	public int getFilterMode(){ return mFilterMode;}
-	public void setFilterMode(int i){ mFilterMode = i; }
-	
-	public String getSeriesFilter(){ return mSeriesFilter; }
-	public void setSeriesFilter(String str){ mSeriesFilter = (str == null)?"":str; }
-
-	public interface iCallback{
-		void onDataRefreshComplete();
-	}
-	
-	// http://stackoverflow.com/questions/19292369/how-to-highlight-the-grid-view-item-on-select
-	
-	/*mimics original layout.
-	private int mThumbHeight = 180;
-	private int mThumbPadding = 60;
-	private int mGridPadding = 60;
-	private int mGridColNum = 2;
-	*/
-	
-	/*3 column image wall. I like this style*/
 	private int mThumbHeight = 160;
 	private int mThumbPadding = 0;
 	private int mGridPadding = 0;
@@ -80,6 +64,13 @@ public class CoverGridView extends GridView implements
 	public CoverGridView(Context context, AttributeSet attrs, int defStyle){ super(context, attrs, defStyle); }
 	
 	public void init(){
+		//Get Preferences
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getContext());
+		this.mGridColNum = Integer.parseInt(prefs.getString("LibraryColCnt","2"));
+		this.mGridPadding = Integer.parseInt(prefs.getString("LibraryPadding","60"));
+		this.mThumbPadding = Integer.parseInt(prefs.getString("LibraryCoverPad","60"));
+		this.mThumbHeight = Integer.parseInt(prefs.getString("LibraryCoverHeight","180"));
+		
 		//....................................
 		//set values
         mThumbPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/OpenComicReader/thumbs/";
@@ -108,6 +99,15 @@ public class CoverGridView extends GridView implements
 	}//func
 	
 	/*========================================================
+	Getter & Setters*/	
+	public int getFilterMode(){ return mFilterMode;}
+	public void setFilterMode(int i){ mFilterMode = i; }
+	
+	public String getSeriesFilter(){ return mSeriesFilter; }
+	public void setSeriesFilter(String str){ mSeriesFilter = (str == null)?"":str; }
+	
+	
+	/*========================================================
 	misc*/
 	public boolean isSeriesFiltered(){ return (mFilterMode == 1); }
 	
@@ -128,10 +128,6 @@ public class CoverGridView extends GridView implements
 	
     /*========================================================
    	Cursor Loader : LoaderManager.LoaderCallbacks<Cursor>*/
-	private LoaderManager getLoaderManager(){
-		return ((FragmentActivity) this.getContext()).getSupportLoaderManager();
-	}//func
-	
    	public void refreshData(){ 
    		if(!mIsFirstRun){
    	        if(mDb == null) mDb = new Sqlite(this.getContext());
@@ -140,18 +136,19 @@ public class CoverGridView extends GridView implements
    			getLoaderManager().restartLoader(0,null,this);
    		}else mIsFirstRun = false;
    	}//func
-    
+
+	private LoaderManager getLoaderManager(){
+		return ((FragmentActivity) this.getContext()).getSupportLoaderManager();
+	}//func
+	    
    	@Override
    	public Loader<Cursor> onCreateLoader(int id, Bundle arg){
        	String sql = "";
-       	//if(mSeriesLbl.getVisibility() != View.GONE) mSeriesLbl.setVisibility(View.GONE);
-       	
+
        	if(isSeriesFiltered()){//Filter by series
        		if(mSeriesFilter.isEmpty()){
        			sql = "SELECT min(comicID) [_id],series [title],sum(pgCount) [pgCount],sum(pgRead) [pgRead],min(isCoverExists) [isCoverExists],count(comicID) [cntIssue] FROM ComicLibrary GROUP BY series ORDER BY series";
        		}else{
-       			//mSeriesLbl.setText("Series > " + mSeriesFilter);
-       			//mSeriesLbl.setVisibility(View.VISIBLE);
        			sql = "SELECT comicID [_id],title,pgCount,pgRead,isCoverExists FROM ComicLibrary WHERE series = '"+mSeriesFilter.replace("'", "''")+"' ORDER BY title";
        		}//if
        	}else{ //Filter by reading progress.

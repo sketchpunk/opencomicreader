@@ -181,11 +181,11 @@ public class MainActivity extends FragmentActivity
         		break;
         	
         	//................................................
-        	case R.id.menu_import:
-        		sage.ui.Dialogs.ConfirmBox(this,"Sync Library","Are you sure you want sync the library?",new DialogInterface.OnClickListener(){
-					public void onClick(DialogInterface dialog,int id){startSync();}
-				});
-        		break;
+        	//case R.id.menu_import:
+        	//	sage.ui.Dialogs.ConfirmBox(this,"Sync Library","Are you sure you want sync the library?",new DialogInterface.OnClickListener(){
+			//		public void onClick(DialogInterface dialog,int id){startSync();}
+			//	});
+        	//	break;
         }//switch
         return true;
     }//cls

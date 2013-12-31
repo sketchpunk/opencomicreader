@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+   <item android:state_pressed="true"><color android:color="@color/coverPressHighlight"/></item>
+  	<!-- 
+    <item android:drawable="@android:color/holo_blue_bright" android:state_activated="true"/>
+    <item android:drawable="@android:color/holo_blue_bright" android:state_selected="true"/>
+    <item android:drawable="@android:color/holo_blue_bright" android:state_pressed="true"/>
+    <item android:drawable="@android:color/holo_blue_bright" android:state_focused="true"/>
+    <item android:drawable="@android:color/holo_blue_bright" android:state_enabled="true"/>
+     -->
+    <item android:drawable="@android:color/transparent"/>
+</selector>

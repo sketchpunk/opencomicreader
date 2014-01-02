@@ -6,12 +6,12 @@ import com.sketchpunk.ocomicreader.ui.CoverGridView;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.app.ProgressDialog;
-import android.app.WallpaperInfo;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -24,6 +24,7 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.PopupMenu;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
@@ -62,15 +63,28 @@ public class LibraryActivity extends FragmentActivity
 		setContentView(R.layout.activity_library);
 		overridePendingTransition(R.anim.fadein, R.anim.fadeout);
 		
-        //....................................
-		//NOTE: Double check if Wallpaper is live.
-		final WallpaperManager wm=WallpaperManager.getInstance(this);
-		///WallpaperInfo wi=wm.getWallpaperInfo();
-		///wm.getDrawable();
-		final Drawable wallpaperDrawable = wm.getFastDrawable();
-		///RelativeLayout layout=(RelativeLayout)findViewById(R.id.lstitm_lib);
-		getWindow().setBackgroundDrawable(wallpaperDrawable);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		
+        //....................................
+		//setup background
+		switch(Integer.parseInt(prefs.getString("libraryBackground","0"))){
+			case 0: //Solid
+				RelativeLayout mLayouts = (RelativeLayout) findViewById(R.id.MainLayout);
+				mLayouts.setBackgroundColor(Color.parseColor("#FF000000"));
+			break;
+			case 1: //opaque 
+				RelativeLayout mLayouto = (RelativeLayout) findViewById(R.id.MainLayout);
+				mLayouto.setBackgroundColor(Color.parseColor("#BB000000"));
+			break;
+			case 2: //WallPaper 
+				final WallpaperManager wm=WallpaperManager.getInstance(this);
+				///WallpaperInfo wi=wm.getWallpaperInfo();
+				///wm.getDrawable();
+				final Drawable wallpaperDrawable = wm.getFastDrawable();
+				getWindow().setBackgroundDrawable(wallpaperDrawable);
+			break;
+		}//switch
+
 		//....................................
 		mBtnSync = (Button)findViewById(R.id.btnSync);
 		mBtnSync.setOnClickListener(this);
@@ -94,7 +108,6 @@ public class LibraryActivity extends FragmentActivity
         	mGridView.setSeriesFilter(savedInstanceState.getString("mSeriesFilter"));
         	mGridView.setFilterMode(savedInstanceState.getInt("mFilterMode"));
         }else{//if no state, load in default pref.
-        	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         	mGridView.setFilterMode(Integer.parseInt(prefs.getString("libraryFilter","0")));
         }//if
         

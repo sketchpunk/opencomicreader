@@ -32,4 +32,15 @@
         <item>3</item>
         <item>4</item>
     </string-array>
+    
+    <string-array name="BgSelection">
+        <item>Solid Black</item>
+        <item>Opaque Black</item>
+        <item>Copy Wallpaper</item>
+    </string-array>
+    <string-array name="BgSelection_v">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
 </resources>

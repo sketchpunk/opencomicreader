@@ -7,6 +7,7 @@ import com.sketchpunk.ocomicreader.lib.ComicLoader;
 import com.sketchpunk.ocomicreader.ui.ComicPageView;
 
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.annotation.SuppressLint;
@@ -75,10 +76,20 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
     	
     	//Full screen, force navigation
     	if(prefs.getBoolean("fullScreen",false)){
-    		winFlags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+    		View rootView = getWindow().getDecorView();
+    		
+    		//enable immersive mode if device build version is at 4.4 or higher
+    		if(android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+    			rootView.setSystemUiVisibility(
+    				View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+    					| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+    					| View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+    					| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
 
-            View rootView = getWindow().getDecorView();
-            rootView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
+    		}else{ //else enable legacy fullscreen mode
+        		winFlags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;  
+                rootView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
+    		}//if
     	}//if
     	
     	//Keep screen on

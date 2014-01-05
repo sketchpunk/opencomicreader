@@ -99,8 +99,6 @@ public class LibraryActivity extends FragmentActivity
 		mSeriesLbl = (TextView)findViewById(R.id.lblSeries);
 		
 		mGridView = (CoverGridView) findViewById(R.id.lvMain);
-        mGridView.init();
-        registerForContextMenu(mGridView); //Route event from Activity to View
 
         //....................................
         //Load state of filter from Bundle
@@ -112,6 +110,10 @@ public class LibraryActivity extends FragmentActivity
         }//if
         
         mSpFilter.setSelection(mGridView.getFilterMode());
+        
+        //....................................
+        mGridView.init();
+        registerForContextMenu(mGridView); //Route event from Activity to View
 	}//func
 	
     @Override

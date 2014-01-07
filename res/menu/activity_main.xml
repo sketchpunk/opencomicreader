@@ -16,4 +16,9 @@
         android:title="Reset"
         android:orderInCategory="100"
         android:showAsAction="never"/>
+	
+	<item android:id="@+id/menu_about"
+        android:title="About"
+        android:orderInCategory="100"
+        android:showAsAction="never"/>
 </menu>

@@ -4,6 +4,13 @@
     <string name="menu_settings">Settings</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_view">ViewActivity</string>
+    <string name="app_about">Homepage : http://github.com/sketchpunk/opencomicreader \n\n
+        Developer\n - VoR \n\n
+        Contributors\n
+        - SpeedProd\n
+        - afterlifesol\n
+        - AKiniyalocts\n
+    </string>
 
     <string-array name="scaleMode">
         <item>None</item>

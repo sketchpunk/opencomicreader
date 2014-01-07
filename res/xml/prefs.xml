@@ -28,9 +28,9 @@
 		    android:defaultValue="60" minnum="0" maxnum="100"/>
 		
 		<sage.pref.NumPickerPref android:key="LibraryCoverHeight"
-		    android:title="Cover Height" android:summary="How tall should covers be (Limit 150-250)"
+		    android:title="Cover Height" android:summary="How tall should covers be (Limit 150-600)"
 		    android:positiveButtonText="Save" android:negativeButtonText="Cancel"
-		    android:defaultValue="180" minnum="150" maxnum="250"/>
+		    android:defaultValue="180" minnum="150" maxnum="600"/>
 	</PreferenceCategory>
 	
 	<PreferenceCategory android:key="setiViewing" android:title="VIEWING SETTINGS" android:summary="">

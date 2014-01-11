@@ -1,10 +1,14 @@
 package com.sketchpunk.ocomicreader;
  
+import java.io.File;
+
 import com.sketchpunk.ocomicreader.lib.ComicLibrary;
 import com.sketchpunk.ocomicreader.ui.CoverGridView;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.app.WallpaperManager;
@@ -12,8 +16,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -59,15 +65,14 @@ public class LibraryActivity extends FragmentActivity
 		mGridView.dispose();
 		super.onDestroy();
 	}//func
-		
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_library);
 		overridePendingTransition(R.anim.fadein, R.anim.fadeout);
-		
+		//test();
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		
         //....................................
 		//setup background
 		switch(Integer.parseInt(prefs.getString("libraryBackground","0"))){
@@ -268,7 +273,7 @@ public class LibraryActivity extends FragmentActivity
 	}//func
 
 	//@Override
-	public void OnSyncProgress(String txt){
+	public void onSyncProgress(String txt){
 		if(mProgress != null){
 			if(mProgress.isShowing())mProgress.setMessage(txt);
 		}//if

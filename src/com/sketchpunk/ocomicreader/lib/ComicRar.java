@@ -92,4 +92,5 @@ public class ComicRar implements iComicArchive{
 		return false;
 	}//func
 
+	public String[] getMeta(){ return null; }
 }//cls

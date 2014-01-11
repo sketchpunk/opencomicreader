@@ -12,4 +12,6 @@ public interface iComicArchive{
 	public List<String> getPageList();
 	public InputStream getItemInputStream(String path);
 	public boolean getLibraryData(String[] outVar);
+
+	public String[] getMeta();
 }//interface

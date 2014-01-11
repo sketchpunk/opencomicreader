@@ -8,6 +8,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 import android.database.DatabaseUtils.InsertHelper;
 
 public class Sqlite{
@@ -37,9 +38,8 @@ public class Sqlite{
 
 	/*========================================================
 	*/
-	public InsertHelper getInsertHelper(String tblName){
-		return new InsertHelper(mDb,tblName);
-	}//func
+	public InsertHelper getInsertHelper(String tblName){ return new InsertHelper(mDb,tblName); }//func
+	public SQLiteStatement compileStatement(String sql){ return mDb.compileStatement(sql); }
 	
 
 	/*========================================================

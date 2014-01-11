@@ -66,11 +66,11 @@ public class CoverGridView extends GridView implements
 	public void init(){
 		//Get Preferences
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getContext());
-		this.mGridColNum = Integer.parseInt(prefs.getString("LibraryColCnt","2"));
-		this.mGridPadding = Integer.parseInt(prefs.getString("LibraryPadding","60"));
-		this.mThumbPadding = Integer.parseInt(prefs.getString("LibraryCoverPad","60"));
-		this.mThumbHeight = Integer.parseInt(prefs.getString("LibraryCoverHeight","180"));
-		
+		this.mGridColNum =		prefs.getInt("LibraryColCnt",2);
+		this.mGridPadding =		prefs.getInt("LibraryPadding",60);
+		this.mThumbPadding =	prefs.getInt("LibraryCoverPad",60);
+		this.mThumbHeight =		prefs.getInt("LibraryCoverHeight",180);
+
 		//....................................
 		//set values
         mThumbPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/OpenComicReader/thumbs/";

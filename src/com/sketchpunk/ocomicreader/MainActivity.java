@@ -464,12 +464,11 @@ public class MainActivity extends FragmentActivity
 	}//func
 
 	@Override
-	public void OnSyncProgress(String txt){
+	public void onSyncProgress(String txt){
 		if(mProgress != null){
 			if(mProgress.isShowing())mProgress.setMessage(txt);
 		}//if
-		
-		System.out.println("PROGRESS");
+		//System.out.println("PROGRESS");
 	}//func
 	
 	@Override
@@ -480,7 +479,7 @@ public class MainActivity extends FragmentActivity
 		}catch(Exception e){
 			Toast.makeText(this,"Error closing progress dialog",Toast.LENGTH_LONG).show();
 		}//try
-		System.out.println("onSyncComplete");
+		//System.out.println("onSyncComplete");
 		
 		//............................................
 		switch(status){

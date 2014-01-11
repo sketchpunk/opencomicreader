@@ -12,6 +12,7 @@ public class NumPickerPref extends DialogPreference{
 	private int mNum = 0;
 	private int mMax = 0;
 	private int mMin = 0;
+	private int mDefault = 0;
 	
 	public NumPickerPref(Context context,AttributeSet attrs){
 		super(context, attrs);
@@ -21,6 +22,7 @@ public class NumPickerPref extends DialogPreference{
 
 			if(attr.equalsIgnoreCase("maxnum")) mMax = Integer.parseInt(val);
 			else if(attr.equalsIgnoreCase("minnum")) mMin = Integer.parseInt(val);
+			else if(attr.equalsIgnoreCase("defaultvalue")) mDefault = Integer.parseInt(val);
 		}//for
 	}//func
 
@@ -45,17 +47,16 @@ public class NumPickerPref extends DialogPreference{
         if(positiveResult){
         	mNumPicker.clearFocus(); //When using the keyboard to change the size, need to unfocus for the data to be saved into the control.
         	this.mNum = mNumPicker.getValue();
-        	System.out.println(this.mNum);
-        	this.persistString(Integer.toString(this.mNum));
+        	this.persistInt(this.mNum);
         }//if
     }//func
 
     @Override
-    protected Object onGetDefaultValue(TypedArray a, int index){ return (a.getString(index)); }
+    protected Object onGetDefaultValue(TypedArray a, int index){ return (a.getInt(index,mDefault)); }
 
     @Override
     protected void onSetInitialValue(boolean restoreValue, Object defaultValue){
-    	if(restoreValue) this.mNum = Integer.parseInt(this.getPersistedString("1"));
+    	if(restoreValue) this.mNum =  this.getPersistedInt(mDefault);
     	else this.mNum = (defaultValue != null)? Integer.parseInt(defaultValue.toString()) : 1;
     }//func
 }//cls

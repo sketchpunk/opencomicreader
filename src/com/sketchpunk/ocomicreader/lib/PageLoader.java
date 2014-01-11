@@ -74,7 +74,6 @@ public class PageLoader{
 			//...................................			
 			//float maxSize = ((Float)params[0]).floatValue(); //Might use this later for force scale down value.
 			imagePath = (String)params[1];
-			
 			InputStream iStream = archive.getItemInputStream(imagePath);
 			Bitmap bmp = null;
 			

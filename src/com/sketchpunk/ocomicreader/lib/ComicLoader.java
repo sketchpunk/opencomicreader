@@ -1,5 +1,6 @@
 package com.sketchpunk.ocomicreader.lib;
 
+import java.io.File;
 import java.util.List;
 import java.util.Locale;
 
@@ -31,8 +32,13 @@ public class ComicLoader implements PageLoader.CallBack{//LoadImageView.OnImageL
 			o = new ComicRar();
 			if(o.loadFile(path)) return o;
 			o.close();
+		}else{
+			if(new File(path).isDirectory()){
+				o = new ComicFld();
+				if(o.loadFile(path)) return o;
+			}//if
 		}//if
-		
+
 		return null;
 	}//func
 

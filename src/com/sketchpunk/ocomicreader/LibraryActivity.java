@@ -165,15 +165,6 @@ public class LibraryActivity extends FragmentActivity
 	     		//intent.putExtra("path",(String)view.getTag());
 	     		this.startActivityForResult(intent,0);
 	     		break;
-	
-	     	//................................................
-	     	case R.id.menu_reset:
-	     		final Context oThis = this;
-	     		sage.ui.Dialogs.ConfirmBox(this,"Reset Library","Are you sure you want to reset the library?",new DialogInterface.OnClickListener(){
-	     			public void onClick(DialogInterface dialog,int id){ComicLibrary.clearAll(oThis);  mGridView.refreshData(); }
-				});
-	     		break;
-	     		
 	     	//................................................
 	     	case R.id.menu_about:
 	     		sage.ui.Dialogs.About(this,this.getText(R.string.app_about));

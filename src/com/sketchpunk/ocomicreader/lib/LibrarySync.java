@@ -1,8 +1,7 @@
 package com.sketchpunk.ocomicreader.lib;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
+
 import java.util.Stack;
 import java.util.UUID;
 
@@ -11,18 +10,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.DatabaseUtils.InsertHelper;
 import android.database.MergeCursor;
 import android.database.sqlite.SQLiteStatement;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Message;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import android.util.Log;
 
 import com.sketchpunk.ocomicreader.lib.ComicLibrary.ComicFindFilter;
 
@@ -54,7 +47,6 @@ public class LibrarySync implements Runnable{
 	
 	@Override
 	public void run(){
-		System.out.println("Sync Start");
 		//Check if folders have been setup for sync.
 		if(mSyncFld1.isEmpty() && mSyncFld2.isEmpty()){ sendComplete(ComicLibrary.STATUS_NOSETTINGS); return; }//if
 		
@@ -68,7 +60,7 @@ public class LibrarySync implements Runnable{
 			
 			processLibrary();
 		}catch(Exception e){
-			System.out.println("Sync " + e.getMessage());
+			System.err.println("Sync " + e.getMessage());
 			e.printStackTrace();
 		}//try
 
@@ -77,7 +69,6 @@ public class LibrarySync implements Runnable{
 		mDb.close();
 		sendComplete(ComicLibrary.STATUS_COMPLETE);			
 		mContext = null;
-		System.out.println("Sync Ends");
 	}//func
 	
 	
@@ -161,9 +152,6 @@ public class LibrarySync implements Runnable{
 	    		path = sage.io.Path.removeLast(mcur.getString(dCol)); //Remove Filename from the path
 	    		sendProgress(path);
 				
-		        System.out.println(path);
-		        System.out.println(sage.io.Path.getLast(path)); //Get the folder name.
-
 				tmp = mDb.scalar("SELECT comicID FROM ComicLibrary WHERE path = '"+path.replace("'","''")+"'",null);
 				if(!tmp.isEmpty()) continue;
 
@@ -177,7 +165,7 @@ public class LibrarySync implements Runnable{
 				//if(useFolderAsSeries) sql.bindString(4,file.getParentFile().getName());
 				//else sql.bindString(4,sParser.get(path)); //sql.bindNull(4);
 				
-				if(sql.executeInsert() == 0){ System.out.println("ERROR"); }
+				if(sql.executeInsert() == 0){ System.err.println("ERROR saving folder to db"); }
 	    	}while(mcur.moveToNext());
 	    	
 	    	//............................................
@@ -238,7 +226,7 @@ public class LibrarySync implements Runnable{
     				//if(useFolderAsSeries) sql.bindString(4,file.getParentFile().getName());
     				//else sql.bindString(4,sParser.get(path)); //sql.bindNull(4);
     				
-    				if(sql.executeInsert() == 0){ System.out.println("ERROR"); }
+    				if(sql.executeInsert() == 0){ System.err.println("ERROR saving comic to database"); }
     				//
     			}//if
     		}//for
@@ -271,8 +259,6 @@ public class LibrarySync implements Runnable{
 			comicPath = cur.getString(1);
 			file = new File(comicPath);
 			
-			System.out.println(comicPath);
-			
 			//.........................................
 			//if file does not exist, remove from library.
 			if(!file.exists()){
@@ -291,7 +277,6 @@ public class LibrarySync implements Runnable{
 			//if thumb has not been generated.
 			if(cur.getString(2).equals("0")){
 				sendProgress("Creating thumbnail for " + comicPath);
-				System.out.println("Processing " + comicPath);
 				archive = ComicLoader.getArchiveInstance(comicPath);
 				archive.getLibraryData(comicInfo);
 				
@@ -309,7 +294,6 @@ public class LibrarySync implements Runnable{
 					if(comicMeta[1] != "") sql += ",series = '"+comicMeta[1].replaceAll("'","''")+"'";
 				}//if}
 
-				System.out.println("sql " + sql);
 				//Save information to the db.
 				mDb.execSql(String.format("UPDATE ComicLibrary SET %s WHERE comicID = '%s'",sql,comicID),null);
 				if(comicMeta != null && comicMeta[1] != "") continue; //Since series was updated from meta, Don't continue the rest of the loop which handles the series
@@ -318,7 +302,7 @@ public class LibrarySync implements Runnable{
 			//.........................................
 			//if series does not exist, create a series name.
 			seriesName = cur.getString(3);
-			if(seriesName == null || seriesName.isEmpty() || seriesName.compareToIgnoreCase(ComicLibrary.UKNOWN_SERIES) != 0){
+			if(seriesName == null || seriesName.isEmpty() || seriesName.compareToIgnoreCase(ComicLibrary.UKNOWN_SERIES) == 0){
 				if(mUseFldForSeries) seriesName = sage.io.Path.getParentName(comicPath);
 				else{
 					if(sParser == null) sParser = new SeriesParser(); //JIT
@@ -328,9 +312,7 @@ public class LibrarySync implements Runnable{
 					if(seriesName == comicPath) seriesName = sage.io.Path.getParentName(comicPath);
 				}//if
 				
-				if(!seriesName.isEmpty()){
-					mDb.execSql(String.format("UPDATE ComicLibrary SET series='%s' WHERE comicID = '%s'",seriesName.replace("'","''"),comicID),null);
-				}//if
+				if(!seriesName.isEmpty()) mDb.execSql(String.format("UPDATE ComicLibrary SET series='%s' WHERE comicID = '%s'",seriesName.replace("'","''"),comicID),null);
 			}//if
 		}//for
 	

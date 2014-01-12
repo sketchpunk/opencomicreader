@@ -10,13 +10,13 @@
         android:orderInCategory="100"
         android:showAsAction="always|withText"
         android:icon="@android:drawable/ic_menu_add"/>
-     -->
+    
 
 	<item android:id="@+id/menu_reset"
         android:title="Reset"
         android:orderInCategory="100"
         android:showAsAction="never"/>
-	
+	 -->
 	<item android:id="@+id/menu_about"
         android:title="About"
         android:orderInCategory="100"

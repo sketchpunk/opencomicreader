@@ -1,9 +1,14 @@
 package com.sketchpunk.ocomicreader;
 
+import com.sketchpunk.ocomicreader.lib.ComicLibrary;
+
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.Preference;
+import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
@@ -31,7 +36,7 @@ public class PrefActivity extends PreferenceActivity{
 	//************************************************************
 	//Preference View
 	//************************************************************
-    public static class PrefFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener{
+    public static class PrefFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener,OnPreferenceClickListener{
     	private SharedPreferences prefs;
     	
     	@Override
@@ -84,6 +89,32 @@ public class PrefActivity extends PreferenceActivity{
             
             p = this.findPreference("syncfolder2");
             if(p != null) p.setSummary(prefs.getString("syncfolder2","- no folder selected -"));
+            
+            //.............................................
+            //Set Functions
+            ((Preference)this.findPreference("funcClearLib")).setOnPreferenceClickListener(this);
+            ((Preference)this.findPreference("funcClearSeries")).setOnPreferenceClickListener(this);
+            ((Preference)this.findPreference("funcClearCover")).setOnPreferenceClickListener(this);
         }//func
+
+		@Override
+		public boolean onPreferenceClick(Preference pref){
+			final Context context = this.getActivity();
+			
+			if(pref.getKey().compareTo("funcClearSeries") == 0){	     		
+				sage.ui.Dialogs.ConfirmBox(context,"Reset Series","Are you sure you want to reset all the series names to blank?",new DialogInterface.OnClickListener(){
+					public void onClick(DialogInterface dialog,int id){ ComicLibrary.clearSeries(context); }
+				});
+			}else if(pref.getKey().compareTo("funcClearLib") == 0){	     		
+				sage.ui.Dialogs.ConfirmBox(context,"Clear Library","Are you sure you want to reset the whole library?",new DialogInterface.OnClickListener(){
+					public void onClick(DialogInterface dialog,int id){ ComicLibrary.clearAll(context); }
+				});
+			}else if(pref.getKey().compareTo("funcClearCover") == 0){	     		
+				sage.ui.Dialogs.ConfirmBox(context,"Clear Cover Cache","Are you sure you want to delete all the covers in the cache?",new DialogInterface.OnClickListener(){
+					public void onClick(DialogInterface dialog,int id){ ComicLibrary.clearCovers(context); }
+				});
+			}//if
+			return false;
+		}//func
     }//cls
 }//cls

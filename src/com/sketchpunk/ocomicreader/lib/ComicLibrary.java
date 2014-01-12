@@ -4,20 +4,16 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.Locale;
-import java.util.Stack;
-import java.util.UUID;
 
 import sage.data.Sqlite;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.preference.PreferenceManager;
 
 public class ComicLibrary{
 	private static Thread mWorkerThread = null;
@@ -53,6 +49,7 @@ public class ComicLibrary{
     	}//switch
     }//func
 	
+    
 	/*========================================================
 	sync methods*/
     public static boolean startSync(Context context){
@@ -68,10 +65,8 @@ public class ComicLibrary{
     }//func
     
     
-    
 	/*========================================================
 	Static Methods*/
-	
 	public static String getThumbCachePath(){
 		//........................................
 		//Make sure the cache folder exists.
@@ -89,6 +84,9 @@ public class ComicLibrary{
         return path;
 	}//func
 	
+
+	/*========================================================
+	Manage Comics*/
 	public static void removeComic(Context context,String id,boolean delComic){
     	File file;
     	sage.data.Sqlite db = new sage.data.Sqlite(context);
@@ -136,7 +134,10 @@ public class ComicLibrary{
 		Sqlite.delete(context,"ComicLibrary","",null);
 		return true;
 	}//func
-
+    
+    
+	/*========================================================
+	Manage Covers*/
 	public static boolean createThumb(int coverHeight,int coverQuality,iComicArchive archive,String coverPath,String saveTo){
 		boolean rtn = false;
 		InputStream iStream = archive.getItemInputStream(coverPath);
@@ -200,12 +201,9 @@ public class ComicLibrary{
 		sage.data.Sqlite.execSql(context,"UPDATE ComicLibrary SET isCoverExists=0",null);
 	}//func
 	
-	public static void clearSeries(Context context){
-		ContentValues cv = new ContentValues();
-		cv.put("series",ComicLibrary.UKNOWN_SERIES);
-		sage.data.Sqlite.update(context,"ComicLibrary",cv,null,null);
-	}//func
 	
+	/*========================================================
+	Manage Series*/
 	public static void setSeriesName(Context context,String comicID,String seriesName){
 		ContentValues cv = new ContentValues();
 		cv.put("series",seriesName);
@@ -217,7 +215,14 @@ public class ComicLibrary{
 		cv.put("series",newSeries);
 		sage.data.Sqlite.update(context,"ComicLibrary",cv,"series=?",new String[]{oldSeries});
 	}//func
+	
+	public static void clearSeries(Context context){
+		ContentValues cv = new ContentValues();
+		cv.put("series",ComicLibrary.UKNOWN_SERIES);
+		sage.data.Sqlite.update(context,"ComicLibrary",cv,null,null);
+	}//func
 
+	
 	//************************************************************
 	// Support Objects
 	//************************************************************

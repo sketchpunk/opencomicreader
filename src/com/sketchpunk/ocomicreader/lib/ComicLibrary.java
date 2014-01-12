@@ -8,6 +8,7 @@ import java.util.Stack;
 import java.util.UUID;
 
 import sage.data.Sqlite;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -25,6 +26,7 @@ public class ComicLibrary{
 	status constants*/
 	public final static int STATUS_NOSETTINGS = 1;
 	public final static int STATUS_COMPLETE = 0;
+	public final static String UKNOWN_SERIES = "-unknown-";
 
 	
 	/*========================================================
@@ -195,16 +197,25 @@ public class ComicLibrary{
 		}//if
 		
 		//................................................
-		//Sqlite.delete(context,"ComicLibrary","",null);
-		//mDb.execSql("UPDATE ComicLibrary SET isCoverExists=0",null);
+		sage.data.Sqlite.execSql(context,"UPDATE ComicLibrary SET isCoverExists=0",null);
 	}//func
 	
 	public static void clearSeries(Context context){
-		//mDb.execSql("UPDATE ComicLibrary SET series=null",null);
+		ContentValues cv = new ContentValues();
+		cv.put("series",ComicLibrary.UKNOWN_SERIES);
+		sage.data.Sqlite.update(context,"ComicLibrary",cv,null,null);
 	}//func
 	
-	public static void setSeriesName(Context context,String idList,String seriesName){
-		//mDb.execSql(String.format("UPDATE ComicLibrary SET series='%s' WHERE comicID like (%s)",seriesName.replace("'","''"),idList),null);
+	public static void setSeriesName(Context context,String comicID,String seriesName){
+		ContentValues cv = new ContentValues();
+		cv.put("series",seriesName);
+		sage.data.Sqlite.update(context,"ComicLibrary",cv,"comicID=?",new String[]{comicID});
+	}//func
+	
+	public static void renameSeries(Context context,String oldSeries,String newSeries){
+		ContentValues cv = new ContentValues();
+		cv.put("series",newSeries);
+		sage.data.Sqlite.update(context,"ComicLibrary",cv,"series=?",new String[]{oldSeries});
 	}//func
 
 	//************************************************************

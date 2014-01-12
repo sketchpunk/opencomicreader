@@ -173,7 +173,7 @@ public class LibrarySync implements Runnable{
 				sql.bindString(1,UUID.randomUUID().toString());
 				sql.bindString(2,sage.io.Path.getLast(path));
 				sql.bindString(3,path);
-				sql.bindNull(4);
+				sql.bindString(4,ComicLibrary.UKNOWN_SERIES);
 				//if(useFolderAsSeries) sql.bindString(4,file.getParentFile().getName());
 				//else sql.bindString(4,sParser.get(path)); //sql.bindNull(4);
 				
@@ -233,7 +233,7 @@ public class LibrarySync implements Runnable{
     				sql.bindString(1,UUID.randomUUID().toString());
     				sql.bindString(2,sage.io.Path.removeExt(file.getName()));
     				sql.bindString(3,path);
-    				sql.bindString(4,"unknown");
+    				sql.bindString(4,ComicLibrary.UKNOWN_SERIES);
 
     				//if(useFolderAsSeries) sql.bindString(4,file.getParentFile().getName());
     				//else sql.bindString(4,sParser.get(path)); //sql.bindNull(4);
@@ -318,7 +318,7 @@ public class LibrarySync implements Runnable{
 			//.........................................
 			//if series does not exist, create a series name.
 			seriesName = cur.getString(3);
-			if(seriesName == null || seriesName.isEmpty()){
+			if(seriesName == null || seriesName.isEmpty() || seriesName.compareToIgnoreCase(ComicLibrary.UKNOWN_SERIES) != 0){
 				if(mUseFldForSeries) seriesName = sage.io.Path.getParentName(comicPath);
 				else{
 					if(sParser == null) sParser = new SeriesParser(); //JIT

@@ -1,25 +1,20 @@
 package com.sketchpunk.ocomicreader;
  
-import java.io.File;
 
 import com.sketchpunk.ocomicreader.lib.ComicLibrary;
 import com.sketchpunk.ocomicreader.ui.CoverGridView;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.MediaStore;
-import android.app.AlertDialog;
+
 import android.app.ProgressDialog;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -37,9 +32,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import android.support.v4.app.FragmentActivity;
-import android.text.SpannableString;
-import android.text.method.LinkMovementMethod;
-import android.text.util.Linkify;
+
 
 public class LibraryActivity extends FragmentActivity 
 	implements
@@ -182,22 +175,8 @@ public class LibraryActivity extends FragmentActivity
 	     		break;
 	     		
 	     	//................................................
-	     	case R.id.menu_about:	     
-	            //Create Text
-	     		final TextView msg = new TextView(this);
-	            final SpannableString str = new SpannableString(this.getText(R.string.app_about));
-	            Linkify.addLinks(str,Linkify.WEB_URLS);
-	            msg.setText(str);
-	            msg.setMovementMethod(LinkMovementMethod.getInstance());
-	            msg.setPadding(10,2,10,2);
-	            
-	            //Create Dialog
-	            AlertDialog.Builder builder = new AlertDialog.Builder(this)
-	            	.setIcon(R.drawable.ic_launcher)
-	            	.setTitle(R.string.app_name)
-	            	.setView(msg);
-	       
-				builder.create().show();
+	     	case R.id.menu_about:
+	     		sage.ui.Dialogs.About(this,this.getText(R.string.app_about));
 	     		break;
 		}//switch
 		return true;

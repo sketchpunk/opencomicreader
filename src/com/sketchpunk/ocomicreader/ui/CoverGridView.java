@@ -275,6 +275,7 @@ public class CoverGridView extends GridView implements
 		menu.add(0,2,0,"Delete");
 		menu.add(0,1,1,"Reset Progress");
 		menu.add(0,3,2,"Mark as Read");
+		menu.add(0,4,3,"Edit Series Name");
 	}//func
 	
 	public boolean contextItemSelected(MenuItem item){
@@ -288,6 +289,7 @@ public class CoverGridView extends GridView implements
 		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
 		final AdapterItemRef ref = (AdapterItemRef)info.targetView.getTag();
 		final String comicID = ref.id;
+		final String seriesName = ref.series;
 		final Context context = this.getContext();
 		AlertDialog.Builder abBuilder;
 		
@@ -342,6 +344,31 @@ public class CoverGridView extends GridView implements
 					}
 				});
 				abBuilder.show();
+				break;
+			
+			//...................................
+			case 4://Edit Serial
+				String sSeries = "";
+				if(seriesName == null || seriesName.isEmpty()){
+					sSeries = Sqlite.scalar(getContext(), "SELECT Series FROM ComicLibrary WHERE comicID = ?", new String[]{comicID});
+				}else sSeries = seriesName;
+				
+				
+				sage.ui.InputDialog inDialog = new sage.ui.InputDialog(this.getContext()
+					,"Edit Series : " + ref.lblTitle.getText().toString(),null,sSeries){
+					@Override
+					public boolean onOk(String txt){
+						if(seriesName == txt) return true;
+							
+						if(seriesName != null && !seriesName.isEmpty()) ComicLibrary.renameSeries(getContext(),seriesName,txt);
+						else ComicLibrary.setSeriesName(getContext(), comicID, txt);
+
+						refreshData();
+						return true;
+					}//func
+				};
+				
+				inDialog.show();				
 				break;
 		}//switch
 

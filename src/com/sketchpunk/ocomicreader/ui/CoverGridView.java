@@ -51,10 +51,10 @@ public class CoverGridView extends GridView implements
 	private int mFilterMode = 0;
 	private String mSeriesFilter = "";
 	
-	private int mThumbHeight = 160;
-	private int mThumbPadding = 0;
-	private int mGridPadding = 0;
-	private int mGridColNum = 3;
+	private int mThumbHeight = 180;
+	private int mThumbPadding = 60;
+	private int mGridPadding = 60;
+	private int mGridColNum = 2;
 
 	private boolean mIsFirstRun = true;
 	private String mThumbPath;
@@ -66,10 +66,14 @@ public class CoverGridView extends GridView implements
 	public void init(){
 		//Get Preferences
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getContext());
-		this.mGridColNum =		prefs.getInt("LibraryColCnt",2);
-		this.mGridPadding =		prefs.getInt("LibraryPadding",60);
-		this.mThumbPadding =	prefs.getInt("LibraryCoverPad",60);
-		this.mThumbHeight =		prefs.getInt("LibraryCoverHeight",180);
+		try{
+			this.mGridColNum =		prefs.getInt("libraryColCnt",2);
+			this.mGridPadding =		prefs.getInt("libraryPadding",60);
+			this.mThumbPadding =	prefs.getInt("libraryCoverPad",60);
+			this.mThumbHeight =		prefs.getInt("libraryCoverHeight",180);
+		}catch(Exception e){
+			System.err.println("Error Loading Library Prefs " + e.getMessage());
+		}//try
 
 		//....................................
 		//set values

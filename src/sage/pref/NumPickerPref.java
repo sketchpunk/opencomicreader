@@ -56,7 +56,12 @@ public class NumPickerPref extends DialogPreference{
 
     @Override
     protected void onSetInitialValue(boolean restoreValue, Object defaultValue){
-    	if(restoreValue) this.mNum =  this.getPersistedInt(mDefault);
-    	else this.mNum = (defaultValue != null)? Integer.parseInt(defaultValue.toString()) : 1;
+    	try{
+    		if(restoreValue) this.mNum =  this.getPersistedInt(mDefault);
+    		else this.mNum = (defaultValue != null)? Integer.parseInt(defaultValue.toString()) : 1;
+    	}catch(Exception e){
+    		this.mNum = this.mDefault;
+    		System.err.println("Error on SetInitialValue for NumberPickerPref : " + e.getMessage());
+    	}//if
     }//func
 }//cls

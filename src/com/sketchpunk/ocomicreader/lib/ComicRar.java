@@ -81,7 +81,7 @@ public class ComicRar implements iComicArchive{
 
 	public boolean getLibraryData(String[] outVar){
 		List<String> pgList = getPageList(); //List is already filtered and sorted, this is easier then zip
-		if(pgList.size() > 0){
+		if(pgList != null && !pgList.isEmpty()){
 			outVar[0] = Integer.toString(pgList.size()); //Page Count
 			outVar[1] = pgList.get(0); //Path to Cover Entry
 			return true;

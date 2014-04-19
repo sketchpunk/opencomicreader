@@ -37,13 +37,13 @@ public class LoadImageView{
 	public static boolean cancelRunningTask(String imgPath,View view){
 		final LoadingTask task = getLoadingTask(view);
 		
-		if(task != null){
+		if(task != null && task.getStatus() == AsyncTask.Status.RUNNING){
 			final String taskImgPath = task.imagePath;
 			
-			if(taskImgPath == null || !taskImgPath.equals(imgPath)) task.cancel(true);
-			else return false;
+			if(taskImgPath.equals(imgPath)) return false; //Still loading this image.
+			else task.cancel(true);
 		}//if
-		
+
 		return true;
 	}//func
 		
@@ -93,7 +93,7 @@ public class LoadImageView{
 			//.....................................
 			//if no callback, then load the image ourselves
 			File fImg = new File(imagePath);
-			if(!fImg.exists()) return null;
+			if(!fImg.exists()){ System.out.println("---Thumb File does not exist " + imagePath); return null; }
 				
 			return BitmapFactory.decodeFile(imagePath,null);
 		}//func

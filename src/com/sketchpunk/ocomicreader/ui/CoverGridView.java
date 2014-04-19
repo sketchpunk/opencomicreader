@@ -22,6 +22,7 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.content.Loader;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
@@ -43,7 +44,7 @@ public class CoverGridView extends GridView implements
 		,LoadImageView.OnImageLoadedListener{
 	
 	public interface iCallback{ void onDataRefreshComplete(); }
-	
+	private final String TAG = "COVERGRIDVIEW";
 	private SqlCursorAdapter mAdapter;
 	private Sqlite mDb;
 		
@@ -188,7 +189,7 @@ public class CoverGridView extends GridView implements
 	/*========================================================
    	Adapter Events*/
    	public class AdapterItemRef{
-       	public String id;
+       	public String id = "";
        	public TextView lblTitle;
        	public ImageView imgCover;
        	public ProgressCircle pcProgress;
@@ -198,14 +199,13 @@ public class CoverGridView extends GridView implements
    	
    	@Override
    	public View onCreateListItem(View v){
-       	try{
+       	try{       		
        		AdapterItemRef itmRef = new AdapterItemRef();
        		itmRef.lblTitle = (TextView)v.findViewById(R.id.lblTitle);
        		itmRef.pcProgress = (ProgressCircle)v.findViewById(R.id.pcProgress);
        		itmRef.imgCover = (ImageView)v.findViewById(R.id.imgCover);
        		itmRef.imgCover.setTag(itmRef);
        		itmRef.imgCover.getLayoutParams().height = mThumbHeight;
-
        		v.setTag(itmRef);
        	}catch(Exception e){
        		System.out.println("onCreateListItem " + e.getMessage());
@@ -219,19 +219,31 @@ public class CoverGridView extends GridView implements
    			AdapterItemRef itmRef = (AdapterItemRef)v.getTag();
    			
    			//..............................................
-   			String tmp = c.getString(mAdapter.getColIndex("title"));
+   			String id = c.getString(mAdapter.getColIndex("_id"))
+   				,tmp = c.getString(mAdapter.getColIndex("title"));
+   			
+   			//Grid view binds more then one time, limit double loading to save on resources used to load images.
+   			//Need to change ID to uniqueness, but also check title because there is a small bind issue going back/forth between series view
+   			if(itmRef.id.equals(tmp) && itmRef.lblTitle.getText().equals(tmp)){ System.out.println("Repeat"); return; }
+   			itmRef.id = id;
+
    			if(isSeriesFiltered() && mSeriesFilter.isEmpty()){
    				itmRef.series = tmp;
    				tmp += " ("+c.getString(mAdapter.getColIndex("cntIssue"))+")";
    			}else itmRef.series = "";
    			itmRef.lblTitle.setText(tmp);
-   			
-   			itmRef.id = c.getString(mAdapter.getColIndex("_id"));
 
    			//..............................................
    			//load Cover Image
    			if(c.getString(mAdapter.getColIndex("isCoverExists")).equals("1")){
    				LoadImageView.loadImage(mThumbPath + itmRef.id + ".jpg",itmRef.imgCover,this);
+   			}else{
+   				//No image, clear out images TODO put a default image for missing covers.
+   				itmRef.imgCover.setImageBitmap(null);
+   				if(itmRef.bitmap != null){
+   					itmRef.bitmap.recycle();
+   					itmRef.bitmap = null;
+   				}//if
    			}//if
    			
    			//..............................................

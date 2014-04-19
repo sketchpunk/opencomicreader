@@ -290,8 +290,8 @@ public class LibrarySync implements Runnable{
 				//Get Meta Information
 				comicMeta = archive.getMeta(); //Title,Series,Volume,Issue
 				if(comicMeta != null){
-					if(comicMeta[0] != "") sql += ",title = '"+comicMeta[0].replaceAll("'","''")+"'";
-					if(comicMeta[1] != "") sql += ",series = '"+comicMeta[1].replaceAll("'","''")+"'";
+					if(!comicMeta[0].isEmpty()) sql += ",title = '"+comicMeta[0].replaceAll("'","''")+"'";
+					if(!comicMeta[1].isEmpty()) sql += ",series = '"+comicMeta[1].replaceAll("'","''")+"'";
 				}//if}
 
 				//Save information to the db.

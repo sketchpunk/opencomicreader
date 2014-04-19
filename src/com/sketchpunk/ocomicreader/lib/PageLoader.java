@@ -21,7 +21,7 @@ public class PageLoader{
 	public void loadImage(CallBack callback,String imgPath,float maxSize,iComicArchive archive,int imgType){
 		if(mTask != null){
 			if(mTask.getStatus() != AsyncTask.Status.FINISHED){
-				if(!mTask.imagePath.equals(imgPath)) mTask.cancel(true);
+				if(mTask.imagePath != null && !mTask.imagePath.equals(imgPath)) mTask.cancel(true);
 				else return; //Already loaded that image.
 			}//if
 		}//if

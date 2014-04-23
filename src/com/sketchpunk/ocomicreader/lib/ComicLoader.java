@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.List;
 import java.util.Locale;
 
+import javax.microedition.khronos.opengles.GL10;
+
 import com.sketchpunk.ocomicreader.ui.ComicPageView;
 
 import android.app.Activity;
@@ -11,6 +13,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Point;
+import android.opengl.GLES10;
 import android.preference.PreferenceManager;
 import android.view.Display;
 import android.widget.Toast;
@@ -45,7 +48,7 @@ public class ComicLoader implements PageLoader.CallBack{//LoadImageView.OnImageL
 	/*--------------------------------------------------------
 	*/
 	private int mPageLen, mCurrentPage;
-	private float mMaxSize;
+	private int mMaxSize;
 	private CallBack mCallBack;
 	private boolean mIsPreloading;
 	
@@ -74,10 +77,18 @@ public class ComicLoader implements PageLoader.CallBack{//LoadImageView.OnImageL
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		Point size = new Point();
 		display.getSize(size);
-		mMaxSize = (float)Math.max((float)size.x,(float)size.y);
+		//mMaxSize = (float)Math.max((float)size.x,(float)size.y);
 		
 		mPageLoader = new PageLoader();
 		mCurrentPage = -1;
+		
+		
+		//TODO: Save this to settings, shouldn't have to get this value every time.
+        android.opengl.GLSurfaceView mGLView = new android.opengl.GLSurfaceView(context);
+		int[] maxTextureSize = new int[1];
+		GLES10.glGetIntegerv(GL10.GL_MAX_TEXTURE_SIZE, maxTextureSize, 0);
+		
+		mMaxSize = maxTextureSize[0]; //MaxTextureSize
 	}//func
 
 	/*--------------------------------------------------------
@@ -138,7 +149,7 @@ public class ComicLoader implements PageLoader.CallBack{//LoadImageView.OnImageL
 		Display display = ((Activity)mContext).getWindowManager().getDefaultDisplay();
 		Point size = new Point();
 		display.getSize(size);
-		mMaxSize = (float)Math.max((float)size.x,(float)size.y);
+		//mMaxSize = (float)Math.max((float)size.x,(float)size.y);
 	}//func
 	
 	/*--------------------------------------------------------

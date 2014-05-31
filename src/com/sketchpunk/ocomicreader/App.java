@@ -2,9 +2,11 @@ package com.sketchpunk.ocomicreader;
 
 import android.app.Application;
 
-public class App extends Application{
-	/*========================================================
-	*/
+public class App extends Application {
+
 	@Override
-	public void onCreate(){ super.onCreate(); }//func
-}//cls
+	public void onCreate() {
+		super.onCreate();
+	}
+
+}

@@ -167,7 +167,7 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
 			case R.id.mnu_scaleh: mImageView.setScaleMode(ComicPageView.ScaleToHeight); break;
 			case R.id.mnu_scalew: mImageView.setScaleMode(ComicPageView.ScaleToWidth); break;
 			case R.id.mnu_scalen: mImageView.setScaleMode(ComicPageView.ScaleNone); break;
-			case R.id.mnu_goto: sage.ui.Dialogs.NumPicker(this,"Goto Page",1,mComicLoad.getPageCount(),mComicLoad.getCurrentPage()+1,this); break;
+			case R.id.mnu_goto: sage.ui.Dialogs.NumPicker(this,"Go to Page",1,mComicLoad.getPageCount(),mComicLoad.getCurrentPage()+1,this); break;
 			case R.id.mnu_exit: this.finish(); break;
 		}//switch
 		return true;

@@ -52,6 +52,10 @@
 	</PreferenceCategory>
 	
 	<PreferenceCategory android:key="setiViewing" android:title="VIEWING SETTINGS" android:summary="">
+	    <ListPreference android:key="screenOrientation"  android:title="Screen Orientation" android:defaultValue="0"
+           android:summary="Set the orientation of the image on the screen."
+           android:entries="@array/screenOrientation" android:entryValues="@array/screenOrientation_v"/>
+
 	    <ListPreference android:key="scaleMode"  android:title="Scale Mode" android:defaultValue="1"
            android:summary="Set how the image should scale depending on the screen."
            android:entries="@array/scaleMode" android:entryValues="@array/scaleMode_v"/>

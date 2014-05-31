@@ -11,4 +11,13 @@
             </group>
         </menu>
 	</item>
+	<item android:id="@+id/mnu_orientation" android:title="Orientation" android:orderInCategory="100" android:showAsAction="never">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item android:id="@+id/mnu_orientationd" android:title="Use device settings" android:checkable="true"/>
+                <item android:id="@+id/mnu_orientationp" android:title="Lock to portrait" android:checkable="true"/>
+                <item android:id="@+id/mnu_orientationl" android:title="Lock to landscape" android:checkable="true"/>
+            </group>
+        </menu>
+	</item>
 </menu>

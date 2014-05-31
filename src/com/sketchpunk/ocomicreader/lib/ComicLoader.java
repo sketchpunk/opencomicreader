@@ -82,10 +82,6 @@ public class ComicLoader implements PageLoader.CallBack {// LoadImageView.OnImag
 		mPageLoader = new PageLoader();
 		mCurrentPage = -1;
 
-		// TODO: Save this to settings, shouldn't have to get this value every
-		// time.
-		android.opengl.GLSurfaceView mGLView = new android.opengl.GLSurfaceView(
-				context);
 		int[] maxTextureSize = new int[1];
 		GLES10.glGetIntegerv(GL10.GL_MAX_TEXTURE_SIZE, maxTextureSize, 0);
 

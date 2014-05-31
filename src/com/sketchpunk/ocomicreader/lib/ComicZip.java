@@ -1,8 +1,5 @@
 package com.sketchpunk.ocomicreader.lib;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -57,7 +54,7 @@ public class ComicZip implements iComicArchive {
 			String itmName;
 			ZipEntry itm;
 			List<String> pageList = new ArrayList<String>();
-			Enumeration entries = mArchive.entries();
+			Enumeration<? extends ZipEntry> entries = mArchive.entries();
 
 			while (entries.hasMoreElements()) {
 				itm = (ZipEntry) entries.nextElement();

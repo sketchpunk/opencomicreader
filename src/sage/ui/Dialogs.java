@@ -9,7 +9,6 @@ import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
 import android.view.WindowManager;
-import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 

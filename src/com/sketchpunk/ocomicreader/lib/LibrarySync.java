@@ -198,8 +198,6 @@ public class LibrarySync implements Runnable {
 		File[] fList;
 		File fObj;
 		String tmp, path;
-		Boolean useFolderAsSeries = false;
-		SeriesParser sParser = new SeriesParser();
 
 		// Set initial paths
 		if (!mSyncFld1.isEmpty())
@@ -268,7 +266,7 @@ public class LibrarySync implements Runnable {
 		String[] comicInfo = { "", "", "" };
 		String[] comicMeta; // Title,Series,Volume,Issue
 		File file;
-		String tmp, comicID, sql, comicPath, seriesName;
+		String comicID, sql, comicPath, seriesName;
 		iComicArchive archive;
 
 		Cursor cur = mDb

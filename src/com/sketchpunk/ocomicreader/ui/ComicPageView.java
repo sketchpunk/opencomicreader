@@ -1,15 +1,11 @@
 package com.sketchpunk.ocomicreader.ui;
 
-import java.io.File;
-import java.util.Stack;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Point;
 import android.graphics.RectF;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
@@ -18,8 +14,6 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.ScaleGestureDetector.OnScaleGestureListener;
 import android.view.View;
-import android.view.animation.Interpolator;
-import android.view.animation.LinearInterpolator;
 import android.view.animation.OvershootInterpolator;
 
 public class ComicPageView extends View implements
@@ -256,6 +250,7 @@ public class ComicPageView extends View implements
 		return true;
 	}
 
+	@SuppressWarnings("unused")
 	private void onFlingAnimate(float xVelocity, float yVelocity) {
 		System.out.println("onFligAnimate");
 		float timeRatio = 0.2f; // 40% of a second = 400 milliseconds

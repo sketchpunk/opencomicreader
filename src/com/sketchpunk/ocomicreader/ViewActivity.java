@@ -68,7 +68,7 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,
 		super.onDestroy();
 	}
 
-	@SuppressLint("ShowToast")
+	@SuppressLint({ "ShowToast", "InlinedApi" })
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

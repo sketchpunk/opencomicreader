@@ -22,7 +22,6 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.content.Loader;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
@@ -46,7 +45,6 @@ public class CoverGridView extends GridView implements
 		void onDataRefreshComplete();
 	}
 
-	private final String TAG = "COVERGRIDVIEW";
 	private SqlCursorAdapter mAdapter;
 	private Sqlite mDb;
 

@@ -8,7 +8,6 @@ import android.preference.PreferenceManager;
 
 import android.app.ProgressDialog;
 import android.app.WallpaperManager;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -62,14 +61,13 @@ public class LibraryActivity extends FragmentActivity implements
 		SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(this);
 		// setup background
+		RelativeLayout mLayouts = (RelativeLayout) findViewById(R.id.MainLayout);
 		switch (Integer.parseInt(prefs.getString("libraryBackground", "0"))) {
 		case 0: // Solid
-			RelativeLayout mLayouts = (RelativeLayout) findViewById(R.id.MainLayout);
 			mLayouts.setBackgroundColor(Color.parseColor("#FF000000"));
 			break;
 		case 1: // opaque
-			RelativeLayout mLayouto = (RelativeLayout) findViewById(R.id.MainLayout);
-			mLayouto.setBackgroundColor(Color.parseColor("#BB000000"));
+			mLayouts.setBackgroundColor(Color.parseColor("#BB000000"));
 			break;
 		case 2: // WallPaper
 			final WallpaperManager wm = WallpaperManager.getInstance(this);
@@ -228,7 +226,7 @@ public class LibraryActivity extends FragmentActivity implements
 		if (ComicLibrary.startSync(this)) {
 			if (mProgress != null) {
 				if (!mProgress.isShowing()) {
-					mProgress.show(this, "Library Syncing", "", true);
+					ProgressDialog.show(this, "Library Syncing", "", true);
 					return;
 				}// if
 			}// if

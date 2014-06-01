@@ -17,129 +17,128 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class FolderPref extends DialogPreference implements DialogInterface.OnClickListener
-	,MapAdapter.AdapterCallback,AdapterView.OnItemClickListener{
+public class FolderPref extends DialogPreference implements
+		DialogInterface.OnClickListener, MapAdapter.AdapterCallback,
+		AdapterView.OnItemClickListener {
 	private ListView mListView;
-	private LinkedHashMap<String,String> mFolderList;
-	private MapAdapter<String,String> mAdapter;
+	private LinkedHashMap<String, String> mFolderList;
+	private MapAdapter<String, String> mAdapter;
 	private TextView mPathView;
 	private String mCurrentPath;
-	
-	/*========================================================
-	*/	
-	public FolderPref(Context context,AttributeSet attrib){
-		super(context,attrib);
-		//setDialogLayoutResource(com.sketchpunk.ocomicreader.R.layout.dialogpref_folder);
-	}//func
 
-	public FolderPref(Context context,AttributeSet attrib,int defStyle) {
-		super(context,attrib,defStyle);
-		//setDialogLayoutResource(com.sketchpunk.ocomicreader.R.layout.dialogpref_folder);
-	}//func
+	public FolderPref(Context context, AttributeSet attrib) {
+		super(context, attrib);
+	}
 
-	
-	/*========================================================
-	*/
+	public FolderPref(Context context, AttributeSet attrib, int defStyle) {
+		super(context, attrib, defStyle);
+	}
+
 	@Override
 	protected void onPrepareDialogBuilder(AlertDialog.Builder builder) {
-		super.onPrepareDialogBuilder(builder);  
-		builder.setPositiveButton("Save",this);
-		builder.setNegativeButton("Cancel",this);
-		builder.setNeutralButton("Clear",this);
-	}//func
+		super.onPrepareDialogBuilder(builder);
+		builder.setPositiveButton("Save", this);
+		builder.setNegativeButton("Cancel", this);
+		builder.setNeutralButton("Clear", this);
+	}
 
 	@Override
-	protected View onCreateDialogView(){
+	protected View onCreateDialogView() {
 		LinearLayout container = new LinearLayout(getContext());
-	    container.setOrientation(LinearLayout.VERTICAL);
+		container.setOrientation(LinearLayout.VERTICAL);
 
-	    //......................................
-	    mPathView = new TextView(this.getContext());
-	    container.addView(mPathView,LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
-	    
-	    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mPathView.getLayoutParams();
-	    params.setMargins(8,0,0,0);
-	    mPathView.setLayoutParams(params);
+		mPathView = new TextView(this.getContext());
+		container.addView(mPathView, LinearLayout.LayoutParams.MATCH_PARENT,
+				LinearLayout.LayoutParams.WRAP_CONTENT);
 
-	    //......................................
-		mFolderList = new LinkedHashMap<String,String>();
+		LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mPathView
+				.getLayoutParams();
+		params.setMargins(8, 0, 0, 0);
+		mPathView.setLayoutParams(params);
+
+		mFolderList = new LinkedHashMap<String, String>();
 		loadPath(Environment.getExternalStorageDirectory().getAbsolutePath());
-	    
-	    //......................................
-		mAdapter = new MapAdapter<String,String>(this.getContext());
-		mAdapter.setListItemLayout(com.sketchpunk.ocomicreader.R.layout.listitem_dlgfolder); //this should by dynamic, remove dependency
+
+		mAdapter = new MapAdapter<String, String>(this.getContext());
+		// this should be dynamic, remove dependency.
+		mAdapter.setListItemLayout(com.sketchpunk.ocomicreader.R.layout.listitem_dlgfolder);
 		mAdapter.setCallback(this);
 		mAdapter.setSortEnabled(true);
 		mAdapter.setData(mFolderList);
-		
-	    mListView = new ListView(this.getContext());
+
+		mListView = new ListView(this.getContext());
 		mListView.setOnItemClickListener(this);
 		mListView.setAdapter(mAdapter);
-		container.addView(mListView,LinearLayout.LayoutParams.MATCH_PARENT,250);
+		container.addView(mListView, LinearLayout.LayoutParams.MATCH_PARENT,
+				250);
 
-	    //......................................
 		return container;
-	}//func
-	
-	@Override
-	protected void onBindDialogView(View view) {}//func
-	
-	@Override
-	protected void onDialogClosed(boolean positiveResult){}//func
+	}
 
+	@Override
+	protected void onBindDialogView(View view) {
+	}
 
-	/*========================================================
-	Adapter Events*/
+	@Override
+	protected void onDialogClosed(boolean positiveResult) {
+	}
+
+	/*
+	 * Adapter Events
+	 */
 	@Override
 	public View onDisplayListItem(View v, Object key) {
-		TextView tv = (TextView)v.findViewById(com.sketchpunk.ocomicreader.R.id.lblTitle);
-		tv.setText(mFolderList.get((String)key).toString());
-		v.setTag((String)key);
+		TextView tv = (TextView) v
+				.findViewById(com.sketchpunk.ocomicreader.R.id.lblTitle);
+		tv.setText(mFolderList.get((String) key).toString());
+		v.setTag((String) key);
 		return v;
-	}//func
+	}
 
-	
-	/*========================================================
-	UI Events*/
+	/*
+	 * UI Events
+	 */
 	@Override
-	public void onClick(DialogInterface dialog, int which){
-		switch(which){
-			case -1: this.persistString(mCurrentPath); break; //Positive
-			case -3: this.persistString(null); break; //Neutral
-		}//switch
-	}//func
-	
+	public void onClick(DialogInterface dialog, int which) {
+		switch (which) {
+		case -1:
+			this.persistString(mCurrentPath);
+			break; // Positive
+		case -3:
+			this.persistString(null);
+			break; // Neutral
+		}
+	}
+
 	@Override
-	public void onItemClick(AdapterView<?> parent,View view,int position,long id){
-		String path = (String)view.getTag();
-		if(path.equals("..")){
+	public void onItemClick(AdapterView<?> parent, View view, int position,
+			long id) {
+		String path = (String) view.getTag();
+		if (path.equals("..")) {
 			int pos = mCurrentPath.lastIndexOf('/');
-			if(pos > 0) path = mCurrentPath.substring(0,pos);
-		}//if
-		
+			if (pos > 0)
+				path = mCurrentPath.substring(0, pos);
+		}
+
 		loadPath(path);
 		mAdapter.refresh();
-	}//func
-	
+	}
 
-	/*========================================================
-	*/
-	private void loadPath(String path){
+	private void loadPath(String path) {
 		mCurrentPath = path;
 		mPathView.setText(mCurrentPath);
 
-		//..............................
 		mFolderList.clear();
-		mFolderList.put("..","..");
-		
-		//..............................
+		mFolderList.put("..", "..");
+
 		File fObj = new File(path);
 		File[] fList = fObj.listFiles();
-		
-		if(fList != null){
-			for(File file:fList){
-				if(file.isDirectory()) mFolderList.put(file.getPath(),file.getName());
-			}//for
-		}//if
-	}//func
-}//cls
+
+		if (fList != null) {
+			for (File file : fList) {
+				if (file.isDirectory())
+					mFolderList.put(file.getPath(), file.getName());
+			}
+		}
+	}
+}

@@ -4,8 +4,11 @@ package com.sketchpunk.ocomicreader.ui;
 import java.io.File;
 import java.util.Stack;
 
+import com.sketchpunk.ocomicreader.ViewActivity;
+
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
@@ -40,6 +43,10 @@ public class ComicPageView extends View implements GestureDetector.OnGestureList
 	public static final int ScaleToHeight = 1;
 	public static final int ScaleToWidth = 2;
 	public static final int ScaleAuto = 3;
+
+	public static final int OrientationDevice = 0;
+	public static final int OrientationPortrait = 1;
+	public static final int OrientationLandscape = 2;
 	
 	public static final int FlingLeft = 0;
 	public static final int FlingRight = 1;
@@ -55,6 +62,7 @@ public class ComicPageView extends View implements GestureDetector.OnGestureList
 	private ComicPageView.CallBack mCallBack;
 
 	private int mScaleMode=1;
+	private int mScreenOrientation=0;
 	private RectF mBound;
 	private Sizes mViewSize;
 	private Sizes mImgSize;
@@ -86,6 +94,9 @@ public class ComicPageView extends View implements GestureDetector.OnGestureList
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
     	String tmp = prefs.getString("scaleMode","1");
     	this.mScaleMode = Integer.parseInt(tmp);
+   
+    	tmp = prefs.getString("screenOrientation","0");
+    	this.mScreenOrientation = Integer.parseInt(tmp);
 	}//func
 
 	/*=======================================================
@@ -122,6 +133,14 @@ public class ComicPageView extends View implements GestureDetector.OnGestureList
 		this.invalidate();
 	}//func
 
+	private void resetScreenOrientation(ViewActivity view){
+		switch(mScreenOrientation){
+			case ComicPageView.OrientationDevice: view.setRequestedOrientation(view.getRequestedOrientation()); break;
+			case ComicPageView.OrientationPortrait: view.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT); break;
+			case ComicPageView.OrientationLandscape: view.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE); break;
+		}//switch
+		
+	}//func
 
 	/*=======================================================
 	Setters/Getters*/
@@ -130,6 +149,13 @@ public class ComicPageView extends View implements GestureDetector.OnGestureList
 		mScaleMode = mode;
 		resetScale();
 	}//func
+
+	public int getScreenOrientation(){ return mScreenOrientation; }
+	public void setScreenOrientation(int mode, ViewActivity view){
+		mScreenOrientation = mode;
+		resetScreenOrientation(view);
+		resetScale();
+	}//func	
 	
 	public void setImageBitmap(Bitmap bmp){
 		if(bmp == null){

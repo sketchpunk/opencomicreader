@@ -3,6 +3,7 @@
 import java.util.Map;
 
 import sage.data.Sqlite;
+
 import com.sketchpunk.ocomicreader.lib.ComicLoader;
 import com.sketchpunk.ocomicreader.ui.ComicPageView;
 
@@ -15,6 +16,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.view.ContextMenu;
 import android.view.Gravity;
@@ -95,6 +97,13 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
     	//Keep screen on
     	if(prefs.getBoolean("keepScreenOn",true)) winFlags |= WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
 
+    	// Apply preferred orientation
+		switch(Integer.parseInt(prefs.getString("screenOrientation", "0"))){
+			case ComicPageView.OrientationDevice: this.setRequestedOrientation(this.getRequestedOrientation()); break;
+			case ComicPageView.OrientationPortrait: this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT); break;
+			case ComicPageView.OrientationLandscape: this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE); break;
+		}//switch
+    	
     	//Apply Flags
     	if(winFlags != 0) getWindow().addFlags(winFlags);
 
@@ -159,6 +168,12 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
     		case ComicPageView.ScaleToWidth: menu.findItem(R.id.mnu_scalew).setChecked(true); break;
     		case ComicPageView.ScaleAuto: menu.findItem(R.id.mnu_scalea).setChecked(true); break;
     	}//switch
+
+    	switch(mImageView.getScreenOrientation()){
+			case ComicPageView.OrientationDevice: menu.findItem(R.id.mnu_orientationd).setChecked(true); break;
+    		case ComicPageView.OrientationPortrait: menu.findItem(R.id.mnu_orientationp).setChecked(true); break;
+    		case ComicPageView.OrientationLandscape: menu.findItem(R.id.mnu_orientationl).setChecked(true); break;
+	    }//switch
     }//func
     
 	@Override
@@ -169,6 +184,9 @@ public class ViewActivity extends Activity implements ComicPageView.CallBack,Com
 			case R.id.mnu_scalen: mImageView.setScaleMode(ComicPageView.ScaleNone); break;
 			case R.id.mnu_scalea: mImageView.setScaleMode(ComicPageView.ScaleAuto); break;
 			case R.id.mnu_goto: sage.ui.Dialogs.NumPicker(this,"Goto Page",1,mComicLoad.getPageCount(),mComicLoad.getCurrentPage()+1,this); break;
+			case R.id.mnu_orientationd: mImageView.setScreenOrientation(ComicPageView.OrientationDevice, this); break;
+			case R.id.mnu_orientationp: mImageView.setScreenOrientation(ComicPageView.OrientationPortrait, this); break;
+			case R.id.mnu_orientationl: mImageView.setScreenOrientation(ComicPageView.OrientationLandscape, this); break;
 			case R.id.mnu_exit: this.finish(); break;
 		}//switch
 		return true;

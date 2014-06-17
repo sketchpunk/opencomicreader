@@ -25,6 +25,16 @@
         <item>3</item>
     </string-array>
 
+    <string-array name="screenOrientation">
+        <item>Use device settings</item>
+        <item>Lock to portrait</item>
+        <item>Lock to landscape</item>
+    </string-array>
+    <string-array name="screenOrientation_v">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
     <string-array name="libraryFilter">
         <item>View All</item>
         <item>View By Series</item>

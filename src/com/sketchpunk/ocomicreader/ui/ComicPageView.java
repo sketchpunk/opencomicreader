@@ -54,7 +54,7 @@ public class ComicPageView extends View implements GestureDetector.OnGestureList
 	private ScaleGestureDetector mScaleGesture;
 	private ComicPageView.CallBack mCallBack;
 
-	private int mScaleMode=1;
+	private int mScaleMode=3;
 	private RectF mBound;
 	private Sizes mViewSize;
 	private Sizes mImgSize;
@@ -84,7 +84,7 @@ public class ComicPageView extends View implements GestureDetector.OnGestureList
 		
 		//Get perferences
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-    	String tmp = prefs.getString("scaleMode","1");
+    	String tmp = prefs.getString("scaleMode","3");
     	this.mScaleMode = Integer.parseInt(tmp);
 	}//func
 

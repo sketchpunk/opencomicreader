@@ -1,11 +1,15 @@
 package com.sketchpunk.ocomicreader.lib;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Locale;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import sage.io.DiskCache;
+
+import com.sketchpunk.ocomicreader.lib.PageLoader.CallBack;
 import com.sketchpunk.ocomicreader.ui.ComicPageView;
 
 import android.app.Activity;
@@ -14,6 +18,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.opengl.GLES10;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.view.Display;
 import android.widget.Toast;
@@ -47,39 +52,44 @@ public class ComicLoader implements PageLoader.CallBack{//LoadImageView.OnImageL
 
 	/*--------------------------------------------------------
 	*/
-	private int mPageLen, mCurrentPage;
-	private int mMaxSize;
-	private CallBack mCallBack;
-	private boolean mIsPreloading;
+	private static int CACHE_SIZE = 1024 * 1024 * 10; //10mb
 	
+	private int mPageLen, mCurrentPage, mMaxSize;
+	private int mPreloadSize = 2;
+	private CallBack mCallBack;
+	private boolean mIsPreloading; //todo, might get rid of this. Preloading no longer needs to be a setting.
+
 	private ComicPageView mImageView;
 	private PageLoader mPageLoader;
 	private iComicArchive mArchive;
 	private List<String> mPageList;
-	private Bitmap mCurrentBmp=null,mNextBmp=null,mPrevBmp=null;
+	private Bitmap mCurrentBmp=null;
 	private Context mContext = null;
+	private DiskCache mCache;
+	private CacheLoader mCacheLoader = null;
 
 	public ComicLoader(Context context,ComicPageView o){
 		mImageView = o;
 		mContext = context;
+		mCache = new DiskCache(context,"comicLoader",CACHE_SIZE);
 
 	    //............................
 		//Save Callback
 		if(context instanceof CallBack) mCallBack = (CallBack)context;
 		
 		//............................
-		//Get perferences
+		//Get perferences TODO REMOVE
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		mIsPreloading = prefs.getBoolean("preLoading",false);
 		
 		//............................
-		//Get the window size
+		//Get the window size TODO is this needed?
 		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
 		Point size = new Point();
 		display.getSize(size);
 		//mMaxSize = (float)Math.max((float)size.x,(float)size.y);
 		
-		mPageLoader = new PageLoader();
+		mPageLoader = new PageLoader(this);
 		mCurrentPage = -1;
 		
 		
@@ -105,16 +115,16 @@ public class ComicLoader implements PageLoader.CallBack{//LoadImageView.OnImageL
 			
 			if(mArchive != null){ mArchive.close(); mArchive = null; }//if
 
-			if(mCurrentBmp != null){
+			if(mCurrentBmp != null){ //Todo remove it
 				mImageView.setImageBitmap(null);
 				mCurrentBmp.recycle(); mCurrentBmp = null;
 			}//if
-			
-			if(mNextBmp != null){mNextBmp.recycle(); mNextBmp = null;}
-			if(mPrevBmp != null){mPrevBmp.recycle(); mPrevBmp = null;}
 
 			mCallBack = null;
 			mImageView = null;
+			
+			mCache.clear();
+			mCache.close();
 			return true;
 		}catch(Exception e){
 			System.out.println("Error closing archive " + e.getMessage());
@@ -145,7 +155,7 @@ public class ComicLoader implements PageLoader.CallBack{//LoadImageView.OnImageL
 		return false;
 	}//func
 
-	public void refreshOrientation(){
+	public void refreshOrientation(){ //todo check if this function is needed.
 		Display display = ((Activity)mContext).getWindowManager().getDefaultDisplay();
 		Point size = new Point();
 		display.getSize(size);
@@ -155,122 +165,105 @@ public class ComicLoader implements PageLoader.CallBack{//LoadImageView.OnImageL
 	/*--------------------------------------------------------
 	Paging Methods*/
 	public int gotoPage(int pos){
-		if(pos < 1 || pos > mPageLen || pos == mCurrentPage+1) return 0;
-
-		//Arrays start at 0, but pages start at 1.
-		if(pos == mCurrentPage+1) return nextPage();
-		else if(pos == mCurrentPage-1) return prevPage();
-		else{
-			mCurrentPage = pos-1; //Page to Index Conversion
-			mPageLoader.loadImage((PageLoader.CallBack)this,mPageList.get(mCurrentPage),mMaxSize,mArchive,0);
+		if(pos < 0 || pos >= mPageLen || pos == mCurrentPage) return 0;
+		
+		//Check if the cache loader is busy with a request.
+		if(mCacheLoader != null && mCacheLoader.getStatus() != AsyncTask.Status.FINISHED){
+			System.out.println("Still Loading from Cache.");
+			return 0;
 		}//if
+
+		//Load from cache on a thread.
+		mCurrentPage = pos;
+		mCacheLoader = new CacheLoader();
+		mCacheLoader.execute(mCurrentPage);
 		
 		return 1;
 	}//func
 	
 	public int nextPage(){
-		if(mCurrentPage+1 >= mPageLen) return 0;
-
-		if(!mIsPreloading){
-			mCurrentPage++;
-			mPageLoader.loadImage((PageLoader.CallBack)this,mPageList.get(mCurrentPage),mMaxSize,mArchive,0);
-		}else{
-			//mPageLoader.cancelTask(); //Cancel any loading to prevent any bitmaps from changing.
-			if(mPageLoader.isLoading()) return -1;
-			
-			mCurrentPage++;
-			if(mPrevBmp != null){ mPrevBmp.recycle(); mPrevBmp = null;} //Clean up prev image
-			if(mCurrentBmp != null) mPrevBmp = mCurrentBmp; //save current to prev incase user wants to go back one
-			
-			//if we have a next image, set view to that and preload next.
-			if(mNextBmp != null){
-				mCurrentBmp = mNextBmp;
-				mNextBmp = null;
-				
-				if(mCurrentPage+1 < mPageLen) mPageLoader.loadImage((PageLoader.CallBack)this,mPageList.get(mCurrentPage+1),mMaxSize,mArchive,1);
-				mImageView.setImageBitmap(mCurrentBmp);
-				
-				if(mCallBack != null) mCallBack.onPageLoaded(true,mCurrentPage+1);
-			}else{
-				mPageLoader.loadImage((PageLoader.CallBack)this,mPageList.get(mCurrentPage),mMaxSize,mArchive,0);
-			}//if
-		}//if
-		
+		if(mCurrentPage >= mPageLen) return 0;
+		gotoPage(mCurrentPage+1);
 		return 1;
 	}//func
 	
 	public int prevPage(){
 		if(mCurrentPage-1 < 0) return 0;
 		
-		if(!mIsPreloading){
-			mCurrentPage--;
-			mPageLoader.loadImage((PageLoader.CallBack)this,mPageList.get(mCurrentPage),mMaxSize,mArchive,0);
-		}else{
-			//mPageLoader.cancelTask(); //Cancel any loading to prevent any bitmaps from changing.
-			if(mPageLoader.isLoading()) return -1;
-			
-			mCurrentPage--;
-			if(mNextBmp != null){ mNextBmp.recycle(); mNextBmp = null;} //Clean up next image
-			if(mCurrentBmp != null) mNextBmp = mCurrentBmp; //save current to next incase user wants to go forward
-			
-			//if we have a prev image, set view to that and preload prev.
-			if(mPrevBmp != null){
-				mCurrentBmp = mPrevBmp;
-				mPrevBmp = null;
-				
-				if(mCurrentPage-1 >= 0) mPageLoader.loadImage((PageLoader.CallBack)this,mPageList.get(mCurrentPage-1),mMaxSize,mArchive,2);
-				mImageView.setImageBitmap(mCurrentBmp);
-				
-				if(mCallBack != null) mCallBack.onPageLoaded(true,mCurrentPage+1);
-			}else{
-				mPageLoader.loadImage((PageLoader.CallBack)this,mPageList.get(mCurrentPage),mMaxSize,mArchive,0);
-			}//if
-		}//if
-		
+		gotoPage(mCurrentPage-1);
 		return 1;
+	}//func
+	
+	/*--------------------------------------------------------
+	Loading*/
+	private void preloadNext(){
+		String pgPath;
+		for(int i=1; i <= mPreloadSize; i++){
+			if(mCurrentPage+i >= mPageLen) break; //do not preload over the page limit.
+			
+			pgPath = mPageList.get(mCurrentPage+i);
+			if(!mCache.contrainsKey(pgPath)){ //Preload next page if available.
+				System.out.println("Next Page is not cached " + Integer.toString(i));
+				mPageLoader.loadImage(pgPath,mMaxSize,mArchive,0);
+				break;
+			}//if
+		}//for
+	}//func
+	
+	private void loadToImageView(Bitmap bmp){
+		if(mCurrentBmp != null){mCurrentBmp.recycle(); mCurrentBmp = null;}
+		mCurrentBmp = bmp;
+		mImageView.setImageBitmap(mCurrentBmp);
+		if(mCallBack != null) mCallBack.onPageLoaded((bmp != null),mCurrentPage);
 	}//func
 
 	
 	/*--------------------------------------------------------
-	Image Loading*/
+	Page Loader Event, Getting images out of the archive.*/
 	@Override
-	public void onImageLoaded(String errMsg, Bitmap bmp,int imgType){
+	public void onImageLoaded(String errMsg, Bitmap bmp,String imgPath,int imgType){		
 		if(errMsg != null){
 			Toast.makeText(mContext,errMsg,Toast.LENGTH_LONG).show();
 		}//if
 
 		//............................................		
 		//if we have a new image and an old image.
-		if(bmp != null){
-			switch(imgType){
-				case 0:
-					if(mCurrentBmp != null){mCurrentBmp.recycle(); mCurrentBmp = null;}
-					mCurrentBmp = bmp;
-					mImageView.setImageBitmap(mCurrentBmp);
-					if(mCallBack != null) mCallBack.onPageLoaded((bmp != null),mCurrentPage+1);
-					
-					if(mIsPreloading && mCurrentPage+1 < mPageLen){
-						mPageLoader.loadImage((PageLoader.CallBack)this,mPageList.get(mCurrentPage+1),mMaxSize,mArchive,1);
-					}//if
-					
-					break;
-				case 1:
-					if(mNextBmp != null){mNextBmp.recycle(); mNextBmp = null;}
-					mNextBmp = bmp;
-					
-					if(mIsPreloading && mCurrentPage-1 >= 0 && mPrevBmp == null){ //Preload prev if not available.
-						mPageLoader.loadImage((PageLoader.CallBack)this,mPageList.get(mCurrentPage-1),mMaxSize,mArchive,2);
-					}//if
-					
-					break;
-				case 2:
-					if(mPrevBmp != null){mPrevBmp.recycle(); mPrevBmp = null;}
-					mPrevBmp = bmp;
-					break;
-			}//switch
-		}//if
+		if(bmp != null){	
+			//Load Image Right Away.
+			if(imgType == 1) loadToImageView(bmp);
 
-		//............................................
-		bmp = null;
+			mCache.putBitmap(imgPath,bmp);
+			if(imgType == 0){ bmp.recycle(); bmp = null;} //No need to load right away, clear out memory.			
+			
+			bmp = null;
+			preloadNext(); //Check if we can preload the next page
+		}//if
 	}//func
+	
+	
+	/*--------------------------------------------------------
+	Task to load images out of the cache folder.*/
+	protected class CacheLoader extends AsyncTask<Integer,Void,Bitmap>{
+		protected Bitmap doInBackground(Integer... params){
+			int pgIndex = params[0].intValue();
+		
+			String pgPath = mPageList.get(mCurrentPage);
+			Bitmap bmp = mCache.getBitmap(pgPath);
+			
+			if(bmp == null){ //Not in cache, Call Page Loader
+				mPageLoader.loadImage(pgPath,mMaxSize,mArchive,1);
+			}else{//Pass Image to View and check preloading the next image.
+				preloadNext();
+				return bmp;
+			}//if
+			
+			return null;
+		}//func
+		
+		@Override
+		protected void onPostExecute(Bitmap bmp){
+			if(bmp != null){ loadToImageView(bmp); bmp = null; }
+		}//func
+	}//cls
+
 }//cls

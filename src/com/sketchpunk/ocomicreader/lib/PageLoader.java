@@ -17,16 +17,17 @@ import android.os.Debug;
 
 public class PageLoader{
 	public static interface CallBack{
-		public void onImageLoaded(String errMsg,Bitmap bmp,int imgType);
+		public void onImageLoaded(String errMsg,Bitmap bmp,String imgPath,int imgType);
 	}//interface
 	
     /*========================================================
 	*/
 	private LoadingTask mTask;
+	private CallBack mCallBack;
 	
-	public PageLoader(){}//func
+	public PageLoader(CallBack cb){ mCallBack = cb; }//func
 	
-	public void loadImage(CallBack callback,String imgPath,int maxSize,iComicArchive archive,int imgType){
+	public void loadImage(String imgPath,int maxSize,iComicArchive archive,int imgType){
 		if(mTask != null){
 			if(mTask.getStatus() != AsyncTask.Status.FINISHED){
 				if(mTask.imagePath != null && !mTask.imagePath.equals(imgPath)) mTask.cancel(true);
@@ -34,7 +35,7 @@ public class PageLoader{
 			}//if
 		}//if
 
-		mTask = new LoadingTask(callback,archive,imgType);
+		mTask = new LoadingTask(mCallBack,archive,imgType);
 		mTask.execute(maxSize,imgPath);
 	}//func
 	
@@ -161,7 +162,7 @@ public class PageLoader{
 			int w = bmp.getWidth(), h = bmp.getHeight();
 			if(w > maxTextureSize || h > maxTextureSize){
 				System.gc(); //This does help, even though this is frowned upon.
-				Bitmap newBmp = null, oldBmp = null;
+				Bitmap newBmp = null;
 				
 				float fScale = maxTextureSize / (float) Math.max(w,h);
 				int newWidth = Math.round(w * fScale)
@@ -175,15 +176,16 @@ public class PageLoader{
 				
 				for(int i=0; i < 2; i++){				
 					try{
-						if(i == 0) newBmp = Bitmap.createBitmap(newWidth,newHeight,bmp.getConfig()); //RGB_565 //Use less memory Config.ARGB_8888
-						else newBmp = Bitmap.createBitmap(newWidth,newHeight,Config.RGB_565);
+						if(i == 0) newBmp = Bitmap.createBitmap(newWidth,newHeight,bmp.getConfig());
+						else newBmp = Bitmap.createBitmap(newWidth,newHeight,Config.RGB_565); //Use less memory
 
 						Canvas canvas = new Canvas(newBmp);
 						canvas.setMatrix(scaleMatrix);
 						canvas.drawBitmap(bmp,0,0,paint);
 
-						oldBmp = bmp; bmp = newBmp; //Swap Bitmaps
-						oldBmp.recycle(); oldBmp = null; newBmp = null; //Cleanup
+						bmp.recycle();	//Clean up original bitmap
+						bmp = newBmp;	//Save reference of new image to the return image
+						newBmp = null;	//Clear reference so it doesn't get recycled.					
 						break;
 					}catch(OutOfMemoryError e){
 						System.out.println("Out of memory rescaling");
@@ -203,7 +205,6 @@ public class PageLoader{
 				}//if
 				
 				if(newBmp != null){newBmp.recycle(); newBmp = null; }
-				if(oldBmp != null){oldBmp.recycle(); oldBmp = null; }
 			}//if
 			
 			return bmp;
@@ -224,7 +225,7 @@ public class PageLoader{
 			//When done loading the image, alert parent
 			if(mCallBack != null){
 				final CallBack cb = mCallBack.get();
-				if(cb != null) cb.onImageLoaded(errMsg,bmp,mImgType);
+				if(cb != null) cb.onImageLoaded(errMsg,bmp,imagePath,mImgType);
 			}//if
 		}//func
 	}//cls

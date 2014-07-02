@@ -1,0 +1,5 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+	<Preference android:key="funcClearLib" android:title="Clear Library" android:summary="This will delete the entire database and cover cache."/>
+	<Preference android:key="funcClearSeries" android:title="Clear Series" android:summary="This will reset all the series name in the database to unknown. If you click sync, series name will be updated."/>
+	<Preference android:key="funcClearCover" android:title="Clear Cover Cache" android:summary="This will delete all the covers generated for each comic. If you click sync, covers will be recreated."/>    
+</PreferenceScreen>

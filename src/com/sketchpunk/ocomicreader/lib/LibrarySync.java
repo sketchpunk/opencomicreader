@@ -194,7 +194,7 @@ public class LibrarySync implements Runnable{
     	if(stack.size() == 0) return ComicLibrary.STATUS_NOSETTINGS;
 
     	//............................................
-    	SQLiteStatement sql = mDb.compileStatement("INSERT INTO ComicLibrary(isCoverExists,pgCount,pgRead,pgCurrent,comicID,title,path,series) VALUES(0,0,0,1,?,?,?,?);");    	
+    	SQLiteStatement sql = mDb.compileStatement("INSERT INTO ComicLibrary(isCoverExists,pgCount,pgRead,pgCurrent,comicID,title,path,series) VALUES(0,0,0,0,?,?,?,?);");    	
     	mDb.beginTransaction();
 
     	while(!stack.isEmpty()){

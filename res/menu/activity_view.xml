@@ -1,6 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/mnu_exit" android:title="Back to Library" android:orderInCategory="100" android:showAsAction="never"/>
-    <item android:id="@+id/mnu_goto" android:title="Goto Page" android:orderInCategory="100" android:showAsAction="never"/>
+    <item android:id="@+id/mnu_goto" android:title="Go to Page" android:orderInCategory="100" android:showAsAction="never"/>
     <item android:id="@+id/mnu_scale" android:title="Scale" android:orderInCategory="100" android:showAsAction="never">
         <menu>
             <group android:checkableBehavior="single">
@@ -20,4 +20,6 @@
             </group>
         </menu>
 	</item>
+	<item android:id="@+id/mnu_readright" android:title="Read Left to Right" android:orderInCategory="100" android:checkable="true"/>
+	<item android:id="@+id/mnu_immersive" android:title="Turn on Immservice Mode" android:orderInCategory="100" android:showAsAction="never"/>
 </menu>

@@ -14,6 +14,7 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
@@ -178,8 +179,10 @@ public class ComicPageView extends View implements GestureDetector.OnGestureList
 	@Override
 	public void onSizeChanged(int w,int h,int oldw,int oldh){
 		super.onSizeChanged(w, h, oldw, oldh);
+		
 		mViewSize.oWidth = (float)w;
 		mViewSize.oHeight = (float)h;
+		
 		resetScale();
 	}//func
 	
@@ -194,10 +197,79 @@ public class ComicPageView extends View implements GestureDetector.OnGestureList
 		return true;
 	}//func
 	
+	public int getStatusBarHeight() {
+	      int result = 0;
+	      int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+	      if (resourceId > 0) {
+	          result = getResources().getDimensionPixelSize(resourceId);
+	          //Math.ceil(result * getContext().getResources().getDisplayMetrics().density);
+	      }
+	      System.out.println("Statusbar " + Integer.toString(result));
+	      return result;
+	}
+	
+	public int getNavBarHeight() {
+	      int result = 0;
+	      int resourceId = getResources().getIdentifier("navigation_bar_height", "dimen", "android");
+	      if (resourceId > 0) {
+	          result = getResources().getDimensionPixelSize(resourceId);
+	          //Math.ceil(result * getContext().getResources().getDisplayMetrics().density);
+	      }
+	      System.out.println("Nav " + Integer.toString(result));
+	      return result;
+	
+		/*
+		Resources resources = context.getResources();
+		int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
+		if (resourceId > 0) {
+		    return resources.getDimensionPixelSize(resourceId);
+		}
+		return 0;
+		*/
+	}
+	
 	@Override
 	protected void onDraw(Canvas canvas){
 		if(mBitmap != null){
-			if(! mBitmap.isRecycled()) canvas.drawBitmap(mBitmap,mMatrix,mPaint);
+			/*
+			Rect rec = new Rect();
+			
+			float scale = this.getHeight() / (float)mBitmap.getHeight(); //Main scale, be it up or down.
+			float scale2 = mBitmap.getHeight() / (float)this.getHeight(); //The opposite scale direction.
+			System.out.println(scale);
+			//System.out.println(this.getWidth() * scale);
+			System.out.println(this.getWidth());
+			System.out.println(this.getHeight());
+			System.out.println(mBitmap.getWidth());
+			System.out.println(mBitmap.getHeight());
+			int scaleWidth = Math.round(mBitmap.getWidth() * scale);
+			
+			rec.top = 0;
+			rec.left = 0;Math.round(this.getWidth() * scale2);
+			rec.right = mBitmap.getWidth(); //Math.round(this.getWidth() * scale);
+			rec.bottom = mBitmap.getHeight();//Math.round(mBitmap.getHeight() * scale);
+
+			if(scaleWidth > this.getWidth()) rec.right = rec.left + Math.round(this.getWidth() * scale2); //testing extra 20 pixel crop
+			
+			System.out.println(scaleWidth);
+			System.out.println(rec.right);
+			System.out.println(mBitmap.getWidth());
+			System.out.println("done");
+			Rect rec2 = new Rect();
+			
+			rec2.top = 0;
+			rec2.left = 0;
+			rec2.right = this.getWidth(); //Math.round(mBitmap.getWidth() * scale); previous scaled for smaller then view port width
+			rec2.bottom = this.getHeight();
+			//mMatrix.mapRect(rec,rec2);
+			//canvas.drawBitmap(mBitmap,rec,rec2,mPaint);
+			
+			if(! mBitmap.isRecycled())  canvas.drawBitmap(mBitmap,rec,rec2,mPaint);
+			*/
+			if(! mBitmap.isRecycled()){ canvas.drawBitmap(mBitmap,mMatrix,mPaint); System.out.println("Bitmap Drawn"); }
+			else System.out.println("Bitmap is Recycled");
+		}else{
+			System.out.println("Bitmap is null");
 		}//if
 	}//func	
 

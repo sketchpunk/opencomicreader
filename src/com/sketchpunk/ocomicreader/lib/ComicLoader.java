@@ -11,6 +11,7 @@ import sage.io.DiskCache;
 
 import com.sketchpunk.ocomicreader.lib.PageLoader.CallBack;
 import com.sketchpunk.ocomicreader.ui.ComicPageView;
+import com.sketchpunk.ocomicreader.ui.GestureImageView;
 
 import android.app.Activity;
 import android.content.Context;
@@ -24,7 +25,7 @@ import android.view.Display;
 import android.widget.Toast;
 
 public class ComicLoader implements PageLoader.CallBack{//LoadImageView.OnImageLoadingListener,LoadImageView.OnImageLoadedListener{
-	public static interface CallBack{
+	public static interface ComicLoaderListener{
 		public void onPageLoaded(boolean isSuccess,int currentPage);
 	}//interface
 	
@@ -56,42 +57,28 @@ public class ComicLoader implements PageLoader.CallBack{//LoadImageView.OnImageL
 	
 	private int mPageLen, mCurrentPage, mMaxSize;
 	private int mPreloadSize = 2;
-	private CallBack mCallBack;
-	private boolean mIsPreloading; //todo, might get rid of this. Preloading no longer needs to be a setting.
+	private ComicLoaderListener mListener;
 
-	private ComicPageView mImageView;
+	private GestureImageView mImageView;
 	private PageLoader mPageLoader;
 	private iComicArchive mArchive;
 	private List<String> mPageList;
-	private Bitmap mCurrentBmp=null;
 	private Context mContext = null;
 	private DiskCache mCache;
 	private CacheLoader mCacheLoader = null;
 
-	public ComicLoader(Context context,ComicPageView o){
+	public ComicLoader(Context context,GestureImageView o){
 		mImageView = o;
 		mContext = context;
 		mCache = new DiskCache(context,"comicLoader",CACHE_SIZE);
 
 	    //............................
 		//Save Callback
-		if(context instanceof CallBack) mCallBack = (CallBack)context;
-		
-		//............................
-		//Get perferences TODO REMOVE
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-		mIsPreloading = prefs.getBoolean("preLoading",false);
-		
-		//............................
-		//Get the window size TODO is this needed?
-		Display display = ((Activity)context).getWindowManager().getDefaultDisplay();
-		Point size = new Point();
-		display.getSize(size);
-		//mMaxSize = (float)Math.max((float)size.x,(float)size.y);
-		
+		if(context instanceof ComicLoaderListener) mListener = (ComicLoaderListener)context;
+
+		//............................		
 		mPageLoader = new PageLoader(this);
 		mCurrentPage = -1;
-		
 		
 		//TODO: Save this to settings, shouldn't have to get this value every time.
         android.opengl.GLSurfaceView mGLView = new android.opengl.GLSurfaceView(context);
@@ -115,12 +102,7 @@ public class ComicLoader implements PageLoader.CallBack{//LoadImageView.OnImageL
 			
 			if(mArchive != null){ mArchive.close(); mArchive = null; }//if
 
-			if(mCurrentBmp != null){ //Todo remove it
-				mImageView.setImageBitmap(null);
-				mCurrentBmp.recycle(); mCurrentBmp = null;
-			}//if
-
-			mCallBack = null;
+			mListener = null;
 			mImageView = null;
 			
 			mCache.clear();
@@ -154,13 +136,6 @@ public class ComicLoader implements PageLoader.CallBack{//LoadImageView.OnImageL
 
 		return false;
 	}//func
-
-	public void refreshOrientation(){ //todo check if this function is needed.
-		Display display = ((Activity)mContext).getWindowManager().getDefaultDisplay();
-		Point size = new Point();
-		display.getSize(size);
-		//mMaxSize = (float)Math.max((float)size.x,(float)size.y);
-	}//func
 	
 	/*--------------------------------------------------------
 	Paging Methods*/
@@ -170,7 +145,7 @@ public class ComicLoader implements PageLoader.CallBack{//LoadImageView.OnImageL
 		//Check if the cache loader is busy with a request.
 		if(mCacheLoader != null && mCacheLoader.getStatus() != AsyncTask.Status.FINISHED){
 			System.out.println("Still Loading from Cache.");
-			return 0;
+			return -1;
 		}//if
 
 		//Load from cache on a thread.
@@ -183,15 +158,12 @@ public class ComicLoader implements PageLoader.CallBack{//LoadImageView.OnImageL
 	
 	public int nextPage(){
 		if(mCurrentPage >= mPageLen) return 0;
-		gotoPage(mCurrentPage+1);
-		return 1;
+		return gotoPage(mCurrentPage+1);
 	}//func
 	
 	public int prevPage(){
 		if(mCurrentPage-1 < 0) return 0;
-		
-		gotoPage(mCurrentPage-1);
-		return 1;
+		return gotoPage(mCurrentPage-1);
 	}//func
 	
 	/*--------------------------------------------------------
@@ -211,10 +183,8 @@ public class ComicLoader implements PageLoader.CallBack{//LoadImageView.OnImageL
 	}//func
 	
 	private void loadToImageView(Bitmap bmp){
-		if(mCurrentBmp != null){mCurrentBmp.recycle(); mCurrentBmp = null;}
-		mCurrentBmp = bmp;
-		mImageView.setImageBitmap(mCurrentBmp);
-		if(mCallBack != null) mCallBack.onPageLoaded((bmp != null),mCurrentPage);
+		mImageView.setImageBitmap(bmp);
+		if(mListener != null) mListener.onPageLoaded((bmp != null),mCurrentPage);
 	}//func
 
 	

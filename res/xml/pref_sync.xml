@@ -1,0 +1,20 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+	<sage.pref.FolderPref android:key="syncfolder1" android:title="Sync Folder 1" android:defaultValue=""/>
+	<sage.pref.FolderPref android:key="syncfolder2" android:title="Sync Folder 2" android:defaultValue=""/>
+	
+	<CheckBoxPreference android:key="syncImgFlds" android:title="Include Image Folders" android:defaultValue="false"
+        android:summary="If you have folders full of images, each folder can be synced into the library as a comic."/>
+	
+	<CheckBoxPreference android:key="syncFldForSeries" android:title="Use Parent folder name as series name" android:defaultValue="false"
+        android:summary="Disable the ability to determine the series based on file path and file name. (Need to clear series name and resync when changing this setting.)"/>
+	
+	<sage.pref.NumPickerPref android:key="syncCoverHeight"
+	    android:title="Cover Thumb Cache Height" android:summary="Set the height the cache image will be saved. Improve thumb quality on hi-res screens (Limit 200-500)"
+	    android:positiveButtonText="Save" android:negativeButtonText="Cancel"
+	    android:defaultValue="300" minnum="200" maxnum="500"/>
+			
+	<sage.pref.NumPickerPref android:key="syncCoverQuality"
+	    android:title="Cover Thumb Cache Quality" android:summary="Jpeg compression level, the lower it is will save space but lower quality of the image. Good for space limited devices. (Limit 1-100)"
+	    android:positiveButtonText="Save" android:negativeButtonText="Cancel"
+	    android:defaultValue="70" minnum="1" maxnum="100"/>
+</PreferenceScreen>

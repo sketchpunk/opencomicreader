@@ -68,10 +68,13 @@ public class LibraryActivity extends FragmentActivity
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         //....................................
 		//setup background
+		RelativeLayout mLayouts = (RelativeLayout) findViewById(R.id.MainLayout);
+		mLayouts.setBackgroundColor(Color.parseColor("#FF000000"));
+		
+		/*
 		switch(Integer.parseInt(prefs.getString("libraryBackground","0"))){
 			case 0: //Solid
-				RelativeLayout mLayouts = (RelativeLayout) findViewById(R.id.MainLayout);
-				mLayouts.setBackgroundColor(Color.parseColor("#FF000000"));
+				
 			break;
 			case 1: //opaque 
 				RelativeLayout mLayouto = (RelativeLayout) findViewById(R.id.MainLayout);
@@ -85,7 +88,7 @@ public class LibraryActivity extends FragmentActivity
 				getWindow().setBackgroundDrawable(wallpaperDrawable);
 			break;
 		}//switch
-
+		*/
 		//....................................
 		mBtnSync = (Button)findViewById(R.id.btnSync);
 		mBtnSync.setOnClickListener(this);
@@ -113,6 +116,7 @@ public class LibraryActivity extends FragmentActivity
         mSpFilter.setSelection(mGridView.getFilterMode());
         
         //....................................
+        //int barHeight = ((RelativeLayout)findViewById(R.id.topBar)).getHeight();
         mGridView.init();
         registerForContextMenu(mGridView); //Route event from Activity to View
 	}//func

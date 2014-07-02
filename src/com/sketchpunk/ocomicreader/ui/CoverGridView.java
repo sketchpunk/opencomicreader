@@ -1,4 +1,4 @@
-package com.sketchpunk.ocomicreader.ui;
+package com.sketchpunk.ocomicreader.ui; 
 
 import sage.adapter.SqlCursorAdapter;
 import sage.data.SqlCursorLoader;
@@ -52,9 +52,10 @@ public class CoverGridView extends GridView implements
 	private int mFilterMode = 0;
 	private String mSeriesFilter = "";
 	
-	private int mThumbHeight = 180;
-	private int mThumbPadding = 60;
-	private int mGridPadding = 60;
+	private int mTopPadding = 130; //TODO: get the proper bar height to make this work.
+	private int mThumbHeight = 600;
+	private int mThumbPadding = 0;
+	private int mGridPadding = 0;
 	private int mGridColNum = 2;
 
 	private boolean mIsFirstRun = true;
@@ -68,10 +69,10 @@ public class CoverGridView extends GridView implements
 		//Get Preferences
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.getContext());
 		try{
-			this.mGridColNum =		prefs.getInt("libraryColCnt",2);
-			this.mGridPadding =		prefs.getInt("libraryPadding",60);
-			this.mThumbPadding =	prefs.getInt("libraryCoverPad",60);
-			this.mThumbHeight =		prefs.getInt("libraryCoverHeight",180);
+			this.mGridColNum =		prefs.getInt("libColCnt",2);
+			this.mGridPadding =		prefs.getInt("libPadding",0);
+			this.mThumbPadding =	prefs.getInt("libCoverPad",3);
+			this.mThumbHeight =		prefs.getInt("libCoverHeight",800);
 		}catch(Exception e){
 			System.err.println("Error Loading Library Prefs " + e.getMessage());
 		}//try
@@ -85,7 +86,7 @@ public class CoverGridView extends GridView implements
         mAdapter.setCallback(this);
         
         this.setNumColumns(mGridColNum);
-        this.setPadding(mGridPadding,mGridPadding+40,mGridPadding,mGridPadding);
+        this.setPadding(mGridPadding,mGridPadding+mTopPadding,mGridPadding,mGridPadding);
         this.setHorizontalSpacing(mThumbPadding);
         this.setVerticalSpacing(mThumbPadding);
         this.setAdapter(mAdapter);
@@ -252,6 +253,7 @@ public class CoverGridView extends GridView implements
    			int pTotal = c.getInt(mAdapter.getColIndex("pgCount"));
    			if(pTotal > 0){
    				float pRead = c.getFloat(mAdapter.getColIndex("pgRead"));
+   				if(pRead > 0) pRead += 1; //Page index start at 0, so if the user has already passed the first page, Add value to it to be able to get 100%, else leave it so it can get 0%
    				progress = (pRead / ((float)pTotal));
    			}//if
    			

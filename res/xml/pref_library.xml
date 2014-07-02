@@ -1,0 +1,25 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+	<ListPreference android:key="libraryFilter"  android:title="Library Filter" android:defaultValue="0"
+          android:summary="Set the default of how the library should be filtered on launch."
+          android:entries="@array/libraryFilter" android:entryValues="@array/libraryFilter_v"/>
+
+	<sage.pref.NumPickerPref android:key="libColCnt"
+	    android:title="Column Count" android:summary="How many covers show display across the screen (Limit 1-6)"
+	    android:positiveButtonText="Save" android:negativeButtonText="Cancel"
+	    android:defaultValue="2" minnum="1" maxnum="6"/>
+
+	<sage.pref.NumPickerPref android:key="libPadding"
+	    android:title="Library Padding" android:summary="How much padding around the screen to use (Limit 0-100)"
+	    android:positiveButtonText="Save" android:negativeButtonText="Cancel"
+	    android:defaultValue="0" minnum="0" maxnum="100"/>
+			
+	<sage.pref.NumPickerPref android:key="libCoverPad"
+	    android:title="Cover Padding" android:summary="How much padding space around comics (Limit 0-100)"
+	    android:positiveButtonText="Save" android:negativeButtonText="Cancel"
+	    android:defaultValue="3" minnum="0" maxnum="100"/>
+	
+	<sage.pref.NumPickerPref android:key="libCoverHeight"
+	    android:title="Cover Height" android:summary="How tall should covers be (Limit 150-1000)"
+	    android:positiveButtonText="Save" android:negativeButtonText="Cancel"
+	    android:defaultValue="800" minnum="150" maxnum="1000"/>
+</PreferenceScreen>

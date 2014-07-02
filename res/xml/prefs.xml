@@ -26,10 +26,6 @@
            android:summary="Set the default of how the library should be filtered on launch."
            android:entries="@array/libraryFilter" android:entryValues="@array/libraryFilter_v"/>
 		
-		<ListPreference android:key="libraryBackground"  android:title="Library Background" android:defaultValue="0"
-           android:summary="How do you want the background of the library to be."
-           android:entries="@array/BgSelection" android:entryValues="@array/BgSelection_v"/>
-		
 		<sage.pref.NumPickerPref android:key="libraryColCnt"
 		    android:title="Column Count" android:summary="How many covers show display across the screen (Limit 1-6)"
 		    android:positiveButtonText="Save" android:negativeButtonText="Cancel"

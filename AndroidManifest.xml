@@ -27,7 +27,7 @@
             android:name="com.sketchpunk.ocomicreader.ViewActivity"
             android:configChanges="orientation|screenSize"
             android:label="Open Comic Reader"
-            android:theme="@style/CustomTheme" >
+            android:theme="@android:style/Theme.Holo.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.EDIT" />
@@ -62,12 +62,12 @@
         </activity>
         <activity
             android:name="com.sketchpunk.ocomicreader.PrefActivity"
-            android:theme="@android:style/Theme.Black.NoTitleBar" >
+            android:theme="@android:style/Theme.Holo.NoActionBar" >
         </activity>
         <activity
             android:name="com.sketchpunk.ocomicreader.LibraryActivity"
             android:label="Open Comic Reader"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            android:theme="@android:style/Theme.Holo.NoActionBar">
             
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

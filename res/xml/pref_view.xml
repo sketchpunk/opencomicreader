@@ -1,0 +1,21 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    <ListPreference android:key="screenOrientation"  android:title="Screen Orientation" android:defaultValue="0"
+          android:summary="Set the orientation of the image on the screen."
+          android:entries="@array/screenOrientation" android:entryValues="@array/screenOrientation_v"/>
+
+    <ListPreference android:key="scaleMode"  android:title="Scale Mode" android:defaultValue="1"
+          android:summary="Set how the image should scale depending on the screen."
+          android:entries="@array/scaleMode" android:entryValues="@array/scaleMode_v"/>
+    
+	<CheckBoxPreference android:key="showPageNum" android:title="Show Page Number" android:defaultValue="true"
+        android:summary="When switching pages, a toast alert appears in the corner telling you what page you're on."/>
+    
+	<CheckBoxPreference android:key="fullScreen" android:title="Fullscreen" android:defaultValue="false"
+        android:summary="Display comics at full screen. Tap and hold for options to exit when there is no virtual buttons."/>
+    
+    <CheckBoxPreference android:key="keepScreenOn" android:title="Keep Screen On" android:defaultValue="true"
+        android:summary="Prevent screen from timing out while viewing a comic."/>
+    
+    <CheckBoxPreference android:key="readToRight" android:title="Read Left to Right" android:defaultValue="true"
+        android:summary="If you wish to read Right to Left (Mangas), Uncheck this option and all the controls will be reversed."/>
+</PreferenceScreen>

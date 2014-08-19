@@ -281,7 +281,7 @@ public class GestureImageView extends View
 	public boolean onSingleTapConfirmed(MotionEvent e){
 		float x = e.getX();
 
-		System.out.format("TAP %f %d %n",x,this.getWidth());
+		//System.out.format("TAP %f %d %n",x,this.getWidth());
 		
 		if(x >= this.getWidth()-mTapBoundary){
 			invokeGesture(TAPRIGHT);

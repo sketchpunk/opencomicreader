@@ -50,7 +50,6 @@ public class DiskCache{
 	public void clear(){
 		try {
 			mCache.delete();
-			System.out.println("ClearCache");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -70,8 +69,6 @@ public class DiskCache{
 		DiskLruCache.Editor editor = null;
 		OutputStream oStream = null;
 		boolean isOk = false;
-		System.out.println("PUTBITMAP " + key);
-		System.out.println(hashKey(key));
 		try{
 			editor = mCache.edit(hashKey(key));
 			if(editor == null) return false;

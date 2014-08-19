@@ -34,7 +34,7 @@
 	    	android:layout_centerInParent="true">
    	        
    	    	<Spinner android:id="@+id/spFilter"
-	   			android:layout_width="150dp"
+	   			android:layout_width="140dp"
 	   			android:layout_height="wrap_content"
 	   			style="@android:style/Widget.Holo.Spinner"/>
 
@@ -60,6 +60,7 @@
    	        android:layout_width="wrap_content"
    	        android:layout_height="wrap_content">
    	        
+   	        <!-- 
    	        <Button android:id="@+id/btnSync"
    	            android:paddingLeft="16dp"
    	            android:paddingRight="8dp"
@@ -69,15 +70,16 @@
 				android:layout_height="wrap_content"
 				android:text="Sync"
 				android:drawableLeft="@android:drawable/ic_menu_add" />
-   	        
+   	         -->
+
    	        <Button android:id="@+id/btnMenu"
    	            android:paddingLeft="8dp"
-   	            android:paddingRight="16dp"
+   	            android:paddingRight="0dp"
    	            android:textColor="@android:color/white"
    	            android:background="?android:selectableItemBackground"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:text="Menu"
+				android:text=""
 				android:drawableLeft="@android:drawable/ic_menu_more" />
    	        
    	    </LinearLayout>

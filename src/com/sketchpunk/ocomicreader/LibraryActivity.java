@@ -90,8 +90,8 @@ public class LibraryActivity extends FragmentActivity
 		}//switch
 		*/
 		//....................................
-		mBtnSync = (Button)findViewById(R.id.btnSync);
-		mBtnSync.setOnClickListener(this);
+		//mBtnSync = (Button)findViewById(R.id.btnSync);
+		//mBtnSync.setOnClickListener(this);
 		mBtnMenu = (Button)findViewById(R.id.btnMenu);
 		mBtnMenu.setOnClickListener(this);
 		
@@ -173,6 +173,13 @@ public class LibraryActivity extends FragmentActivity
 	     	case R.id.menu_about:
 	     		sage.ui.Dialogs.About(this,this.getText(R.string.app_about));
 	     		break;
+	     	
+	     	//................................................
+	     	case R.id.menu_sync:
+		 		sage.ui.Dialogs.ConfirmBox(this,"Sync Library","Are you sure you want sync the library?",new DialogInterface.OnClickListener(){
+					public void onClick(DialogInterface dialog,int id){startSync();}
+				});
+	     		break;
 		}//switch
 		return true;
 	}//func
@@ -208,12 +215,16 @@ public class LibraryActivity extends FragmentActivity
 	@Override
 	public void onClick(View v){
 		 switch(v.getId()){
+		 
+		 /*
 		 	case R.id.btnSync: 
 		 		sage.ui.Dialogs.ConfirmBox(this,"Sync Library","Are you sure you want sync the library?",new DialogInterface.OnClickListener(){
 					public void onClick(DialogInterface dialog,int id){startSync();}
 				});
 		 		
 		 		break;
+		 		
+		 */
 		 	case R.id.btnMenu: 
 		 		//openOptionsMenu();
 		 		PopupMenu popup = new PopupMenu(this, v);

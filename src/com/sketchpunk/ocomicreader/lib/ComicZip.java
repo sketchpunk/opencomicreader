@@ -59,11 +59,11 @@ public class ComicZip implements iComicArchive{
 			String itmName;
 			ZipEntry itm;
 			List<String> pageList = new ArrayList<String>();
-			Enumeration entries = mArchive.entries();
+			Enumeration<? extends ZipEntry> entries = mArchive.entries();
 
 			//..................................
 			while(entries.hasMoreElements()) {
-				itm = (ZipEntry)entries.nextElement();
+				itm = entries.nextElement();
 				if(itm.isDirectory()) continue;
 				
 				itmName = itm.getName().toLowerCase(Locale.getDefault());
@@ -74,7 +74,7 @@ public class ComicZip implements iComicArchive{
 
 			//..................................
 			if(pageList.size() > 0){
-				Collections.sort(pageList); //Sort the page names
+				Collections.sort(pageList, PageComparator.COMPARATOR); //Sort the page names
 				return pageList;
 			}//if
 		}catch(Exception e){

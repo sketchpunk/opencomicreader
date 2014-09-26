@@ -53,7 +53,7 @@ public class ComicFld implements iComicArchive{
 		
 			//..................................
 			if(pageList.size() > 0){
-				Collections.sort(pageList); //Sort the page names
+				Collections.sort(pageList, PageComparator.COMPARATOR); //Sort the page names
 				return pageList;
 			}//if
 		}catch(Exception e){

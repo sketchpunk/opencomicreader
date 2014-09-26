@@ -51,7 +51,7 @@ public class ComicRar implements iComicArchive{
 		List<String> pageList = Arrays.asList(ary);
 
 		if(pageList.size() > 0){
-			Collections.sort(pageList); //Sort the page names
+			Collections.sort(pageList, PageComparator.COMPARATOR); //Sort the page names
 			return pageList;
 		}//if
 

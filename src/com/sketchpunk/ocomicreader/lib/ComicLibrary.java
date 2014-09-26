@@ -135,6 +135,27 @@ public class ComicLibrary{
 		return true;
 	}//func
     
+	public static String getListSql(int filterMode,String seriesName,int nextPos){
+		String sql = "SELECT comicID [_id],title,pgCount,pgRead,isCoverExists,path,pgCurrent FROM ComicLibrary";
+		
+   		switch(filterMode){
+   			case 2: sql += " WHERE pgRead=0 ORDER BY title"; break; //Unread;
+   			case 3: sql += " WHERE pgRead > 0 AND pgRead < pgCount-1 ORDER BY title"; break;//Progress
+   			case 4: sql += " WHERE pgRead >= pgCount-1 ORDER BY title"; break;//Read
+   			case 1: //Series
+   				if(seriesName.isEmpty()){
+   	       			sql = "SELECT min(comicID) [_id],series [title],sum(pgCount) [pgCount],sum(pgRead) [pgRead],min(isCoverExists) [isCoverExists],count(comicID) [cntIssue] FROM ComicLibrary GROUP BY series ORDER BY series";
+   	       		}else{
+   	       			sql = "SELECT comicID [_id],title,pgCount,pgRead,isCoverExists,path,pgCurrent FROM ComicLibrary WHERE series = '"+seriesName.replace("'", "''")+"' ORDER BY title";
+   	       		}//if
+   			break;
+   		}//switch
+   		
+   		//When finishing reading a comic, get the next comic on the list to view.
+   		if(nextPos > -1) sql += " LIMIT 1 OFFSET " + Integer.toString(nextPos);
+   		
+       	return sql;
+	}//func
     
 	/*========================================================
 	Manage Covers*/

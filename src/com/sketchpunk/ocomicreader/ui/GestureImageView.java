@@ -1,15 +1,18 @@
 package com.sketchpunk.ocomicreader.ui;
 
+import sage.Util;
 import sage.listener.MultiFingerGestureDetector;
 
 import com.sketchpunk.ocomicreader.lib.ImgTransform;
 import com.sketchpunk.ocomicreader.ui.ComicPageView.CallBack;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.GestureDetector;
@@ -49,7 +52,7 @@ public class GestureImageView extends View
 	private Context mContext = null;
 	
 	private Paint mPaint = new Paint(Paint.FILTER_BITMAP_FLAG); //make scaled image less pixelated
-	private int mTapBoundary = 75; //Left/Right boundary to denote page change
+	private int mTapBoundary = 35; //Left/Right boundary to denote page change
 	
 	private ScaleGestureDetector mScaleGesture;
 	private GestureDetector mGesture;
@@ -72,7 +75,9 @@ public class GestureImageView extends View
 		mContext = context;
 		if(context instanceof OnImageGestureListener) mListener = (OnImageGestureListener)context;
 		
-		//mTapBoundary = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,mTapBoundary,this.getResources().getDisplayMetrics());
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        mTapBoundary = prefs.getInt("viewTapBoundary",35);
+		mTapBoundary = Util.dp2px(mTapBoundary,context); //Get the proper Pixel Size depending on density.
 	}//func
 	
 	@Override

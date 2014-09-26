@@ -200,7 +200,7 @@ public class PageLoader{
 						errMsg = "Error Rescaling Image for Display : " + e.getMessage();
 						System.out.println(errMsg);
 						
-						bmp.recycle(); bmp = null;
+						if(bmp != null && !bmp.isRecycled()){ bmp.recycle(); bmp = null; }
 					}//if
 				}//if
 				

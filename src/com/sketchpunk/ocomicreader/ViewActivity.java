@@ -5,13 +5,12 @@ import java.util.Map;
 import sage.data.Sqlite;
 import sage.ui.ActivityUtil;
 
+import com.sketchpunk.ocomicreader.lib.ComicLibrary;
 import com.sketchpunk.ocomicreader.lib.ComicLoader;
 import com.sketchpunk.ocomicreader.lib.ImgTransform;
-import com.sketchpunk.ocomicreader.ui.ComicPageView;
 import com.sketchpunk.ocomicreader.ui.GestureImageView;
 
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.annotation.SuppressLint;
@@ -19,17 +18,14 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.view.ContextMenu;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View;
-import android.view.ViewTreeObserver;
-import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Toast;
 
 //http://developer.android.com/training/displaying-bitmaps/cache-bitmap.html#disk-cache
@@ -46,28 +42,33 @@ public class ViewActivity extends Activity implements
 	private GestureImageView mImageView; //Main display of image
 	private ComicLoader mComicLoad; //Object that will manage streaming and scaling images out of the archive file
 	private String mComicID = "";
+	private int mComicPos	= -1;
+	private int mFilterMode	= -1;
+	private String mSeriesName = "";	
 	private Sqlite mDb = null;
 	private Toast mToast;
+	private boolean isVolumePressed = false;
 	private Boolean mPref_ShowPgNum = true;
 	private Boolean mPref_ReadRight = true;
 	private Boolean mPref_FullScreen = true;
+	private Boolean mPref_PanOnTap = true;
 
 	//------------------------------------------------------------------------
-	//Activty Events		
+	//Activity Events		
     @SuppressLint("ShowToast")
 	@Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         
-        //TODO Make sure scale is set from Preferences
         //........................................
         //Get preferences
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-    	mPref_ShowPgNum =	prefs.getBoolean("showPageNum",true);
-    	mPref_FullScreen =	prefs.getBoolean("fullScreen",true);
-    	mPref_ReadRight =	prefs.getBoolean("readToRight",true);
-    	int scaleMode =		Integer.parseInt(prefs.getString("scaleMode","3")); 
+    	mPref_ShowPgNum		= prefs.getBoolean("showPageNum",true);
+    	mPref_FullScreen	= prefs.getBoolean("fullScreen",true);
+    	mPref_ReadRight		= prefs.getBoolean("readToRight",true);
+    	mPref_PanOnTap		= prefs.getBoolean("viewPanOnPaging",true);
+    	int scaleMode		= Integer.parseInt(prefs.getString("scaleMode","3")); 
     	
     	//Set activity features
     	int features = 0;
@@ -97,8 +98,20 @@ public class ViewActivity extends Activity implements
     	if(uri != null){
     		filePath = Uri.decode(uri.toString().replace("file://",""));
     	}else{
-    		Bundle b = intent.getExtras(); 
-            mComicID = b.getString("comicid");
+            //....................................
+            //Load state of filter from Bundle
+            if(savedInstanceState != null){
+            	mComicID	= savedInstanceState.getString("mComicID");
+                mComicPos	= savedInstanceState.getInt("mComicPos");
+                mFilterMode	= savedInstanceState.getInt("mFilterMode");
+    			mSeriesName	= savedInstanceState.getString("mSeriesName");
+            }else{//if no state, load in bundle
+        		Bundle b = intent.getExtras(); 
+                mComicID	= b.getString("comicid");
+                mComicPos	= b.getInt("comicpos",-1);
+                mFilterMode	= b.getInt("filtermode",-1);
+    			mSeriesName	= b.getString("seriesname");
+            }//if
 
             mDb = new Sqlite(this);
             mDb.openRead();
@@ -113,7 +126,7 @@ public class ViewActivity extends Activity implements
         mImageView.setPanState( (mPref_ReadRight)?ImgTransform.INITPAN_LEFT:ImgTransform.INITPAN_RIGHT );
         mImageView.setScaleMode(scaleMode);
         registerForContextMenu(mImageView);
-        
+
         //.........................................
         mComicLoad = new ComicLoader(this,mImageView);
         if(mComicLoad.loadArchive(filePath)){
@@ -158,7 +171,42 @@ public class ViewActivity extends Activity implements
 		//});
 	}//func
 
+    @Override
+    protected void onSaveInstanceState(Bundle siState){
+    	//Save the state of the filters so
+    	siState.putString("mComicID",mComicID);
+    	siState.putInt("mComicPos",mComicPos);
+    	siState.putInt("mFilterMode",mFilterMode);
+    	siState.putString("mSeriesName",mSeriesName);
+    	
+    	super.onSaveInstanceState(siState);
+    }//func 
 
+	@Override
+	public boolean dispatchKeyEvent(KeyEvent e){
+		//Allow the volume buttons to page through the comic book.
+		//Keep track of up/down actions because if the user holds the volume button down, it keeps going to the next page.
+		//So to switch pages a user has to do a complete down up press of the volume buttons.
+		switch(e.getKeyCode()){
+			case KeyEvent.KEYCODE_VOLUME_UP:
+				if(e.getAction() == KeyEvent.ACTION_DOWN && !isVolumePressed){
+					onImageGesture(GestureImageView.TAPLEFT); 
+					isVolumePressed = true; 
+				}else if(e.getAction() == KeyEvent.ACTION_UP) isVolumePressed = false;
+				return true;
+				
+			case KeyEvent.KEYCODE_VOLUME_DOWN:
+				if(e.getAction() == KeyEvent.ACTION_DOWN && !isVolumePressed){
+					onImageGesture(GestureImageView.TAPRIGHT);
+					isVolumePressed = true;
+				}else if(e.getAction() == KeyEvent.ACTION_UP) isVolumePressed = false;
+				return true;
+		}//switch
+
+		return super.dispatchKeyEvent(e);
+	}//func
+
+	
 	//------------------------------------------------------------------------
 	// Menu Events
     @Override
@@ -258,16 +306,20 @@ public class ViewActivity extends Activity implements
 			//.....................................
 			//Tap gesture progresses the panel, then changes pages.
 			case GestureImageView.TAPLEFT:
-				shifted = (!mPref_ReadRight)? mImageView.shiftLeft() : mImageView.shiftRight_rev();
-				if(shifted) return;
+				if(mPref_PanOnTap){
+					shifted = (!mPref_ReadRight)? mImageView.shiftLeft() : mImageView.shiftRight_rev();
+					if(shifted) return;
+				}//if
 
 				if(this.mPref_ShowPgNum) showToast("Loading Page...",1);
 				status = (mPref_ReadRight)? mComicLoad.prevPage() : mComicLoad.nextPage();
 			break;
 			
 			case GestureImageView.TAPRIGHT:
-				shifted = (mPref_ReadRight)? mImageView.shiftRight() : mImageView.shiftLeft_rev();
-				if(shifted) return;
+				if(mPref_PanOnTap){
+					shifted = (mPref_ReadRight)? mImageView.shiftRight() : mImageView.shiftLeft_rev();
+					if(shifted) return;
+				}//if
 				
 				if(this.mPref_ShowPgNum) showToast("Loading Page...",1);
 				status = (mPref_ReadRight)? mComicLoad.nextPage() : mComicLoad.prevPage();
@@ -289,7 +341,13 @@ public class ViewActivity extends Activity implements
 		}//switch
 		
 		if(status == 0){
-			String msg = (direction == 0 && mPref_ReadRight || direction == 1 && !mPref_ReadRight)?"FIRST PAGE" : "LAST PAGE";
+			boolean isFirst = (direction == 0 && mPref_ReadRight || direction == 1 && !mPref_ReadRight);
+			String msg = "";
+			
+			if(!isFirst && mComicPos >= 0 && mFilterMode != -1){
+				msg = (loadNextComic())?"NEXT COMIC LOADED IN":"LAST PAGE OF FINAL COMIC ON LIST";
+			}else msg = (isFirst)?"FIRST PAGE" : "LAST PAGE";
+
 			showToast(msg,1);
 		}else if(status == -1) showToast("Still Preloading, Try again in one second",1);
 	}//func
@@ -301,5 +359,27 @@ public class ViewActivity extends Activity implements
 		mToast.setText(msg);
 		mToast.setDuration(duration);
 		mToast.show();
+	}//func
+
+	private boolean loadNextComic(){
+		if(mComicPos == -1 || mFilterMode == -1) return false;
+		if(mDb == null){ mDb = new Sqlite(this); mDb.openRead(); }
+        Map<String,String> dbData = mDb.scalarRow(ComicLibrary.getListSql(mFilterMode,mSeriesName,mComicPos+1),null);
+        
+        String filePath = dbData.get("path");
+        if(filePath == null || filePath.isEmpty()) return false;
+        
+        showToast("Loading Next Comic...",1);
+        mComicLoad.closeComic();
+        
+        if(mComicLoad.loadArchive(filePath)){
+        	int currentPage = Math.max(Integer.parseInt(dbData.get("pgCurrent")),0);
+        	mComicPos++; //Next issue loaded on the list, save its position.
+        	mComicID = dbData.get("_id");
+        	mComicLoad.gotoPage(currentPage); //Continue where user left off
+        	return true;
+        }//if
+
+		return false;
 	}//func
 }//cls

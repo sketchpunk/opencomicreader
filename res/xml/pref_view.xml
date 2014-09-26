@@ -7,6 +7,14 @@
           android:summary="Set how the image should scale depending on the screen."
           android:entries="@array/scaleMode" android:entryValues="@array/scaleMode_v"/>
     
+    <sage.pref.NumPickerPref android:key="viewTapBoundary"
+	    android:title="Tap Boundary" android:summary="Set the size of the left/right boundary to activate page turning (Limit 10-200)"
+	    android:positiveButtonText="Save" android:negativeButtonText="Cancel"
+	    android:defaultValue="35" minnum="10" maxnum="200"/>
+    
+    <CheckBoxPreference android:key="viewPanOnPaging" android:title="Pan on Paging" android:defaultValue="true"
+        android:summary="The page pans when tapping to next/prev page till the end before going to the next page."/>
+    
 	<CheckBoxPreference android:key="showPageNum" android:title="Show Page Number" android:defaultValue="true"
         android:summary="When switching pages, a toast alert appears in the corner telling you what page you're on."/>
     

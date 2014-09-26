@@ -52,6 +52,15 @@ public class PrefActivity extends PreferenceActivity implements Preference.OnPre
 	   	FuncPreferenceFragment.appendHeader(target);
 	}//func
 	
+	//---------------------------------------------------------------------------------
+	@Override
+	protected boolean isValidFragment(String fragmentName){
+		//if(MYFRAGMENT.class.getName().equals(fragmentName)) return true;
+		//TODO, Quick fix for an error someone is having. Its security in 4.4. Return true is lazy and will allow Fragment Injection Attacks.
+		//So fix this to test if the fragment name is one of the fragments this activity loads.
+		return true;
+	}//func
+	
 	
 	//---------------------------------------------------------------------------------
 	//HELPER

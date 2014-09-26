@@ -7,6 +7,7 @@ import java.util.Locale;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import sage.Util;
 import sage.io.DiskCache;
 
 import com.sketchpunk.ocomicreader.lib.PageLoader.CallBack;
@@ -79,13 +80,16 @@ public class ComicLoader implements PageLoader.CallBack{//LoadImageView.OnImageL
 		//............................		
 		mPageLoader = new PageLoader(this);
 		mCurrentPage = -1;
-		
-		//TODO: Save this to settings, shouldn't have to get this value every time.
-        android.opengl.GLSurfaceView mGLView = new android.opengl.GLSurfaceView(context);
-		int[] maxTextureSize = new int[1];
-		GLES10.glGetIntegerv(GL10.GL_MAX_TEXTURE_SIZE, maxTextureSize, 0);
-		
-		mMaxSize = maxTextureSize[0]; //MaxTextureSize
+
+		//............................
+		//Get Max Texture Size. If not saved in settings, save it so we only need to call it once.
+		Settings settings = new Settings(context);
+		mMaxSize = settings.getInt("maxTextureSize");
+		if(mMaxSize == 0){
+			mMaxSize = Util.getMaximumTextureSize();
+			if(mMaxSize == 0) mMaxSize = 1024;
+			else settings.saveValue("maxTextureSize",mMaxSize);
+		}//if
 	}//func
 
 	/*--------------------------------------------------------
@@ -110,6 +114,19 @@ public class ComicLoader implements PageLoader.CallBack{//LoadImageView.OnImageL
 			return true;
 		}catch(Exception e){
 			System.out.println("Error closing archive " + e.getMessage());
+		}//func
+
+		return false;
+	}//func
+	
+	public boolean closeComic(){
+		try{
+			mPageLoader.cancelTask();
+			if(mArchive != null){ mArchive.close(); mArchive = null; }//if
+			mCurrentPage = -1;
+			return true;
+		}catch(Exception e){
+			System.out.println("Error closing comic " + e.getMessage());
 		}//func
 
 		return false;

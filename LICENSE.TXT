@@ -4,6 +4,6 @@ Open Comic Reader : https://github.com/sketchpunk/opencomicreader
 
 1. Source can only be used in open source projects.
 2. Source can not be used in other applications or recompiled as an application that is sold or ad supported.
-3. Any Header, license comments in source files must be left unchanged.
+3. Any header, and/or license comments in source files, must be left unchanged.
 4. Source can be modified and shared, but never used for malware or data collecting purposes.
-5. Application can put on app stores apon requesting permission. Must contain link back to project.
+5. Application can be put on app stores upon requesting permission. Must contain link back to project.

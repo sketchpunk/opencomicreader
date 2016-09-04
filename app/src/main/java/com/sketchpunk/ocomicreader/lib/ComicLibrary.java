@@ -70,7 +70,7 @@ public class ComicLibrary{
 	public static String getThumbCachePath(){
 		//........................................
 		//Make sure the cache folder exists.
-		String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/OpenComicReader/thumbs/";
+		String path = Settings.AppFld("thumbs");
 		File file = new File(path);
         if(!file.exists()) file.mkdirs();
 

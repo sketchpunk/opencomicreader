@@ -2,7 +2,10 @@ package com.sketchpunk.ocomicreader.lib;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Environment;
 import android.preference.PreferenceManager;
+
+import com.sketchpunk.ocomicreader.R;
 
 public class Settings{
 	private final SharedPreferences mPref;
@@ -26,4 +29,11 @@ public class Settings{
         mEditor.putInt(sName,sValue);
         mEditor.commit();
     }//func
+
+
+	public static String AppFld(String append){
+		String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + R.string.fld_name + "/";
+		if(append != null && !append.isEmpty()) path += append + "/";
+		return path;
+	}
 }//cls

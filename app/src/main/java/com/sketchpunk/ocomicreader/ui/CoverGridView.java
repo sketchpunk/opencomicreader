@@ -9,6 +9,7 @@ import sage.ui.ProgressCircle;
 import com.sketchpunk.ocomicreader.R;
 import com.sketchpunk.ocomicreader.ViewActivity;
 import com.sketchpunk.ocomicreader.lib.ComicLibrary;
+import com.sketchpunk.ocomicreader.lib.Settings;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -78,8 +79,8 @@ public class CoverGridView extends GridView implements
 		}//try
 
 		//....................................
-		//set values
-        mThumbPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/OpenComicReader/thumbs/";
+		//set values TODO Folder Path should be in String
+        mThumbPath = Settings.AppFld("thumbs");// Environment.getExternalStorageDirectory().getAbsolutePath() + "/OpenComicReader/thumbs/";
 		
         mAdapter = new SqlCursorAdapter(this.getContext());
         mAdapter.setItemLayout(R.layout.listitem_library);

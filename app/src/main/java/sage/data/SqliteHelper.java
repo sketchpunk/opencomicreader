@@ -3,7 +3,7 @@ package sage.data;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-
+//TODO can delete
 public class SqliteHelper extends SQLiteOpenHelper{
 	/*========================================================
 	*/

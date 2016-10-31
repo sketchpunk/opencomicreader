@@ -7,6 +7,8 @@ import android.preference.PreferenceManager;
 
 import com.sketchpunk.ocomicreader.R;
 
+import sage.SageApp;
+
 public class Settings{
 	private final SharedPreferences mPref;
 	private SharedPreferences.Editor mEditor = null;
@@ -32,7 +34,7 @@ public class Settings{
 
 
 	public static String AppFld(String append){
-		String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + R.string.fld_name + "/";
+		String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + SageApp.getContext().getString(R.string.fld_name) + "/";
 		if(append != null && !append.isEmpty()) path += append + "/";
 		return path;
 	}

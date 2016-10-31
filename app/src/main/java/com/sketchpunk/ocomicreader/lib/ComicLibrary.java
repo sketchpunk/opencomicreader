@@ -15,18 +15,18 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 
+import com.sketchpunk.ocomicreader.data.MainDB;
+//TODO can probaly remove alot of the context since the new sqlite com uses the app context.
 public class ComicLibrary{
 	private static Thread mWorkerThread = null;
 	
-	/*========================================================
-	status constants*/
+	//region status constants
 	public final static int STATUS_NOSETTINGS = 1;
 	public final static int STATUS_COMPLETE = 0;
 	public final static String UKNOWN_SERIES = "-unknown-";
+	//endregion
 
-	
-	/*========================================================
-	Thread safe messaging*/
+	//region Thread safe messaging
 	//Object used to handle threadsafe call backs
 	public static Handler EventHandler = new Handler(){ public void handleMessage(Message msg){ ComicLibrary.onHandle(msg); }};
 	
@@ -46,12 +46,11 @@ public class ComicLibrary{
     			if(cb != null) cb.onSyncComplete(data.getInt("status"));
     			mWorkerThread = null;
     		break;
-    	}//switch
-    }//func
-	
+    	}
+    }
+	//endregion
     
-	/*========================================================
-	sync methods*/
+	//region Static methods
     public static boolean startSync(Context context){
 		//...............................
     	if(mWorkerThread != null){
@@ -62,11 +61,8 @@ public class ComicLibrary{
 		mWorkerThread = new Thread(new LibrarySync(context));
 		mWorkerThread.start();
 		return true;
-    }//func
-    
-    
-	/*========================================================
-	Static Methods*/
+    }
+
 	public static String getThumbCachePath(){
 		//........................................
 		//Make sure the cache folder exists.
@@ -82,15 +78,13 @@ public class ComicLibrary{
         }//if
         
         return path;
-	}//func
-	
+	}
+	//endregion
 
-	/*========================================================
-	Manage Comics*/
+	//region Manage Comics
 	public static void removeComic(Context context,String id,boolean delComic){
     	File file;
-    	sage.data.Sqlite db = new sage.data.Sqlite(context);
-    	db.openWrite();
+    	Sqlite db = new Sqlite(MainDB.get()).openWrite();
     	
     	if(delComic){ //Delete comic from device
     		String comicPath = db.scalar("SELECT path FROM ComicLibrary WHERE comicID = '"+id.replace("'","''")+"';",null);
@@ -107,18 +101,19 @@ public class ComicLibrary{
     	}//if
     	
     	db.close();
-    }//func
-    
-    public static void setComicProgress(Context context,String id,int state,boolean applySeries){
-    	String sql = "UPDATE ComicLibrary SET ";
-    	sql += (state == 0)?"pgRead=0,pgCurrent=0":"pgRead=pgCount,pgCurrent=pgCount"; //0-Reset or 1-Mark as Read.
-    	
-    	if(applySeries) sql += " WHERE series in (SELECT series FROM ComicLibrary WHERE comicID = '"+id+"')";
-    	else sql += " WHERE comicID = '"+id+"'";
-    	
-    	sage.data.Sqlite.execSql(context,sql,null);
-    }//func
-	
+    }
+
+    public static void setComicProgress(String[] idAry,int state,boolean applySeries){
+		String idList = sage.data.StringUtil.join(idAry,"','","'","'"),
+			sql = "UPDATE ComicLibrary SET " + ((state == 0)?"pgRead=0,pgCurrent=0":"pgRead=pgCount,pgCurrent=pgCount"); //0-Reset or 1-Mark as Read.
+
+    	if(applySeries) sql += " WHERE series in (SELECT series FROM ComicLibrary WHERE comicID in ("+idList+"))";
+    	else sql += " WHERE comicID in ("+idList+")";
+
+		Sqlite db = new Sqlite(MainDB.get()).openWrite();
+		db.execSql(sql,null);
+    }
+
 	public static boolean clearAll(Context context){
 		//................................................
 		//Delete thumbnails
@@ -131,9 +126,10 @@ public class ComicLibrary{
 		}//if
 
 		//................................................
-		Sqlite.delete(context,"ComicLibrary","",null);
+		Sqlite db = new Sqlite(MainDB.get()).openWrite();
+		db.delete("ComicLibrary","",null);
 		return true;
-	}//func
+	}
     
 	public static String getListSql(int filterMode,String seriesName,int nextPos){
 		String sql = "SELECT comicID [_id],title,pgCount,pgRead,isCoverExists,path,pgCurrent FROM ComicLibrary";
@@ -144,9 +140,9 @@ public class ComicLibrary{
    			case 4: sql += " WHERE pgRead >= pgCount-1 ORDER BY title"; break;//Read
    			case 1: //Series
    				if(seriesName.isEmpty()){
-   	       			sql = "SELECT min(comicID) [_id],series [title],sum(pgCount) [pgCount],sum(pgRead) [pgRead],min(isCoverExists) [isCoverExists],count(comicID) [cntIssue] FROM ComicLibrary GROUP BY series ORDER BY series";
+   	       			sql = "SELECT min(comicID) [_id],series [title], series, sum(pgCount) [pgCount],sum(pgRead) [pgRead],min(isCoverExists) [isCoverExists],count(comicID) [cntIssue] FROM ComicLibrary GROUP BY series ORDER BY series";
    	       		}else{
-   	       			sql = "SELECT comicID [_id],title,pgCount,pgRead,isCoverExists,path,pgCurrent FROM ComicLibrary WHERE series = '"+seriesName.replace("'", "''")+"' ORDER BY title";
+   	       			sql = "SELECT comicID [_id],title,pgCount,pgRead,isCoverExists,path,pgCurrent,series FROM ComicLibrary WHERE series = '"+seriesName.replace("'", "''")+"' ORDER BY title";
    	       		}//if
    			break;
    		}//switch
@@ -155,10 +151,10 @@ public class ComicLibrary{
    		if(nextPos > -1) sql += " LIMIT 1 OFFSET " + Integer.toString(nextPos);
    		
        	return sql;
-	}//func
-    
-	/*========================================================
-	Manage Covers*/
+	}
+    //endregion
+
+	//region Manage Covers
 	public static boolean createThumb(int coverHeight,int coverQuality,iComicArchive archive,String coverPath,String saveTo){
 		boolean rtn = false;
 		InputStream iStream = archive.getItemInputStream(coverPath);
@@ -219,56 +215,60 @@ public class ComicLibrary{
 		}//if
 		
 		//................................................
-		sage.data.Sqlite.execSql(context,"UPDATE ComicLibrary SET isCoverExists=0",null);
-	}//func
+		Sqlite db = new Sqlite(MainDB.get()).openWrite();
+		db.execSql("UPDATE ComicLibrary SET isCoverExists=0",null);
+	}
+	//endregion
 	
-	
-	/*========================================================
-	Manage Series*/
+	//region Manage Series
 	public static void setSeriesName(Context context,String comicID,String seriesName){
 		ContentValues cv = new ContentValues();
 		cv.put("series",seriesName);
-		sage.data.Sqlite.update(context,"ComicLibrary",cv,"comicID=?",new String[]{comicID});
-	}//func
+
+		Sqlite db = new Sqlite(MainDB.get()).openWrite();
+		db.update("ComicLibrary",cv,"comicID=?",new String[]{comicID});
+	}
 	
 	public static void renameSeries(Context context,String oldSeries,String newSeries){
 		ContentValues cv = new ContentValues();
 		cv.put("series",newSeries);
-		sage.data.Sqlite.update(context,"ComicLibrary",cv,"series=?",new String[]{oldSeries});
-	}//func
+
+		Sqlite db = new Sqlite(MainDB.get()).openWrite();
+		db.update("ComicLibrary",cv,"series=?",new String[]{oldSeries});
+	}
 	
 	public static void clearSeries(Context context){
 		ContentValues cv = new ContentValues();
 		cv.put("series",ComicLibrary.UKNOWN_SERIES);
-		sage.data.Sqlite.update(context,"ComicLibrary",cv,null,null);
-	}//func
 
+		Sqlite db = new Sqlite(MainDB.get()).openWrite();
+		db.update("ComicLibrary",cv,null,null);
+	}
+	//endregion
 	
-	//************************************************************
-	// Support Objects
-	//************************************************************
+	//region Support Objects
 	public static interface SyncCallback{
 		public void onSyncProgress(String txt);
 		public void onSyncComplete(int status);
-	}//interface
-	
+	}
+
     protected static class ComicFindFilter implements java.io.FileFilter{
     	private final String[] mExtList = new String[]{".zip",".cbz",".rar",".cbr"};
     	public boolean accept(File o){
     		if(o.isDirectory()) return true; //Want to allow folders
     		for(String extension:mExtList){
     			if(o.getName().toLowerCase(Locale.getDefault()).endsWith(extension)) return true;
-    		}//for
+    		}
     		return false;
-    	}//func
-    }//cls
-	
+    	}
+    }
+
     protected static class ThumbFindFilter implements java.io.FileFilter{
     	public boolean accept(File o){
     		if(o.isDirectory()) return false;
     		else if(o.getName().toLowerCase(Locale.getDefault()).endsWith(".jpg")) return true;
     		return false;
-    	}//func
-    }//cls
-    
-}//cls
+    	}
+    }
+	//endregion
+}

@@ -1,6 +1,7 @@
 package sage;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.util.TypedValue;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -68,4 +69,6 @@ public class Util{
         egl.eglTerminate(display);
         return maximumTextureSize;
     }
+
+	public static boolean isDebugging(){ return ( 0 != ( SageApp.getContext().getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE ) ); }
 }//cls

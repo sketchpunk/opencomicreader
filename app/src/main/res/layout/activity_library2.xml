@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical">
+
+    <!--Want to have the title bar over the drawer, so Linear Layout and toolbar at the root, then drawerlayout will hold the content and sidebar.-->
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
+        android:minHeight="?attr/actionBarSize"
+        android:background="@color/background_material_dark"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"/>
+
+    <sage.ui.DrawerLayoutExt
+        android:id="@+id/drawer_layout" android:layout_width="match_parent" android:layout_height="match_parent">
+
+        <fragment android:id="@+id/mainFragment" android:name="com.sketchpunk.ocomicreader.activities.LibraryFragment"
+                  android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"/>
+
+        <!-- DRAWER-->
+        <LinearLayout android:orientation="vertical" android:layout_gravity="start" android:layout_width="200dp" android:background="@android:color/white" android:layout_height="match_parent" android:clickable="true">
+            <fragment android:id="@+id/filterFragment" android:name="com.sketchpunk.ocomicreader.activities.FilterFragment"
+                android:layout_width="match_parent" android:layout_height="match_parent"/>
+        </LinearLayout>
+    </sage.ui.DrawerLayoutExt>
+
+</LinearLayout>

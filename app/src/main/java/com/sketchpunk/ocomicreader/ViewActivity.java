@@ -5,6 +5,7 @@ import java.util.Map;
 import sage.data.Sqlite;
 import sage.ui.ActivityUtil;
 
+import com.sketchpunk.ocomicreader.data.MainDB;
 import com.sketchpunk.ocomicreader.lib.ComicLibrary;
 import com.sketchpunk.ocomicreader.lib.ComicLoader;
 import com.sketchpunk.ocomicreader.lib.ImgTransform;
@@ -113,8 +114,7 @@ public class ViewActivity extends Activity implements
     			mSeriesName	= b.getString("seriesname");
             }//if
 
-            mDb = new Sqlite(this);
-            mDb.openRead();
+            mDb = new Sqlite(MainDB.get()).openRead();
             Map<String,String> dbData = mDb.scalarRow("SELECT path,pgCurrent FROM ComicLibrary WHERE comicID = ?",new String[]{mComicID});
             
             filePath = dbData.get("path");
@@ -150,7 +150,7 @@ public class ViewActivity extends Activity implements
 	@Override
 	public void onResume(){
 		super.onResume();
-        if(mDb == null) mDb = new Sqlite(this);
+        if(mDb == null) mDb = new Sqlite(MainDB.get());
         if(!mDb.isOpen()) mDb.openRead();
         
         if(mPref_FullScreen) ActivityUtil.setImmersiveModeOn(this);
@@ -276,7 +276,7 @@ public class ViewActivity extends Activity implements
 		if(isSuccess){ //Save reading progress.
 			if(mComicID != ""){
 				//Make sure database is open
-				if(mDb == null) mDb = new Sqlite(this);
+				if(mDb == null) mDb = new Sqlite(MainDB.get());
 				if(!mDb.isOpen()) mDb.openRead();
 	
 				//Save update
@@ -363,7 +363,7 @@ public class ViewActivity extends Activity implements
 
 	private boolean loadNextComic(){
 		if(mComicPos == -1 || mFilterMode == -1) return false;
-		if(mDb == null){ mDb = new Sqlite(this); mDb.openRead(); }
+		if(mDb == null){ mDb = new Sqlite(MainDB.get()).openRead(); }
         Map<String,String> dbData = mDb.scalarRow(ComicLibrary.getListSql(mFilterMode,mSeriesName,mComicPos+1),null);
         
         String filePath = dbData.get("path");

@@ -207,9 +207,9 @@ public class LibraryActivity extends FragmentActivity
 	public void onBackPressed(){
 		//Override back press to make it easy to back out of series filter.
 		if(mGridView.isSeriesFiltered() && mGridView.getSeriesFilter() != ""){
-			mGridView.setSeriesFilter("");
-			mGridView.refreshData();
-		}else super.onBackPressed();
+		mGridView.setSeriesFilter("");
+		mGridView.refreshData();
+	}else super.onBackPressed();
 	}//func
 
 	@Override

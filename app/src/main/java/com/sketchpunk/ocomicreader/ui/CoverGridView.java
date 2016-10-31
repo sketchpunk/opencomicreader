@@ -8,6 +8,7 @@ import sage.ui.ProgressCircle;
 
 import com.sketchpunk.ocomicreader.R;
 import com.sketchpunk.ocomicreader.ViewActivity;
+import com.sketchpunk.ocomicreader.data.MainDB;
 import com.sketchpunk.ocomicreader.lib.ComicLibrary;
 import com.sketchpunk.ocomicreader.lib.Settings;
 
@@ -95,8 +96,7 @@ public class CoverGridView extends GridView implements
         
         //....................................
         //Start DB and Data Loader
-        mDb = new Sqlite(this.getContext());
-        mDb.openRead(); 
+        mDb = new Sqlite(MainDB.get()).openRead();
         
         getLoaderManager().initLoader(0,null,this); //Handles the CursorLoader
 	}//func
@@ -141,7 +141,7 @@ public class CoverGridView extends GridView implements
    	Cursor Loader : LoaderManager.LoaderCallbacks<Cursor>*/
    	public void refreshData(){ 
    		if(!mIsFirstRun){
-   	        if(mDb == null) mDb = new Sqlite(this.getContext());
+   	        if(mDb == null) mDb = new Sqlite(MainDB.get());
    	        if(!mDb.isOpen()) mDb.openRead();
    	  
    			getLoaderManager().restartLoader(0,null,this);
@@ -354,7 +354,7 @@ public class CoverGridView extends GridView implements
 					@Override
 					public void onClick(DialogInterface dialog, int which){
 						boolean applySeries = (isSeriesFiltered() && mSeriesFilter.isEmpty());
-						ComicLibrary.setComicProgress(context,comicID,0,applySeries);
+						//ComicLibrary.setComicProgress(context,comicID,0,applySeries);
 						refreshData();
 					}
 				});
@@ -371,7 +371,7 @@ public class CoverGridView extends GridView implements
 					@Override
 					public void onClick(DialogInterface dialog, int which){
 						boolean applySeries = (isSeriesFiltered() && mSeriesFilter.isEmpty());
-						ComicLibrary.setComicProgress(context,comicID,1,applySeries);
+						//ComicLibrary.setComicProgress(context,comicID,1,applySeries);
 						refreshData();
 					}
 				});
@@ -382,16 +382,17 @@ public class CoverGridView extends GridView implements
 			case 4://Edit Serial
 				String sSeries = "";
 				if(seriesName == null || seriesName.isEmpty()){
-					sSeries = Sqlite.scalar(getContext(), "SELECT Series FROM ComicLibrary WHERE comicID = ?", new String[]{comicID});
+					Sqlite db = new Sqlite(MainDB.get()).openRead();
+					sSeries = db.scalar("SELECT Series FROM ComicLibrary WHERE comicID = ?", new String[]{comicID});
 				}else sSeries = seriesName;
-				
-				
+
+
 				sage.ui.InputDialog inDialog = new sage.ui.InputDialog(this.getContext()
 					,"Edit Series : " + ref.lblTitle.getText().toString(),null,sSeries){
 					@Override
 					public boolean onOk(String txt){
 						if(seriesName == txt) return true;
-							
+
 						if(seriesName != null && !seriesName.isEmpty()) ComicLibrary.renameSeries(getContext(),seriesName,txt);
 						else ComicLibrary.setSeriesName(getContext(), comicID, txt);
 
@@ -399,8 +400,8 @@ public class CoverGridView extends GridView implements
 						return true;
 					}//func
 				};
-				
-				inDialog.show();				
+
+				inDialog.show();
 				break;
 		}//switch
 

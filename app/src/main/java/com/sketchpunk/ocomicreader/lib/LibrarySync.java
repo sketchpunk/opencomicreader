@@ -17,6 +17,7 @@ import android.os.Message;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 
+import com.sketchpunk.ocomicreader.data.MainDB;
 import com.sketchpunk.ocomicreader.lib.ComicLibrary.ComicFindFilter;
 
 public class LibrarySync implements Runnable{
@@ -51,7 +52,7 @@ public class LibrarySync implements Runnable{
 		if(mSyncFld1.isEmpty() && mSyncFld2.isEmpty()){ sendComplete(ComicLibrary.STATUS_NOSETTINGS); return; }//if
 		
 		//.....................................
-		mDb = new Sqlite(mContext); mDb.openWrite();
+		mDb = new Sqlite(MainDB.get()).openWrite();
 		try{
 			if(!mSkipCrawl){
 				crawlComicFiles();

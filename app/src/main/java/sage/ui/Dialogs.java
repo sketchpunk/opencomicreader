@@ -1,8 +1,9 @@
 package sage.ui;
 
 import com.sketchpunk.ocomicreader.R;
+import com.sketchpunk.ocomicreader.lib.ComicLibrary;
 
-import android.app.AlertDialog;
+import android.support.v7.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.text.SpannableString;
@@ -33,11 +34,27 @@ public class Dialogs{
 	
 	public static void ConfirmBox(Context context,String title,String msg,DialogInterface.OnClickListener onOk){
 		AlertDialog.Builder abBuilder = new AlertDialog.Builder(context)
-			.setTitle(title).setMessage(msg)
-			.setNegativeButton("No",null).setPositiveButton("Yes",onOk)
-			.setCancelable(false);
+				.setTitle(title).setMessage(msg)
+				.setNegativeButton("No",null).setPositiveButton("Yes",onOk)
+				.setCancelable(false);
 		abBuilder.show();
-	}//func
+	}
+
+	public static void ConfirmBox(Context context,String title,String msg,DialogInterface.OnClickListener onOk,DialogInterface.OnClickListener onCancel){
+		AlertDialog.Builder abBuilder = new AlertDialog.Builder(context)
+				.setTitle(title).setMessage(msg)
+				.setNegativeButton("No",onCancel).setPositiveButton("Yes",onOk)
+				.setCancelable(false);
+		abBuilder.show();
+	}
+
+	public static void Confirm3(Context c,String title, String msg,String posText,String negText,String neuText,DialogInterface.OnClickListener onPositive,DialogInterface.OnClickListener onNegative,DialogInterface.OnClickListener onNeutral){
+		AlertDialog.Builder abBuilder = new AlertDialog.Builder(c).setTitle(title).setMessage(msg).setCancelable(true);
+		if(posText != null) abBuilder.setPositiveButton(posText,onPositive);
+		if(negText != null) abBuilder.setNegativeButton(negText,onNegative);
+		if(neuText != null) abBuilder.setNeutralButton(neuText,onNeutral);
+		abBuilder.show();
+	}
 	
 	public static void NumPicker(Context context,String title,int iMin,int iMax,int iVal,final DialogInterface.OnClickListener onOk){
 		//Create main UI objects

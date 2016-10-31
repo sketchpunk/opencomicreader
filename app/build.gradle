@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion "21.1.2"
+    compileSdkVersion 24
+    buildToolsVersion "23.0.2"
 
     defaultConfig {
         applicationId "com.sketchpunk.ocomicreader"
-        minSdkVersion 15
-        targetSdkVersion 19
+        minSdkVersion 19
+        targetSdkVersion 24
     }
 
     buildTypes {
@@ -23,5 +23,9 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:19.1.0'
+    compile 'com.android.support:design:24.2.0'
+    compile 'com.android.support:percent:24.2.0'
+    compile 'com.android.support:appcompat-v7:24.2.0'
+    compile 'com.android.support:recyclerview-v7:24.2.0'
+    compile 'com.android.support:support-v4:24.2.0'
 }
